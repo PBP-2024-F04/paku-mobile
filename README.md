@@ -73,3 +73,6 @@ Bagi merchant, PaKu memberikan peluang untuk **menambahkan produk makanan** baru
 
 ## :rocket: Tautan Video
 [Video Promosi PaKu]()
+
+## :rocket: Sheets Tracker Pengerjaan
+[Sheets Tracker Pengerjaan PaKu](https://docs.google.com/spreadsheets/d/1xTAlUjnHdHML4rV8QLKRsMHG14CR71f_xnXhZ5GjmDs/edit?usp=sharing)
