@@ -53,6 +53,21 @@ Bagi merchant, PaKu memberikan peluang untuk **menambahkan produk makanan** baru
 
 ## :bust_in_silhouette: Alur Pengintegrasian dengan _web service_
 
+1. Membuat Endpoint JSON di Proyek Django
+   - Identifikasi kebutuhan data untuk setiap modul yang akan diakses oleh aplikasi Flutter.
+   - Buat endpoint berbasis JSON untuk setiap modul pada proyek Django.
+   - Implementasi mekanisme autentikasi (login dan logout) pada proyek Django untuk mengamankan akses ke endpoint.
+
+2. Mengoptimalkan Endpoint.
+   - Implementasikan pagination untuk menangani data dalam jumlah besar.
+   - Validasi data untuk mencegah input yang tidak valid.
+   - Mengintegrasikan Endpoint di Flutter
+
+3. Menggunakan library `http` untuk mengakses endpoint.
+   - Implementasi mekanisme autentikasi pada proyek Flutter.
+   - Penanganan respons, termasuk kode status HTTP seperti 200, 400, atau 500.
+   - Parsing data JSON menggunakan model berupa class di Dart.
+
 ## :rocket: Tautan APK
 [Deployment PaKu]()
 
