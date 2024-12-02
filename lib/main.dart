@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:paku/screens/landing.dart';
+import 'package:paku/screens/accounts/login.dart';
+// import 'package:paku/screens/landing.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,7 +17,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const LandingPage(),
+      home: const LoginPage(),
     );
   }
 }
