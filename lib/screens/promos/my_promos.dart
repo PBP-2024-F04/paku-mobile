@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:paku/colors.dart'; // Import colors.dart untuk menggunakan TailwindColors
 
-class Promos extends StatelessWidget {
+class MyPromo extends StatelessWidget {
   // Placeholder data untuk promo
   final List<Map<String, dynamic>> promos = [
     {
@@ -34,7 +34,7 @@ class Promos extends StatelessWidget {
                 color: TailwindColors.mossGreenDarker, // Gunakan warna dari TailwindColors
               ),
         ),
-        backgroundColor: TailwindColors.sageDark, // Gunakan warna dari TailwindColors
+        backgroundColor: TailwindColors.yellowDefault, // Gunakan warna dari TailwindColors
       ),
       body: promos.isEmpty
           ? const Center(
@@ -44,7 +44,7 @@ class Promos extends StatelessWidget {
               ),
             )
           : Padding(
-              padding: const EdgeInsets.all(32.0),
+              padding: const EdgeInsets.all(16.0),
               child: ListView.builder(
                 itemCount: promos.length,
                 itemBuilder: (context, index) {
@@ -86,18 +86,12 @@ class Promos extends StatelessWidget {
                                 onPressed: () {
                                   // Belum ada aksi untuk update
                                 },
-                                style: TextButton.styleFrom(
-                                  foregroundColor: TailwindColors.sageDark, // Mengatur warna teks tombol ke SageDarker
-                                ),
                                 child: const Text('Update'),
                               ),
                               TextButton(
                                 onPressed: () {
                                   // Belum ada aksi untuk delete
                                 },
-                                style: TextButton.styleFrom(
-                                  foregroundColor: TailwindColors.sageDark, // Mengatur warna teks tombol ke SageDarker
-                                ),
                                 child: const Text('Delete'),
                               ),
                             ],
