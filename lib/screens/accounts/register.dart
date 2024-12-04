@@ -17,31 +17,19 @@ class _RegisterPageState extends State<RegisterPage> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              Align(
-                alignment: Alignment.center,
-                child: Text(
-                  "Create Account",
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontSize: 40,
-                  ),
-                ),
+              Text(
+                "Create Account",
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.displayMedium,
               ),
-              Align(
-                alignment: Alignment.center,
-                child: Text(
-                  "Buat akun PaKu dan mulai jelajahi Kuliner Palu!",
-                  style: Theme.of(context).textTheme.labelLarge,
-                ),
+              Text(
+                "Buat akun PaKu dan mulai jelajahi Kuliner Palu!",
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.labelLarge,
               ),
               const SizedBox(height: 25),
               ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  elevation: 0,
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  foregroundColor: Theme.of(context).colorScheme.surface,
-                  shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-                  fixedSize: const Size(200, 40),
-                ),
+                style: ElevatedButton.styleFrom(fixedSize: const Size(200, 40)),
                 onPressed: () => Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => const RegisterFoodiePage()),
@@ -50,13 +38,7 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
               const SizedBox(height: 5),
               ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  elevation: 0,
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  foregroundColor: Theme.of(context).colorScheme.surface,
-                  shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-                  fixedSize: const Size(200, 40),
-                ),
+                style: ElevatedButton.styleFrom(fixedSize: const Size(200, 40)),
                 onPressed: () => Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => const RegisterMerchantPage()),

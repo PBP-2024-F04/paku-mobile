@@ -53,14 +53,28 @@ class MyApp extends StatelessWidget {
           labelSmall: GoogleFonts.lato(color: TailwindColors.mossGreenDarker),  // caption
 
           // Display Texts (for larger headers)
-          displayLarge: GoogleFonts.lato(color: TailwindColors.mossGreenDarker), // display1
-          displayMedium: GoogleFonts.lato(color: TailwindColors.mossGreenDarker), // display2
-          displaySmall: GoogleFonts.lato(color: TailwindColors.mossGreenDarker), // display3
+          displayLarge: GoogleFonts.playfairDisplay(color: TailwindColors.mossGreenDarker, fontWeight: FontWeight.w800), // display1
+          displayMedium: GoogleFonts.playfairDisplay(color: TailwindColors.mossGreenDarker, fontWeight: FontWeight.w800), // display2
+          displaySmall: GoogleFonts.playfairDisplay(color: TailwindColors.mossGreenDarker, fontWeight: FontWeight.w800), // display3
         ),
 
         inputDecorationTheme: InputDecorationTheme(
           hintStyle: Theme.of(context).textTheme.bodyMedium,
           border: const OutlineInputBorder(borderRadius: BorderRadius.zero),
+        ),
+
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            elevation: 0,
+            backgroundColor: TailwindColors.sageDark,
+            foregroundColor: Colors.white,
+            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+          ),
+        ),
+
+        appBarTheme: const AppBarTheme(
+          backgroundColor: TailwindColors.sageDark,
+          foregroundColor: Colors.white,
         ),
 
         // Menentukan font (opsional)

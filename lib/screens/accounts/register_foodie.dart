@@ -22,8 +22,6 @@ class _RegisterFoodiePageState extends State<RegisterFoodiePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Register Foodie"),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Theme.of(context).colorScheme.surface,
       ),
       body: Center(
         child: Form(
@@ -37,9 +35,7 @@ class _RegisterFoodiePageState extends State<RegisterFoodiePage> {
                 Text(
                   "Create Foodie Account",
                   textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontSize: 40,
-                  ),
+                  style: Theme.of(context).textTheme.displayMedium,
                 ),
 
                 const SizedBox(height: 30),
@@ -117,13 +113,7 @@ class _RegisterFoodiePageState extends State<RegisterFoodiePage> {
                       },
                     );
                   },
-                  style: ElevatedButton.styleFrom(
-                    elevation: 0,
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    foregroundColor: Theme.of(context).colorScheme.surface,
-                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-                    fixedSize: const Size(200, 40),
-                  ),
+                  style: ElevatedButton.styleFrom(fixedSize: const Size(200, 40)),
                   child: const Text('Register Foodie'),
                 ),
               ],
