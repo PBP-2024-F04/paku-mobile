@@ -2,7 +2,9 @@
 import 'package:flutter/material.dart';
 import 'package:paku/screens/landing.dart';
 import 'package:paku/screens/promos/promos.dart';
-import 'package:paku/colors.dart'; // Import colors.dart
+import 'package:paku/colors.dart'; 
+import 'package:google_fonts/google_fonts.dart';
+
 
 void main() {
   runApp(const MyApp());
@@ -35,30 +37,28 @@ class MyApp extends StatelessWidget {
 
         scaffoldBackgroundColor: TailwindColors.yellowLight,
 
-        textTheme: const TextTheme(
+        textTheme: TextTheme(
           // Body Texts
-          bodyLarge: TextStyle(color: TailwindColors.mossGreenDarker),  // bodyText1
-          bodyMedium: TextStyle(color: TailwindColors.mossGreenDarker), // bodyText2
-          bodySmall: TextStyle(color: TailwindColors.mossGreenDarker),  // bodyText3
+          bodyLarge: GoogleFonts.lato(color: TailwindColors.mossGreenDarker),  // bodyText1
+          bodyMedium: GoogleFonts.lato(color: TailwindColors.mossGreenDarker), // bodyText2
+          bodySmall: GoogleFonts.lato(color: TailwindColors.mossGreenDarker),  // bodyText3
 
           // Title Texts
-          titleLarge: TextStyle(color: TailwindColors.mossGreenDarker),  // headline1
-          titleMedium: TextStyle(color: TailwindColors.mossGreenDarker), // headline2
-          titleSmall: TextStyle(color: TailwindColors.mossGreenDarker),  // headline3
+          titleLarge: GoogleFonts.playfairDisplay(color: TailwindColors.mossGreenDarker, fontWeight: FontWeight.w800),  // headline1
+          titleMedium: GoogleFonts.playfairDisplay(color: TailwindColors.mossGreenDarker, fontWeight: FontWeight.w800), // headline2
+          titleSmall: GoogleFonts.playfairDisplay(color: TailwindColors.mossGreenDarker, fontWeight: FontWeight.w800,),  // headline3
 
           // Label Texts
-          labelLarge: TextStyle(color: TailwindColors.mossGreenDarker),  // subtitle1
-          labelMedium: TextStyle(color: TailwindColors.mossGreenDarker), // subtitle2
-          labelSmall: TextStyle(color: TailwindColors.mossGreenDarker),  // caption
+          labelLarge: GoogleFonts.lato(color: TailwindColors.mossGreenDarker),  // subtitle1
+          labelMedium: GoogleFonts.lato(color: TailwindColors.mossGreenDarker), // subtitle2
+          labelSmall: GoogleFonts.lato(color: TailwindColors.mossGreenDarker),  // caption
 
           // Display Texts (for larger headers)
-          displayLarge: TextStyle(color: TailwindColors.mossGreenDarker), // display1
-          displayMedium: TextStyle(color: TailwindColors.mossGreenDarker), // display2
-          displaySmall: TextStyle(color: TailwindColors.mossGreenDarker), // display3
-
-          // Menentukan font (opsional)
-          // fontFamily: 'YourFontFamily',
+          displayLarge: GoogleFonts.lato(color: TailwindColors.mossGreenDarker), // display1
+          displayMedium: GoogleFonts.lato(color: TailwindColors.mossGreenDarker), // display2
+          displaySmall: GoogleFonts.lato(color: TailwindColors.mossGreenDarker), // display3
         ),
+
 
         // Menentukan font (opsional)
         // fontFamily: 'YourFontFamily',
