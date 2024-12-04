@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:paku/screens/accounts/login.dart';
 import 'package:paku/screens/accounts/register_foodie.dart';
 import 'package:paku/screens/accounts/register_merchant.dart';
 
@@ -44,6 +45,14 @@ class _RegisterPageState extends State<RegisterPage> {
                   MaterialPageRoute(builder: (_) => const RegisterMerchantPage()),
                 ),
                 child: const Text("Buat akun Merchant"),
+              ),
+              const SizedBox(height: 20),
+              TextButton(
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LoginPage())
+                ),
+                child: const Text("Sudah punya akun? Login."),
               ),
             ],
           ),
