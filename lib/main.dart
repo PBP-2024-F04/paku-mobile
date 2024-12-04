@@ -58,6 +58,10 @@ class MyApp extends StatelessWidget {
           displaySmall: GoogleFonts.lato(color: TailwindColors.mossGreenDarker), // display3
         ),
 
+        inputDecorationTheme: InputDecorationTheme(
+          hintStyle: Theme.of(context).textTheme.bodyMedium,
+          border: const OutlineInputBorder(borderRadius: BorderRadius.zero),
+        ),
 
         // Menentukan font (opsional)
         // fontFamily: 'YourFontFamily',

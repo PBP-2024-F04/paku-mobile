@@ -22,93 +22,112 @@ class _RegisterFoodiePageState extends State<RegisterFoodiePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Register Foodie"),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.surface,
       ),
-      body: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
+      body: Center(
+        child: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
 
-              TextFormField(
-                decoration: InputDecoration(
-                  hintText: "Username",
-                  labelText: "Username",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5.0),
+                Text(
+                  "Create Foodie Account",
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontSize: 40,
                   ),
                 ),
-                onChanged: (String? value) => setState(() => _username = value!),
-              ),
 
-              TextFormField(
-                decoration: InputDecoration(
-                  hintText: "Password",
-                  labelText: "Password",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5.0),
+                const SizedBox(height: 30),
+        
+                TextFormField(
+                  decoration: const InputDecoration(
+                    hintText: "Username",
+                    labelText: "Username",
                   ),
+                  onChanged: (String? value) => setState(() => _username = value!),
                 ),
-                obscureText: true,
-                onChanged: (String? value) => setState(() => _password1 = value!),
-              ),
 
-              TextFormField(
-                decoration: InputDecoration(
-                  hintText: "Password Confirmation",
-                  labelText: "Password Confirmation",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5.0),
+                const SizedBox(height: 10),
+        
+                TextFormField(
+                  decoration: const InputDecoration(
+                    hintText: "Password",
+                    labelText: "Password",
                   ),
+                  obscureText: true,
+                  onChanged: (String? value) => setState(() => _password1 = value!),
                 ),
-                obscureText: true,
-                onChanged: (String? value) => setState(() => _password2 = value!),
-              ),
 
-              TextFormField(
-                decoration: InputDecoration(
-                  hintText: "Full Name",
-                  labelText: "Full Name",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5.0),
+                const SizedBox(height: 10),
+        
+                TextFormField(
+                  decoration: const InputDecoration(
+                    hintText: "Password Confirmation",
+                    labelText: "Password Confirmation",
                   ),
+                  obscureText: true,
+                  onChanged: (String? value) => setState(() => _password2 = value!),
                 ),
-                onChanged: (String? value) => setState(() => _fullName = value!),
-              ),
+        
+                const SizedBox(height: 10),
 
-              ElevatedButton(
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        title: const Text('Register Foodie'),
-                        content: SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Username: $_username'),
-                              Text('Password: $_password1'),
-                              Text('Password Confirmation: $_password2'),
-                              Text('Full Name: $_fullName'),
-                            ],
+                TextFormField(
+                  decoration: const InputDecoration(
+                    hintText: "Full Name",
+                    labelText: "Full Name",
+                  ),
+                  onChanged: (String? value) => setState(() => _fullName = value!),
+                ),
+
+                const SizedBox(height: 25),
+        
+                ElevatedButton(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: const Text('Register Foodie'),
+                          content: SingleChildScrollView(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Username: $_username'),
+                                Text('Password: $_password1'),
+                                Text('Password Confirmation: $_password2'),
+                                Text('Full Name: $_fullName'),
+                              ],
+                            ),
                           ),
-                        ),
-                        actions: [
-                          TextButton(
-                            child: const Text('OK'),
-                            onPressed: () {
-                              Navigator.pop(context);
-                              _formKey.currentState?.reset();
-                            },
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                },
-                child: const Text('Register Foodie'),
-              ),
-            ],
+                          actions: [
+                            TextButton(
+                              child: const Text('OK'),
+                              onPressed: () {
+                                Navigator.pop(context);
+                                _formKey.currentState?.reset();
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    elevation: 0,
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Theme.of(context).colorScheme.surface,
+                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                    fixedSize: const Size(200, 40),
+                  ),
+                  child: const Text('Register Foodie'),
+                ),
+              ],
+            ),
           ),
         ),
       ),

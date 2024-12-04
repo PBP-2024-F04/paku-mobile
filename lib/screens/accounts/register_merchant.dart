@@ -22,93 +22,111 @@ class _RegisterMerchantPageState extends State<RegisterMerchantPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Register Merchant"),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.surface,
       ),
-      body: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-
-              TextFormField(
-                decoration: InputDecoration(
-                  hintText: "Username",
-                  labelText: "Username",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5.0),
+      body: Center(
+        child: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(30.0),
+            child: Column(
+              children: [
+        
+                Text(
+                  "Create Merchant Account",
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontSize: 40,
                   ),
                 ),
-                onChanged: (String? value) => setState(() => _username = value!),
-              ),
 
-              TextFormField(
-                decoration: InputDecoration(
-                  hintText: "Password",
-                  labelText: "Password",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5.0),
+                const SizedBox(height: 30),
+
+                TextFormField(
+                  decoration: const InputDecoration(
+                    hintText: "Username",
+                    labelText: "Username",
                   ),
+                  onChanged: (String? value) => setState(() => _username = value!),
                 ),
-                obscureText: true,
-                onChanged: (String? value) => setState(() => _password1 = value!),
-              ),
 
-              TextFormField(
-                decoration: InputDecoration(
-                  hintText: "Password Confirmation",
-                  labelText: "Password Confirmation",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5.0),
+                const SizedBox(height: 10),
+        
+                TextFormField(
+                  decoration: const InputDecoration(
+                    hintText: "Password",
+                    labelText: "Password",
                   ),
+                  obscureText: true,
+                  onChanged: (String? value) => setState(() => _password1 = value!),
                 ),
-                obscureText: true,
-                onChanged: (String? value) => setState(() => _password2 = value!),
-              ),
 
-              TextFormField(
-                decoration: InputDecoration(
-                  hintText: "Restaurant Name",
-                  labelText: "Restaurant Name",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5.0),
+                const SizedBox(height: 10),
+        
+                TextFormField(
+                  decoration: const InputDecoration(
+                    hintText: "Password Confirmation",
+                    labelText: "Password Confirmation",
                   ),
+                  obscureText: true,
+                  onChanged: (String? value) => setState(() => _password2 = value!),
                 ),
-                onChanged: (String? value) => setState(() => _restaurantName = value!),
-              ),
 
-              ElevatedButton(
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        title: const Text('Register Merchant'),
-                        content: SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Username: $_username'),
-                              Text('Password: $_password1'),
-                              Text('Password Confirmation: $_password2'),
-                              Text('Restaurant Name: $_restaurantName'),
-                            ],
+                const SizedBox(height: 10),
+        
+                TextFormField(
+                  decoration: const InputDecoration(
+                    hintText: "Restaurant Name",
+                    labelText: "Restaurant Name",
+                  ),
+                  onChanged: (String? value) => setState(() => _restaurantName = value!),
+                ),
+
+                const SizedBox(height: 10),
+        
+                ElevatedButton(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: const Text('Register Merchant'),
+                          content: SingleChildScrollView(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Username: $_username'),
+                                Text('Password: $_password1'),
+                                Text('Password Confirmation: $_password2'),
+                                Text('Restaurant Name: $_restaurantName'),
+                              ],
+                            ),
                           ),
-                        ),
-                        actions: [
-                          TextButton(
-                            child: const Text('OK'),
-                            onPressed: () {
-                              Navigator.pop(context);
-                              _formKey.currentState?.reset();
-                            },
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                },
-                child: const Text('Register Merchant'),
-              ),
-            ],
+                          actions: [
+                            TextButton(
+                              child: const Text('OK'),
+                              onPressed: () {
+                                Navigator.pop(context);
+                                _formKey.currentState?.reset();
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    elevation: 0,
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Theme.of(context).colorScheme.surface,
+                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                    fixedSize: const Size(200, 40),
+                  ),
+                  child: const Text('Register Merchant'),
+                ),
+              ],
+            ),
           ),
         ),
       ),

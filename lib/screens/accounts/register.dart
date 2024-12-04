@@ -40,7 +40,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   foregroundColor: Theme.of(context).colorScheme.surface,
                   shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-                  fixedSize: const Size(200, 30),
+                  fixedSize: const Size(200, 40),
                 ),
                 onPressed: () => Navigator.push(
                   context,
@@ -55,7 +55,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   foregroundColor: Theme.of(context).colorScheme.surface,
                   shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-                  fixedSize: const Size(200, 30),
+                  fixedSize: const Size(200, 40),
                 ),
                 onPressed: () => Navigator.push(
                   context,
