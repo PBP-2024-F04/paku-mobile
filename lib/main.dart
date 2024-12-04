@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:paku/screens/landing.dart';
 import 'package:paku/screens/promos/promos.dart';
+import 'package:paku/screens/promos/add_promos.dart';
 import 'package:paku/colors.dart'; 
 import 'package:google_fonts/google_fonts.dart';
 
@@ -63,7 +64,7 @@ class MyApp extends StatelessWidget {
         // Menentukan font (opsional)
         // fontFamily: 'YourFontFamily',
       ),
-      home: const LandingPage(),
+      home: Promos(),
     );
   }
 }
