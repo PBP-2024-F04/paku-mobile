@@ -16,64 +16,72 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              TextFormField(
-                decoration: InputDecoration(
-                  hintText: "Name",
-                  labelText: "Name",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5.0),
-                  ),
+      appBar: AppBar(
+        title: const Text("Login"),
+      ),
+      body: Center(
+        child: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(30.0),
+            child: Column(
+              children: [
+                Text(
+                  "Sign in to PaKu",
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.displayMedium,
                 ),
-                onChanged: (String? value) => setState(() => _username = value!),
-              ),
-              TextFormField(
-                decoration: InputDecoration(
-                  hintText: "Password",
-                  labelText: "Password",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5.0),
+                const SizedBox(height: 30),
+                TextFormField(
+                  decoration: const InputDecoration(
+                    hintText: "Name",
+                    labelText: "Name",
                   ),
+                  onChanged: (String? value) => setState(() => _username = value!),
                 ),
-                obscureText: true,
-                onChanged: (String? value) => setState(() => _password = value!),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        title: const Text('Login'),
-                        content: SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Username: $_username'),
-                              Text('Password: $_password'),
-                            ],
+                const SizedBox(height: 10),
+                TextFormField(
+                  decoration: const InputDecoration(
+                    hintText: "Password",
+                    labelText: "Password",
+                  ),
+                  obscureText: true,
+                  onChanged: (String? value) => setState(() => _password = value!),
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: const Text('Login'),
+                          content: SingleChildScrollView(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Username: $_username'),
+                                Text('Password: $_password'),
+                              ],
+                            ),
                           ),
-                        ),
-                        actions: [
-                          TextButton(
-                            child: const Text('OK'),
-                            onPressed: () {
-                              Navigator.pop(context);
-                              _formKey.currentState?.reset();
-                            },
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                },
-                child: const Text('Login'),
-              ),
-            ],
+                          actions: [
+                            TextButton(
+                              child: const Text('OK'),
+                              onPressed: () {
+                                Navigator.pop(context);
+                                _formKey.currentState?.reset();
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                  child: const Text('Login'),
+                ),
+              ],
+            ),
           ),
         ),
       ),
