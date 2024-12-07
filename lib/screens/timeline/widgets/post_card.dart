@@ -3,10 +3,10 @@ import 'package:paku/colors.dart';
 import 'package:paku/screens/timeline/models/post.dart';
 import 'package:paku/screens/timeline/view_post.dart';
 
-class PostWidget extends StatelessWidget {
+class PostCard extends StatelessWidget {
   final Post post;
 
-  const PostWidget(this.post, {super.key});
+  const PostCard(this.post, {super.key});
 
   @override
   Widget build(BuildContext context) {

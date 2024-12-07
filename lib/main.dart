@@ -1,7 +1,7 @@
 // lib/main.dart
 import 'package:flutter/material.dart';
 // import 'package:paku/screens/landing.dart';
-import 'package:paku/screens/timeline/timeline.dart';
+import 'package:paku/screens/timeline/timeline_main.dart';
 import 'package:paku/theme.dart';
 
 void main() {
@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'PaKu',
       theme: theme,
-      home: const TimelinePage(),
+      home: const TimelineMainPage(),
     );
   }
 }
