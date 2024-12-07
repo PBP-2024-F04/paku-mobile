@@ -87,11 +87,7 @@ class _TimelinePageState extends State<TimelinePage> {
     }),
     Post.fromJson({
       "id": "932c5407-f2b5-49f4-b36f-844f75481e26",
-      "user": {
-        "role": "Foodie",
-        "display_name": "h",
-        "username": "testfoodie"
-      },
+      "user": {"role": "Foodie", "display_name": "h", "username": "testfoodie"},
       "text": "testsfdsfsdf",
       "is_edited": true,
       "created_at": "2024-10-27T03:40:22.018Z",
@@ -99,11 +95,7 @@ class _TimelinePageState extends State<TimelinePage> {
     }),
     Post.fromJson({
       "id": "788dfdf7-d8cb-45a1-ad1a-a78d6e4404bc",
-      "user": {
-        "role": "Foodie",
-        "display_name": "h",
-        "username": "testfoodie"
-      },
+      "user": {"role": "Foodie", "display_name": "h", "username": "testfoodie"},
       "text": "hello2",
       "is_edited": false,
       "created_at": "2024-10-27T03:39:24.107Z",
@@ -111,11 +103,7 @@ class _TimelinePageState extends State<TimelinePage> {
     }),
     Post.fromJson({
       "id": "5b5e9e8e-c22e-49ff-b33c-7d6554f2acf5",
-      "user": {
-        "role": "Foodie",
-        "display_name": "h",
-        "username": "testfoodie"
-      },
+      "user": {"role": "Foodie", "display_name": "h", "username": "testfoodie"},
       "text": "hello1",
       "is_edited": false,
       "created_at": "2024-10-27T03:39:13.465Z",

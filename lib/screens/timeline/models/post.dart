@@ -1,8 +1,10 @@
 import 'dart:convert';
 
-List<Post> postFromJson(String str) => List<Post>.from(json.decode(str).map((x) => Post.fromJson(x)));
+List<Post> postFromJson(String str) =>
+    List<Post>.from(json.decode(str).map((x) => Post.fromJson(x)));
 
-String postToJson(List<Post> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+String postToJson(List<Post> data) =>
+    json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
 class Post {
   String id;
@@ -22,22 +24,22 @@ class Post {
   });
 
   factory Post.fromJson(Map<String, dynamic> json) => Post(
-    id: json["id"],
-    user: User.fromJson(json["user"]),
-    text: json["text"],
-    isEdited: json["is_edited"],
-    createdAt: DateTime.parse(json["created_at"]),
-    updatedAt: DateTime.parse(json["updated_at"]),
-  );
+        id: json["id"],
+        user: User.fromJson(json["user"]),
+        text: json["text"],
+        isEdited: json["is_edited"],
+        createdAt: DateTime.parse(json["created_at"]),
+        updatedAt: DateTime.parse(json["updated_at"]),
+      );
 
   Map<String, dynamic> toJson() => {
-    "id": id,
-    "user": user.toJson(),
-    "text": text,
-    "is_edited": isEdited,
-    "created_at": createdAt.toIso8601String(),
-    "updated_at": updatedAt.toIso8601String(),
-  };
+        "id": id,
+        "user": user.toJson(),
+        "text": text,
+        "is_edited": isEdited,
+        "created_at": createdAt.toIso8601String(),
+        "updated_at": updatedAt.toIso8601String(),
+      };
 }
 
 class User {
@@ -52,15 +54,14 @@ class User {
   });
 
   factory User.fromJson(Map<String, dynamic> json) => User(
-    role: json["role"],
-    displayName: json["display_name"],
-    username: json["username"],
-  );
+        role: json["role"],
+        displayName: json["display_name"],
+        username: json["username"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "role": role,
-    "display_name": displayName,
-    "username": username,
-  };
+        "role": role,
+        "display_name": displayName,
+        "username": username,
+      };
 }
-
