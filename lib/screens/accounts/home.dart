@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:paku/screens/accounts/login.dart';
+import 'package:paku/widgets/left_drawer.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 
@@ -42,9 +43,8 @@ class _HomePageState extends State<HomePage> {
     final request = context.watch<CookieRequest>();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("PaKu"),
-      ),
+      appBar: AppBar(title: const Text("PaKu")),
+      drawer: const LeftDrawer(),
       body: Center(
         child: ElevatedButton(
           onPressed: () => _logout(context, request),
