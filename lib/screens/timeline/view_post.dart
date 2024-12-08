@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:paku/screens/timeline/models/comment.dart';
 import 'package:paku/screens/timeline/widgets/comment_card.dart';
+import 'package:paku/widgets/left_drawer.dart';
 
 final dummyComments = [
   Comment.fromJson({
@@ -44,9 +45,8 @@ class _ViewPostPageState extends State<ViewPostPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.postId),
-      ),
+      appBar: AppBar(title: Text(widget.postId)),
+      drawer: const LeftDrawer(),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(30),
         child: Center(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:paku/colors.dart';
 import 'package:paku/screens/timeline/models/post.dart';
 import 'package:paku/screens/timeline/widgets/post_card.dart';
+import 'package:paku/widgets/left_drawer.dart';
 
 final dummyPosts = [
   Post.fromJson({
@@ -65,9 +66,8 @@ class _TimelineMainPageState extends State<TimelineMainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Timeline"),
-      ),
+      appBar: AppBar(title: const Text("Timeline")),
+      drawer: const LeftDrawer(),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(30),
         child: Center(
