@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:paku/screens/accounts/register.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 
@@ -91,6 +92,14 @@ class _LoginPageState extends State<LoginPage> {
                 ElevatedButton(
                   onPressed: () => _login(context, request),
                   child: const Text('Login'),
+                ),
+                const SizedBox(height: 20),
+                TextButton(
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const RegisterPage())
+                  ),
+                  child: const Text("Belum punya akun? Registrasi!"),
                 ),
               ],
             ),
