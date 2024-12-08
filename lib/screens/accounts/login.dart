@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -12,9 +14,44 @@ class _LoginPageState extends State<LoginPage> {
 
   String _username = "";
   String _password = "";
-  
+
+  void _login(BuildContext context, CookieRequest request) async {
+    final response = await request.login("http://localhost:8000/accounts/auth/login/", {
+      'username': _username,
+      'password': _password,
+    });
+
+    if (request.loggedIn) {
+      String message = response['message'];
+      String username = response['username'];
+      if (context.mounted) {
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(SnackBar(content: Text("$message Selamat datang, $username.")));
+      }
+    } else {
+      if (context.mounted) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Login Gagal'),
+            content: Text(response['message']),
+            actions: [
+              TextButton(
+                child: const Text('OK'),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Login"),
@@ -37,7 +74,8 @@ class _LoginPageState extends State<LoginPage> {
                     hintText: "Name",
                     labelText: "Name",
                   ),
-                  onChanged: (String? value) => setState(() => _username = value!),
+                  onChanged: (String? value) =>
+                      setState(() => _username = value!),
                 ),
                 const SizedBox(height: 10),
                 TextFormField(
@@ -46,38 +84,12 @@ class _LoginPageState extends State<LoginPage> {
                     labelText: "Password",
                   ),
                   obscureText: true,
-                  onChanged: (String? value) => setState(() => _password = value!),
+                  onChanged: (String? value) =>
+                      setState(() => _password = value!),
                 ),
                 const SizedBox(height: 10),
                 ElevatedButton(
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          title: const Text('Login'),
-                          content: SingleChildScrollView(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('Username: $_username'),
-                                Text('Password: $_password'),
-                              ],
-                            ),
-                          ),
-                          actions: [
-                            TextButton(
-                              child: const Text('OK'),
-                              onPressed: () {
-                                Navigator.pop(context);
-                                _formKey.currentState?.reset();
-                              },
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  },
+                  onPressed: () => _login(context, request),
                   child: const Text('Login'),
                 ),
               ],
