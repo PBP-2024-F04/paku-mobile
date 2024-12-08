@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:paku/screens/timeline/models/comment.dart';
 import 'package:paku/screens/timeline/widgets/comment_card.dart';
 import 'package:paku/widgets/left_drawer.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
 
 final dummyComments = [
   Comment.fromJson({
@@ -42,8 +44,20 @@ class ViewPostPage extends StatefulWidget {
 }
 
 class _ViewPostPageState extends State<ViewPostPage> {
+  Future<List<Comment>> _fetchComments(CookieRequest request) async {
+    final response = await request.get('http://localhost:8000/timeline/json/posts/${widget.postId}/show_comments');
+    
+    if (response is List<dynamic>) {
+      return response.map((data) => Comment.fromJson(data)).toList();
+    }
+    
+    return [];
+  }
+
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
+
     return Scaffold(
       appBar: AppBar(title: Text(widget.postId)),
       drawer: const LeftDrawer(),
@@ -52,11 +66,27 @@ class _ViewPostPageState extends State<ViewPostPage> {
         child: Center(
           child: Column(
             children: [
-              ListView.builder(
-                scrollDirection: Axis.vertical,
-                shrinkWrap: true,
-                itemCount: dummyComments.length,
-                itemBuilder: (context, index) => CommentCard(dummyComments[index]),
+              FutureBuilder(
+                future: _fetchComments(request),
+                builder: (context, AsyncSnapshot snapshot) {
+                  if (snapshot.data == null) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (snapshot.hasData) {
+                    return ListView.builder(
+                      scrollDirection: Axis.vertical,
+                      shrinkWrap: true,
+                      itemCount: snapshot.data.length,
+                      itemBuilder: (context, index) => CommentCard(snapshot.data[index]),
+                    );
+                  } else {
+                    return Text(
+                      'Belum ada komentar.',
+                      style: Theme.of(context).textTheme.labelLarge,
+                    );
+                  }
+                },
               ),
             ],
           ),
