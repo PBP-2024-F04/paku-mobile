@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:paku/screens/accounts/home.dart';
 import 'package:paku/screens/accounts/register.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
@@ -29,6 +30,9 @@ class _LoginPageState extends State<LoginPage> {
         ScaffoldMessenger.of(context)
           ..hideCurrentSnackBar()
           ..showSnackBar(SnackBar(content: Text("$message Selamat datang, $username.")));
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const HomePage()),
+        );
       }
     } else {
       if (context.mounted) {
