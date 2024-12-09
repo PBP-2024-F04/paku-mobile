@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:paku/colors.dart';
+import 'package:paku/screens/timeline/create_post.dart';
 import 'package:paku/screens/timeline/models/post.dart';
 import 'package:paku/screens/timeline/widgets/post_card.dart';
 import 'package:paku/widgets/left_drawer.dart';
@@ -84,7 +85,9 @@ class _TimelineMainPageState extends State<TimelineMainPage> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: TailwindColors.sageDark,
         foregroundColor: Colors.white,
-        onPressed: () {},
+        onPressed: () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (context) => const CreatePostPage()),
+        ),
         child: const Icon(Icons.draw),
       ),
     );
