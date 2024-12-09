@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:paku/screens/accounts/home.dart';
+import 'package:paku/screens/promos/my_promos.dart';
+import 'package:paku/screens/promos/promos.dart';
 
 class LeftDrawer extends StatelessWidget {
   const LeftDrawer({super.key});
@@ -36,6 +38,16 @@ class LeftDrawer extends StatelessWidget {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => const HomePage()),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.discount_outlined),
+            title: const Text('Promos'),
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => MyPromos()),
               );
             },
           ),

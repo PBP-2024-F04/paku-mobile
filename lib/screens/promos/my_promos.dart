@@ -1,174 +1,172 @@
 import 'package:flutter/material.dart';
-import 'package:paku/colors.dart'; // Import colors.dart untuk menggunakan TailwindColors
-import 'package:flutter/widgets.dart';
-import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:paku/colors.dart';
+import 'package:paku/screens/promos/add_promos.dart';
+import 'package:paku/widgets/left_drawer.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
+import 'dart:convert';
+import 'models/promo.dart'; // Import model Promo
 
-class MyPromos extends StatelessWidget {
-  // Placeholder data untuk promo
-  final List<Map<String, dynamic>> promos = [
-    {
-      'promo_title': 'Diskon 50% untuk Pembelian Pertama',
-      'promo_description': 'Dapatkan diskon hingga 50% pada pembelian pertama.',
-      'batas_penggunaan': '31 Desember 2024',
-      'restaurant_name': 'Restoran A',
-      'id': 1
-    },
-    {
-      'promo_title': 'Gratis Ongkir!',
-      'promo_description': 'Nikmati gratis ongkir untuk semua produk!',
-      'batas_penggunaan': null,
-      'restaurant_name': 'Restoran B',
-      'id': 2
-    },
-    {
-      'promo_title': 'Potongan 20% untuk Pembelian Kedua',
-      'promo_description': 'Dapatkan potongan 20% pada pembelian kedua produk.',
-      'batas_penggunaan': '15 Januari 2025',
-      'restaurant_name': 'Restoran C',
-      'id': 3
-    },
-  ];
+class MyPromos extends StatefulWidget {
+  @override
+  _MyPromosState createState() => _MyPromosState();
+}
+
+class _MyPromosState extends State<MyPromos> {
+  Future<List<Promo>> fetchPromos(CookieRequest request) async {
+    try {
+      final response = await request.get('http://10.0.2.2:8000/promos/my_promo_list_json/');
+
+      print('Fetch Promos Response status: ${response.statusCode}');
+      print('Fetch Promos Response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        // Deserialize the response body to a list of Promo objects
+        return promoFromJson(response.body);
+      } else {
+        throw Exception('Failed to load promos: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching promos: $e');
+      return [];
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "PaKu",
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: TailwindColors.mossGreenDarker,
-              ),
-        ),
-        backgroundColor: TailwindColors.sageDark,
-      ),
+      appBar: AppBar(title: const Text("PaKu")),
+      drawer: const LeftDrawer(),
       body: Padding(
         padding: const EdgeInsets.all(32.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Teks judul "Promos" yang selalu muncul
             Text(
-              "Promos",
+              "My Promos",
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: TailwindColors.mossGreenDarker,
                   ),
             ),
-            const SizedBox(height: 8), // Memberikan jarak di bawah judul
-
+            const SizedBox(height: 8),
             Text(
-              "Jangan lewatkan promo-promo berikut! Waktu terbatas!",
+              "Tambahkan promo menarik untuk menarik perhatian calon pelanggan!",
               style: Theme.of(context).textTheme.bodyMedium,
             ),
-            const SizedBox(height: 16), // Memberikan jarak sebelum container scrollable
-
-            // Container dengan padding dan border
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AddPromoPage()),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: TailwindColors.sageDefault,
+              ),
+              child: Text("Tambah Promo Baru", style: TextStyle(color: Colors.white)),
+            ),
+            const SizedBox(height: 16),
             Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32.0), // Padding around the container
-                child: Container(
-                  padding: const EdgeInsets.only(left: 48.0, right: 48.0, top: 0.0, bottom: 0.0),
-                  decoration: BoxDecoration(
-                    color: TailwindColors.peachDarker, // Warna latar belakang container
-                    borderRadius: BorderRadius.zero, // Tidak ada rounded corners
-                    border: Border.all(
-                      color: TailwindColors.peachDarkActive, // Warna border
-                      width: 16, // Lebar border
-                    ),
-                  ),
-                  child: promos.isEmpty
-                      ? const Center(
-                          child: Text(
-                            'Belum ada promo yang kamu tambahkan!',
-                            style: TextStyle(fontSize: 18, color: Colors.grey),
-                          ),
-                        )
-                      : SingleChildScrollView( // Make only the content inside the container scrollable
-                          child: Column(
-                            children: List.generate(promos.length, (index) {
-                              var promo = promos[index];
-                              return Card(
-                                elevation: 4,
-                                margin: EdgeInsets.symmetric(vertical: 16),
-                                color: TailwindColors.whiteDefault, // Set card color to white
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.zero, // Set border radius to zero for sharp edges
+              child: FutureBuilder<List<Promo>>(
+                future: fetchPromos(request),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error fetching promos: ${snapshot.error}'));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(child: Text('Belum ada promo yang kamu tambahkan!'));
+                  } else {
+                    final promos = snapshot.data!;
+                    return ListView.builder(
+                      itemCount: promos.length,
+                      itemBuilder: (context, index) {
+                        var promo = promos[index];
+                        return Card(
+                          elevation: 4,
+                          margin: EdgeInsets.symmetric(vertical: 16),
+                          color: TailwindColors.whiteDefault,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              children: [
+                                Text(
+                                  "📌",
+                                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        color: TailwindColors.redHover,
+                                      ),
                                 ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(16.0),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        "📌",
-                                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                              fontWeight: FontWeight.bold,
-                                              color: TailwindColors.redHover,
-                                            ),
+                                const SizedBox(height: 24),
+                                Text(
+                                  promo.promoTitle,
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: TailwindColors.mossGreenDarker,
                                       ),
-                                      const SizedBox(height: 24),
-                                      Text(
-                                        promo['promo_title']!,
-                                        textAlign: TextAlign.center,
-                                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.bold,
-                                              color: TailwindColors.mossGreenDarker,
-                                            ),
-                                      ),
-                                      const SizedBox(height: 12),
-                                      Text(
-                                        promo['promo_description']!,
-                                        textAlign: TextAlign.center,
-                                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                              color: TailwindColors.mossGreenDarker,
-                                            ),
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        'Berlaku hingga: ${promo['batas_penggunaan'] ?? '(Tidak ada batas)'}',
-                                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                              color: Colors.grey,
-                                            ),
-                                      ),
-                                      const SizedBox(height: 32),
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          TextButton(
-                                            onPressed: () {
-                                              Navigator.pushNamed(
-                                                context,
-                                                '/update_promos', // Go to the update page
-                                              );
-                                            },
-                                            style: TextButton.styleFrom(
-                                              backgroundColor: TailwindColors.yellowDefault,
-                                              foregroundColor: TailwindColors.whiteDefault,
-                                            ),
-                                            child: const Text('Edit'),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          TextButton(
-                                            onPressed: () {},
-                                            style: TextButton.styleFrom(
-                                              backgroundColor: TailwindColors.redDefault,
-                                              foregroundColor: TailwindColors.whiteDefault,
-                                            ),
-                                            child: const Text('Delete'),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
                                 ),
-                              );
-                            }),
+                                const SizedBox(height: 12),
+                                Text(
+                                  promo.promoDescription,
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                        color: TailwindColors.mossGreenDarker,
+                                      ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Berlaku hingga: ${promo.batasPenggunaan}',
+                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey),
+                                ),
+                                const SizedBox(height: 32),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pushNamed(
+                                          context,
+                                          '/update_promos',
+                                          arguments: promo.id,
+                                        );
+                                      },
+                                      style: TextButton.styleFrom(
+                                        backgroundColor: TailwindColors.yellowDefault,
+                                        foregroundColor: TailwindColors.whiteDefault,
+                                      ),
+                                      child: const Text('Edit'),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    TextButton(
+                                      onPressed: () {
+                                        
+                                      },
+                                      style: TextButton.styleFrom(
+                                        backgroundColor: TailwindColors.redDefault,
+                                        foregroundColor: TailwindColors.whiteDefault,
+                                      ),
+                                      child: const Text('Delete'),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                ),
+                        );
+                      },
+                    );
+                  }
+                },
               ),
             ),
           ],

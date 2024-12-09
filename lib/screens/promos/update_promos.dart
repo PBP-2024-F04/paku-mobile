@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:paku/colors.dart';
+import 'package:paku/widgets/left_drawer.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class UpdatePromoPage extends StatefulWidget {
   @override
@@ -9,35 +12,69 @@ class UpdatePromoPage extends StatefulWidget {
 class _UpdatePromoPageState extends State<UpdatePromoPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   TextEditingController _tanggalController = TextEditingController();
-  String _judulPromo = 'Diskon 50% Hari Ini!';
-  String _deskripsiPromo = 'Promo spesial untuk hari ini saja. Jangan lewatkan kesempatan ini.';
-  String _tanggalBatas = '2024-12-31';
+  String _judulPromo = '';
+  String _deskripsiPromo = '';
+  String _tanggalBatas = '';
+  late String promoId;
 
   @override
-  void initState() {
-    super.initState();
-    // Data sudah diset di sini langsung, tanpa perlu load dari server
-    _tanggalController.text = _tanggalBatas;
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Retrieve the promo ID passed from the previous screen
+    final args = ModalRoute.of(context)!.settings.arguments as String;
+    promoId = args; // Get promoId from the argument
+    _fetchPromoDetails(promoId);  // Fetch the promo details
   }
 
-  // Fungsi untuk memilih tanggal dengan DatePicker
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2101),
-    );
-    if (picked != null && picked != DateTime.now()) {
+  // Function to fetch existing promo details from the backend
+  Future<void> _fetchPromoDetails(String promoId) async {
+    final url = Uri.parse('https://your-backend-api.com/update_promo/$promoId'); // Replace with your API URL
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
       setState(() {
-        _tanggalController.text = "${picked.toLocal()}".split(' ')[0];
-        _tanggalBatas = _tanggalController.text;
+        _judulPromo = data['judul_promo'];
+        _deskripsiPromo = data['deskripsi_promo'];
+        _tanggalBatas = data['tanggal_batas'];
+        _tanggalController.text = _tanggalBatas;
       });
+    } else {
+      // Handle error if promo details cannot be fetched
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal memuat data promo')));
     }
   }
 
-  // Fungsi untuk menampilkan AlertDialog setelah submit
-  void _showSuccessDialog(BuildContext context) {
+  // Function to update the promo
+  Future<void> _updatePromo() async {
+    final url = Uri.parse('https://your-backend-api.com/update_promo/$promoId'); // Replace with your API URL
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({
+        'judul_promo': _judulPromo,
+        'deskripsi_promo': _deskripsiPromo,
+        'tanggal_batas': _tanggalBatas,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      // Berhasil mengupdate promo
+      final responseData = json.decode(response.body);
+      if (responseData['success']) {
+        _showSuccessDialog();
+      } else {
+        _showErrorDialog(responseData['errors']);
+      }
+    } else {
+      _showErrorDialog('Terjadi kesalahan. Silakan coba lagi.');
+    }
+  }
+
+  // Menampilkan dialog sukses
+  void _showSuccessDialog() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -66,19 +103,32 @@ class _UpdatePromoPageState extends State<UpdatePromoPage> {
     );
   }
 
+  // Menampilkan dialog error
+  void _showErrorDialog(dynamic errors) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Terjadi Kesalahan!"),
+          content: Text(errors.toString()),
+          actions: <Widget>[
+            TextButton(
+              child: Text("Tutup"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "PaKu",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: TailwindColors.mossGreenDarker,
-          ),
-        ),
-        backgroundColor: TailwindColors.sageDark,
-      ),
+      appBar: AppBar(title: const Text("PaKu")),
+      drawer: const LeftDrawer(),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -179,32 +229,39 @@ class _UpdatePromoPageState extends State<UpdatePromoPage> {
 
                     // Button Group
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,  // UI: Evenly spaced buttons
                       children: [
                         ElevatedButton(
                           onPressed: () {
-                            Navigator.pop(context); // Tombol "Batal"
+                            Navigator.pop(context); // Close the screen without saving (Cancel action)
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: TailwindColors.yellowDefault,
+                            backgroundColor: TailwindColors.yellowDefault, // Match the background color for the Cancel button
+                            padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 40.0),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
                           ),
                           child: Text(
-                            "Batal",
+                            "Batal",  // Label for the Cancel button
                             style: TextStyle(color: Colors.white),
                           ),
                         ),
                         ElevatedButton(
                           onPressed: () {
                             if (_formKey.currentState!.validate()) {
-                              // Menampilkan dialog sukses dengan detail promo
-                              _showSuccessDialog(context);
+                              _updatePromo();  // Call the update promo function to save the promo
                             }
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: TailwindColors.sageDefault,
+                            backgroundColor: TailwindColors.sageDefault, // Match the background color for the Update button
+                            padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 40.0),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
                           ),
                           child: Text(
-                            "Perbarui Promo",
+                            "Perbarui Promo",  // Label for the Update button
                             style: TextStyle(color: Colors.white),
                           ),
                         ),
@@ -218,5 +275,21 @@ class _UpdatePromoPageState extends State<UpdatePromoPage> {
         ),
       ),
     );
+  }
+
+  // DatePicker
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2023),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null && picked != DateTime.now()) {
+      setState(() {
+        _tanggalBatas = "${picked.toLocal()}".split(' ')[0];
+        _tanggalController.text = _tanggalBatas;
+      });
+    }
   }
 }

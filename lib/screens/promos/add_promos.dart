@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:paku/colors.dart';
+import 'package:paku/widgets/left_drawer.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert'; // Untuk json encoding
 
 class AddPromoPage extends StatefulWidget {
   @override
@@ -29,7 +32,31 @@ class _AddPromoPageState extends State<AddPromoPage> {
     }
   }
 
-  // Fungsi untuk menampilkan AlertDialog setelah submit
+  // Fungsi untuk mengirim data promo ke Django
+  Future<void> _submitPromo() async {
+    if (_formKey.currentState!.validate()) {
+      final url = 'http://localhost:8000/promos/create_promo_flutter/';
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'promo_title': _judulPromo,
+          'promo_description': _deskripsiPromo,
+          'batas_penggunaan': _tanggalBatas,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        // Menampilkan dialog sukses jika promo berhasil ditambahkan
+        _showSuccessDialog(context);
+      } else {
+        // Menampilkan dialog error jika terjadi masalah saat submit
+        _showErrorDialog(context);
+      }
+    }
+  }
+
+  // Fungsi untuk menampilkan AlertDialog setelah submit berhasil
   void _showSuccessDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -59,19 +86,32 @@ class _AddPromoPageState extends State<AddPromoPage> {
     );
   }
 
+  // Fungsi untuk menampilkan dialog error
+  void _showErrorDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Terjadi Kesalahan!"),
+          content: Text("Tidak dapat menambahkan promo. Silakan coba lagi."),
+          actions: <Widget>[
+            TextButton(
+              child: Text("OK"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "PaKu",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: TailwindColors.mossGreenDarker,
-          ),
-        ),
-        backgroundColor: TailwindColors.sageDark,
-      ),
+      appBar: AppBar(title: const Text("PaKu")),
+      drawer: const LeftDrawer(),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -188,12 +228,7 @@ class _AddPromoPageState extends State<AddPromoPage> {
                           ),
                         ),
                         ElevatedButton(
-                          onPressed: () {
-                            if (_formKey.currentState!.validate()) {
-                              // Menampilkan dialog sukses dengan detail promo
-                              _showSuccessDialog(context);
-                            }
-                          },
+                          onPressed: _submitPromo, // Submit ke Django
                           style: ElevatedButton.styleFrom(
                             backgroundColor: TailwindColors.sageDefault,
                           ),
