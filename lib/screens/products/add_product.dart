@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:paku/colors.dart';
 
-class ProductEntryFormPage extends StatefulWidget {
-  const ProductEntryFormPage({super.key});
+class AddProductPage extends StatefulWidget {
+  const AddProductPage({super.key});
 
   @override
-  State<ProductEntryFormPage> createState() => _ProductEntryFormPageState();
+  State<AddProductPage> createState() => _AddProductPageState();
 }
 
-class _ProductEntryFormPageState extends State<ProductEntryFormPage> {
+class _AddProductPageState extends State<AddProductPage> {
   final _formKey = GlobalKey<FormState>();
   String _productName = "";
   String _restaurant = "";
@@ -20,6 +21,8 @@ class _ProductEntryFormPageState extends State<ProductEntryFormPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Add New Product'),
+        centerTitle: true,
+        backgroundColor: TailwindColors.sageDark,
         actions: [
           IconButton(
             icon: const Icon(Icons.close),
@@ -33,10 +36,16 @@ class _ProductEntryFormPageState extends State<ProductEntryFormPage> {
         key: _formKey,
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                const Text(
+                  "Create Your Product",
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 16),
+
                 buildTextField(
                   label: "Product Name",
                   hint: "Enter product name",
@@ -54,10 +63,9 @@ class _ProductEntryFormPageState extends State<ProductEntryFormPage> {
                 const SizedBox(height: 16),
 
                 buildTextField(
-                  label: "Restaurant:",
+                  label: "Restaurant",
                   hint: "Enter restaurant name",
-                  onChanged: (value) => _description = value,
-                  maxLines: 4,
+                  onChanged: (value) => _restaurant = value,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return "Restaurant name cannot be empty!";
@@ -99,13 +107,12 @@ class _ProductEntryFormPageState extends State<ProductEntryFormPage> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 16), 
+                const SizedBox(height: 16),
 
                 buildTextField(
                   label: "Category",
                   hint: "Enter product category",
-                  onChanged: (value) => _description = value,
-                  maxLines: 4,
+                  onChanged: (value) => _category = value,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return "Category cannot be empty!";
@@ -113,10 +120,17 @@ class _ProductEntryFormPageState extends State<ProductEntryFormPage> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 16),     
+                const SizedBox(height: 32),
 
                 Center(
                   child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: TailwindColors.sageDefault,
+                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
                         showDialog(
@@ -149,7 +163,10 @@ class _ProductEntryFormPageState extends State<ProductEntryFormPage> {
                         );
                       }
                     },
-                    child: const Text("Save"),
+                    child: const Text(
+                      "Save",
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ),
               ],
@@ -172,7 +189,11 @@ class _ProductEntryFormPageState extends State<ProductEntryFormPage> {
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
+        labelStyle: const TextStyle(fontSize: 16),
+        hintStyle: const TextStyle(color: TailwindColors.whiteDark),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.0)),
+        filled: true,
+        fillColor: TailwindColors.whiteDefault,
       ),
       keyboardType: keyboardType,
       onChanged: onChanged,
