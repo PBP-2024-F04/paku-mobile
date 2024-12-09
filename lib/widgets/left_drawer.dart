@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:paku/screens/accounts/home.dart';
-<<<<<<< HEAD
 import 'package:paku/screens/promos/my_promos.dart';
 import 'package:paku/screens/promos/promos.dart';
-=======
 import 'package:paku/screens/timeline/timeline_main.dart';
->>>>>>> 4649e75baa2718ccf691b0d5aed3fafd31b9aa6e
 
 class LeftDrawer extends StatelessWidget {
   const LeftDrawer({super.key});
@@ -46,21 +43,22 @@ class LeftDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-<<<<<<< HEAD
             leading: const Icon(Icons.discount_outlined),
             title: const Text('Promos'),
             onTap: () {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => MyPromos()),
-=======
+                MaterialPageRoute(builder: (context) => Promos()),
+              );
+            },
+          ),
+          ListTile(
             leading: const Icon(Icons.home_outlined),
             title: const Text('Timeline'),
             onTap: () {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => const TimelineMainPage()),
->>>>>>> 4649e75baa2718ccf691b0d5aed3fafd31b9aa6e
               );
             },
           ),
