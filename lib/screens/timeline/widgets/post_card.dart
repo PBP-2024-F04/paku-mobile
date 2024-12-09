@@ -16,7 +16,7 @@ class PostCard extends StatelessWidget {
         onTap: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => ViewPostPage(post.id)),
+            MaterialPageRoute(builder: (context) => ViewPostPage(post)),
           );
         },
         child: Card(
@@ -30,12 +30,36 @@ class PostCard extends StatelessWidget {
           ),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("${post.user.displayName} @${post.user.username}"),
-                Text(post.text),
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "${post.user.displayName} @${post.user.username}",
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                      Text(post.text),
+                    ],
+                  ),
+                ),
+                PopupMenuButton<String>(
+                  itemBuilder: (BuildContext context) => [
+                    const PopupMenuItem<String>(
+                      value: 'Edit',
+                      child: Text('Edit'),
+                    ),
+                    const PopupMenuItem<String>(
+                      value: 'Delete',
+                      child: Text('Delete'),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
