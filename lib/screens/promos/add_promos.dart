@@ -1,8 +1,63 @@
 import 'package:flutter/material.dart';
 import 'package:paku/colors.dart';
 
-class AddPromoPage extends StatelessWidget {
+class AddPromoPage extends StatefulWidget {
+  @override
+  _AddPromoPageState createState() => _AddPromoPageState();
+}
+
+class _AddPromoPageState extends State<AddPromoPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  TextEditingController _tanggalController = TextEditingController();
+  String _judulPromo = '';
+  String _deskripsiPromo = '';
+  String _tanggalBatas = '';
+
+  // Fungsi untuk memilih tanggal dengan DatePicker
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null && picked != DateTime.now()) {
+      setState(() {
+        _tanggalController.text = "${picked.toLocal()}".split(' ')[0];
+        _tanggalBatas = _tanggalController.text;
+      });
+    }
+  }
+
+  // Fungsi untuk menampilkan AlertDialog setelah submit
+  void _showSuccessDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Promo Berhasil Ditambahkan!"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("Judul Promo: $_judulPromo"),
+              Text("Deskripsi: $_deskripsiPromo"),
+              Text("Batas Penggunaan: $_tanggalBatas"),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text("OK"),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pop(); // Kembali ke halaman sebelumnya
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,6 +120,11 @@ class AddPromoPage extends StatelessWidget {
                         labelStyle: Theme.of(context).textTheme.bodyMedium,
                         hintText: "Masukkan judul promo",
                       ),
+                      onChanged: (value) {
+                        setState(() {
+                          _judulPromo = value;
+                        });
+                      },
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return "Judul promo tidak boleh kosong.";
@@ -82,6 +142,11 @@ class AddPromoPage extends StatelessWidget {
                         hintText: "Masukkan deskripsi promo",
                       ),
                       maxLines: 3,
+                      onChanged: (value) {
+                        setState(() {
+                          _deskripsiPromo = value;
+                        });
+                      },
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return "Deskripsi promo tidak boleh kosong.";
@@ -91,12 +156,17 @@ class AddPromoPage extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
 
-                    // Field 3: Batas Penggunaan
+                    // Field 3: Batas Penggunaan dengan DatePicker
                     TextFormField(
+                      controller: _tanggalController,
                       decoration: InputDecoration(
                         labelText: "Batas Penggunaan",
                         labelStyle: Theme.of(context).textTheme.bodyMedium,
-                        hintText: "Masukkan tanggal batas penggunaan (opsional)",
+                        hintText: "Masukkan tanggal batas penggunaan",
+                        suffixIcon: IconButton(
+                          icon: Icon(Icons.calendar_today),
+                          onPressed: () => _selectDate(context),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -120,13 +190,8 @@ class AddPromoPage extends StatelessWidget {
                         ElevatedButton(
                           onPressed: () {
                             if (_formKey.currentState!.validate()) {
-                              // Simulasi submit
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text("Promo berhasil ditambahkan!"),
-                                  backgroundColor: TailwindColors.sageDark,
-                                ),
-                              );
+                              // Menampilkan dialog sukses dengan detail promo
+                              _showSuccessDialog(context);
                             }
                           },
                           style: ElevatedButton.styleFrom(
