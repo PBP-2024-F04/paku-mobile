@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:paku/screens/reviews/edit_review.dart';
+import 'package:paku/widgets/left_drawer.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -186,16 +187,8 @@ class _ReviewPageState extends State<ReviewPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Product Reviews'),
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: [
-            Tab(text: 'All Reviews'),
-            Tab(text: 'My Reviews'),
-          ],
-        ),
-      ),
+      appBar: AppBar(title: const Text("PaKu")),
+      drawer: const LeftDrawer(),
       body: Column(
         children: [
           // Filter Dropdown

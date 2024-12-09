@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:paku/screens/accounts/home.dart';
 import 'package:paku/screens/promos/my_promos.dart';
 import 'package:paku/screens/promos/promos.dart';
+import 'package:paku/screens/reviews/reviews.dart';
+import 'package:paku/screens/products/products.dart';
 import 'package:paku/screens/timeline/timeline_main.dart';
 
 class LeftDrawer extends StatelessWidget {
@@ -59,6 +61,26 @@ class LeftDrawer extends StatelessWidget {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => const TimelineMainPage()),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.book_outlined),
+            title: const Text('Reviews'),
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => ReviewPage()),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.food_bank_outlined),
+            title: const Text('Products'),
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => Products()),
               );
             },
           ),
