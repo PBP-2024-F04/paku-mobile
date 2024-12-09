@@ -40,7 +40,12 @@ class PostCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "${post.user.displayName} @${post.user.username}",
+                        post.user.displayName,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                      Text(
+                        "@${post.user.username}",
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                       ),
