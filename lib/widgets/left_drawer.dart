@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:paku/screens/accounts/home.dart';
 import 'package:paku/screens/timeline/timeline_main.dart';
+import 'package:paku/screens/reviews/reviews.dart';
 
 class LeftDrawer extends StatelessWidget {
   const LeftDrawer({super.key});
