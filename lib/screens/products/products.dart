@@ -1,130 +1,144 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:paku/colors.dart';
 import 'package:paku/widgets/left_drawer.dart';
 import 'package:paku/screens/products/add_product.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:paku/screens/products/models/product.dart';
+
 
 class ProductsPage extends StatefulWidget {
   const ProductsPage({super.key});
 
   @override
-  _ProductsPageState createState() => _ProductsPageState();
+  State<ProductsPage> createState() => _ProductsPageState();
 }
 
 class _ProductsPageState extends State<ProductsPage> {
-  final List<Map<String, dynamic>> products = [
-    {
-      "productName": "Burger",
-      "restaurant": "Burger Place",
-      "price": 50000,
-      "description": "Delicious beef burger with cheese",
-      "category": "Fast Food",
-    },
-    {
-      "productName": "Pizza",
-      "restaurant": "Pizza House",
-      "price": 75000,
-      "description": "Large pizza with pepperoni topping",
-      "category": "Italian",
-    },
-    {
-      "productName": "Sushi",
-      "restaurant": "Sushi World",
-      "price": 100000,
-      "description": "Fresh sushi with salmon and tuna",
-      "category": "Japanese",
-    },
-  ];
+  Future<List<Product>> fetchProduct(CookieRequest request) async {
+    final response = await request.get('http://127.0.0.1:8000/products/json/');
+    
+    var data = response;
+    
+    List<Product> listProduct = [];
+    for (var d in data) {
+      if (d != null) {
+        listProduct.add(Product.fromJson(d));
+      }
+    }
+    return listProduct;
+  }
 
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
     return Scaffold(
       appBar: AppBar(
-        title: const Text("PaKu"),
+        title: const Text('PaKu'),
       ),
       drawer: const LeftDrawer(),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: <Widget>[
-              const SizedBox(
-                height: 15,
-              ),
-              const Text(
-                "All Products",
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const AddProductPage(),
+      body: FutureBuilder(
+        future: fetchProduct(request),
+        builder: (context, AsyncSnapshot snapshot) {
+          if (snapshot.data == null) {
+            return const Center(child: CircularProgressIndicator());
+          } else {
+            if (!snapshot.hasData) {
+              return const Column(
+                children: [
+                  Text(
+                    'Belum ada data produk pada PaKu.',
+                    style: TextStyle(fontSize: 20, color: TailwindColors.sageDarker),
+                  ),
+                  SizedBox(height: 8),
+                ],
+              );
+            } else {
+              return SingleChildScrollView(
+                child: Column(
+                  children: <Widget>[
+                    const SizedBox(
+                      height: 15,
                     ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: TailwindColors.sageDarkHover,
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 20, vertical: 15),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                child: const Text(
-                  "Add New Products",
-                  style: TextStyle(
-                      color: TailwindColors.whiteLight,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600),
-                ),
-              ),
-              const SizedBox(
-                height: 25,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: GridView.builder(
-                  physics: const NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 15,
-                    crossAxisSpacing: 15,
-                    childAspectRatio: 0.8,
-                  ),
-                  itemCount: products.length,
-                  itemBuilder: (context, index) {
-                    return InkWell(
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ProductDetailPage(
-                            product: products[index],
+                    const Text(
+                      "All Products",
+                      style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const AddProductPage(),
                           ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: TailwindColors.sageDarkHover,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                      child: ProductCard(product: products[index]),
-                    );
-                  },
-                ),
-              ),
+                      child: const Text(
+                        "Add New Products",
+                        style: TextStyle(
+                            color: TailwindColors.whiteLight,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 25,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: GridView.builder(
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 15,
+                          crossAxisSpacing: 15,
+                          childAspectRatio: 0.8,
+                        ),
+                        itemCount: snapshot.data!.length,
+                        itemBuilder: (context, index) {
+                          return InkWell(
+                            onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ProductDetailPage(
+                                  product: snapshot.data[index],
+                                ),
+                              ),
+                            ),
+                            child: ProductCard(product: snapshot.data[index]),
+                          );
+                        },
+                      ),
+                    ),
 
-              const SizedBox(
-                height: 30,
-              ),
-            ],
-          ),
-        ),
+                    const SizedBox(
+                      height: 30,
+                    ),
+                  ],
+                ),
+              );
+            }
+          }
+        },
       ),
     );
   }
 }
 
 class ProductCard extends StatelessWidget {
-  final Map<String, dynamic> product;
+  final Product product;
 
   const ProductCard({super.key, required this.product});
   @override
@@ -139,10 +153,7 @@ class ProductCard extends StatelessWidget {
             color: TailwindColors.whiteActive!,
             blurRadius: 15.0,
             spreadRadius: 0.5,
-            offset: const Offset(
-              3.0,
-              3.0,
-            ),
+            offset: const Offset(3.0, 3.0),
           )
         ],
       ),
@@ -150,9 +161,8 @@ class ProductCard extends StatelessWidget {
         padding: const EdgeInsets.all(12.0),
         child: Column(
           children: <Widget>[
-
             ClipRRect(
-                borderRadius:  const BorderRadius.all(Radius.circular(12)),
+              borderRadius: const BorderRadius.all(Radius.circular(12)),
               child: Container(
                 height: 120,
                 width: MediaQuery.of(context).size.width,
@@ -162,13 +172,13 @@ class ProductCard extends StatelessWidget {
               height: 10,
             ),
             Text(
-              product["productName"],
+              product.fields.productName,
               style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 5),
               child: Text(
-                product["restaurant"],
+                product.fields.restaurant,
                 style: TextStyle(fontSize: 11, color: TailwindColors.whiteDark),
               ),
             ),
@@ -176,33 +186,22 @@ class ProductCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                const SizedBox(
-                  width: 2,
-                ),
                 Text(
-                  product["category"],
-                  style: const TextStyle(color: TailwindColors.peachDefault,
+                  product.fields.category,
+                  style: const TextStyle(
+                    color: TailwindColors.peachDefault,
                     fontSize: 11,
                   ),
                 )
               ],
             ),
             const SizedBox(
-              height: 5,
+              height: 5
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: <Widget>[
-                Text(
-                  "Rp ${product["price"]}",
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(
-                  height: 30,
-                ),
-              ],
-            )
+            Text(
+              "Rp ${product.fields.price}",
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
           ],
         ),
       ),
@@ -211,7 +210,7 @@ class ProductCard extends StatelessWidget {
 }
 
 class ProductDetailPage extends StatefulWidget {
-  final Map<String, dynamic> product;
+  final Product product;
 
   const ProductDetailPage({super.key, required this.product});
 
@@ -266,13 +265,13 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   children: <Widget>[
                     Expanded(
                       child: Text(
-                        widget.product["productName"],
+                        widget.product.fields.productName,
                         style: const TextStyle(
                             fontSize: 22, fontWeight: FontWeight.w600),
                       ),
                     ),
                     Text(
-                      "Rp ${widget.product["price"]}",
+                      "Rp ${widget.product.fields.price}",
                       style: const TextStyle(
                           fontSize: 25, fontWeight: FontWeight.w500),
                     ),
@@ -288,7 +287,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     ),
                     const SizedBox(width: 5),
                     Text(
-                      widget.product["restaurant"],
+                      widget.product.fields.restaurant,
                       style: const TextStyle(
                           fontSize: 16, fontWeight: FontWeight.w500),
                     ),
@@ -304,7 +303,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     ),
                     const SizedBox(width: 5),
                     Text(
-                      widget.product["category"],
+                      widget.product.fields.category,
                       style: const TextStyle(
                           fontSize: 16, fontWeight: FontWeight.w500),
                     ),
@@ -317,7 +316,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 ),
                 const SizedBox(height: 5),
                 Text(
-                  widget.product["description"],
+                  widget.product.fields.description,
                   style: _grayText(),
                 ),
                 const SizedBox(height: 15),
