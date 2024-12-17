@@ -1,5 +1,9 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
 import 'package:paku/colors.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:paku/screens/products/products.dart';
 
 class AddProductPage extends StatefulWidget {
   const AddProductPage({super.key});
@@ -18,6 +22,8 @@ class _AddProductPageState extends State<AddProductPage> {
 
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
+    
     return Scaffold(
       appBar: AppBar(
         title: const Text('Add New Product'),
@@ -131,36 +137,36 @@ class _AddProductPageState extends State<AddProductPage> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    onPressed: () {
+                    onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              title: const Text("Product Added"),
-                              content: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text("Product Name: $_productName"),
-                                  Text("Restaurant: $_restaurant"),
-                                  Text("Price: $_price"),
-                                  Text("Description: $_description"),
-                                  Text("Category: $_category"),
-                                ],
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                    _formKey.currentState!.reset();
-                                  },
-                                  child: const Text("OK"),
-                                ),
-                              ],
-                            );
-                          },
+                        final response = await request.postJson(
+                            "http://127.0.0.1:8000/products/create-product-flutter/",
+                            jsonEncode(<String, String>{
+                                'name': _productName,
+                                'restaurant': _restaurant,
+                                'price': _price.toString(),
+                                'description': _description,
+                                'category': _category
+                            }),
                         );
+                        if (context.mounted) {
+                            if (response['status'] == 'success') {
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(const SnackBar(
+                                content: Text("Produk baru berhasil disimpan!"),
+                                ));
+                                Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => ProductsPage()),
+                                );
+                            } else {
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(const SnackBar(
+                                    content:
+                                        Text("Tidak dapat menambahkan produk, silakan coba lagi."),
+                                ));
+                            }
+                          }
                       }
                     },
                     child: const Text(
