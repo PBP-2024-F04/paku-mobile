@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:paku/screens/products/products.dart';
+import 'package:paku/widgets/left_drawer.dart';
 
 class AddProductPage extends StatefulWidget {
   const AddProductPage({super.key});
@@ -26,7 +27,7 @@ class _AddProductPageState extends State<AddProductPage> {
     
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add New Product'),
+        title: const Text('PaKu'),
         centerTitle: true,
         backgroundColor: TailwindColors.sageDark,
         actions: [
@@ -38,6 +39,7 @@ class _AddProductPageState extends State<AddProductPage> {
           ),
         ],
       ),
+      drawer: const LeftDrawer(),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
@@ -47,7 +49,7 @@ class _AddProductPageState extends State<AddProductPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  "Create Your Product",
+                  "Add New Product",
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 16),
@@ -142,7 +144,7 @@ class _AddProductPageState extends State<AddProductPage> {
                         final response = await request.postJson(
                             "http://127.0.0.1:8000/products/create-product-flutter/",
                             jsonEncode(<String, String>{
-                                'name': _productName,
+                                'productName': _productName,
                                 'restaurant': _restaurant,
                                 'price': _price.toString(),
                                 'description': _description,

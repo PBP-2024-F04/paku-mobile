@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'PaKu',
         theme: theme,
-        home: ProductsPage(),
+        home: const LoginPage(),
       ),
     );
   }
