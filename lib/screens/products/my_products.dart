@@ -1,12 +1,10 @@
-import 'dart:convert';
-
+import 'package:paku/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:paku/colors.dart';
 import 'package:paku/widgets/left_drawer.dart';
-import 'package:paku/screens/products/add_product.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:paku/screens/products/models/product.dart';
+import 'package:paku/screens/products/add_product.dart';
 
 class MyProductsPage extends StatefulWidget {
   const MyProductsPage({super.key});
@@ -16,185 +14,198 @@ class MyProductsPage extends StatefulWidget {
 }
 
 class _MyProductsPageState extends State<MyProductsPage> {
-  Future<List<Product>> fetchMyProducts(CookieRequest request) async {
-    final response = await request.get('http://127.0.0.1:8000/products/my-products-json/');
-    print('Fetch Promos Response status: ${response.statusCode}');
-    print('Fetch Promos Response body: ${response.body}');
-    
-    var data = jsonDecode(response);
-    
-    List<Product> listMyProduct = [];
-    for (var d in data) {
-      if (d != null) {
-        listMyProduct.add(Product.fromJson(d));
-      }
+  late Future<List<dynamic>> _products;
+
+  Future<List<dynamic>> fetchProducts(CookieRequest request) async {
+    final response = await request.get("http://localhost:8000/products/my-products-flutter/");
+    if (response['success']) {
+      return response['products'];
+    } else {
+      throw Exception(response['message'] ?? "Failed to fetch products.");
     }
-    return listMyProduct;
   }
-  List<dynamic> products = [];
-  
+
+  @override
+  void initState() {
+    super.initState();
+    final request = context.read<CookieRequest>();
+    _products = fetchProducts(request);
+  }
+
   @override
   Widget build(BuildContext context) {
-    final request = context.watch<CookieRequest>();
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Products'),  // Ganti judul sesuai konteks
+        title: const Text("PaKu"),
       ),
       drawer: const LeftDrawer(),
-      body: FutureBuilder(
-        future: fetchMyProducts(request),  // Panggil fetchMyProducts
-        builder: (context, AsyncSnapshot snapshot) {
-          if (snapshot.data == null) {
-            return const Center(child: CircularProgressIndicator());
-          } else {
-            if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return const Column(
-                children: [
-                  Text(
-                    'Anda belum memiliki produk.',
-                    style: TextStyle(fontSize: 20, color: TailwindColors.sageDarker),
-                  ),
-                  SizedBox(height: 8),
-                ],
-              );
-            } else {
-              return SingleChildScrollView(
-                child: Column(
-                  children: <Widget>[
-                    const SizedBox(height: 15),
-                    const Text(
-                      "My Products",
-                      style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const AddProductPage(),
-                          ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: TailwindColors.sageDarkHover,
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      ),
-                      child: const Text(
-                        "Add New Product",
-                        style: TextStyle(color: TailwindColors.whiteLight, fontSize: 16, fontWeight: FontWeight.w600),
-                      ),
-                    ),
-                    const SizedBox(height: 25),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: GridView.builder(
-                        physics: const NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          mainAxisSpacing: 15,
-                          crossAxisSpacing: 15,
-                          childAspectRatio: 0.8,
-                        ),
-                        itemCount: snapshot.data!.length,
-                        itemBuilder: (context, index) {
-                          return InkWell(
-                            onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ProductDetailPage(
-                                  product: snapshot.data[index],
-                                ),
-                              ),
-                            ),
-                            child: ProductCard(product: snapshot.data[index]),
-                          );
-                        },
-                      ),
-                    ),
-                    const SizedBox(height: 30),
-                  ],
-                ),
-              );
-            }
-          }
-        },
-      ),
-    );
-  }
-}
-
-class ProductCard extends StatelessWidget {
-  final Product product;
-
-  const ProductCard({super.key, required this.product});
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: const BorderRadius.all(Radius.circular(12)),
-        color: TailwindColors.whiteLight,
-        
-        boxShadow: [
-          BoxShadow(
-            color: TailwindColors.whiteActive!,
-            blurRadius: 15.0,
-            spreadRadius: 0.5,
-            offset: const Offset(3.0, 3.0),
-          )
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
+      body: Padding(padding: const EdgeInsets.all(20.0),
         child: Column(
           children: <Widget>[
-            ClipRRect(
-              borderRadius: const BorderRadius.all(Radius.circular(12)),
-              child: Container(
-                height: 120,
-                width: MediaQuery.of(context).size.width,
-              ),
+            const SizedBox(
+              height: 15,
+            ),
+            const Text(
+              "My Products",
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
             const SizedBox(
-              height: 10,
+              height: 20,
             ),
-            Text(
-              product.fields.productName,
-              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 5),
-              child: Text(
-                product.fields.restaurant,
-                style: TextStyle(fontSize: 11, color: TailwindColors.whiteDark),
-              ),
-            ),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text(
-                  product.fields.category,
-                  style: const TextStyle(
-                    color: TailwindColors.peachDefault,
-                    fontSize: 11,
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AddProductPage(),
                   ),
-                )
-              ],
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: TailwindColors.sageDark,
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 20, vertical: 15),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: const Text(
+                "Tambah Produk Baru",
+                style: TextStyle(
+                    color: TailwindColors.whiteLight,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600),
+              ),
             ),
             const SizedBox(
-              height: 5
+              height: 25,
             ),
-            Text(
-              "Rp ${product.fields.price}",
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
-      ),
-    );
+            Expanded(
+              child: FutureBuilder<List<dynamic>>(
+                  future: _products,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(
+                        child: Text(
+                          "Error: ${snapshot.error}",
+                          style: const TextStyle(color: Colors.red),
+                        ),
+                      );
+                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return const Center(
+                        child: Text("Anda belum memiliki produk pada PaKu."),
+                      );
+                    } else {
+                      final products = snapshot.data!;
+                      return SingleChildScrollView(
+                        child: Column(
+                          children: <Widget>[
+                            const SizedBox(
+                              height: 25,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 20),
+                              child: GridView.builder(
+                                physics: const NeverScrollableScrollPhysics(),
+                                shrinkWrap: true,
+                                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  mainAxisSpacing: 15,
+                                  crossAxisSpacing: 15,
+                                  childAspectRatio: 0.8,
+                                ),
+                                itemCount: products.length,
+                                itemBuilder: (context, index) {
+                                  final product = products[index];
+                                  return InkWell(
+                                    onTap: () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ProductDetailPage(
+                                          product: products[index],
+                                        ),
+                                      ),
+                                    ),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: const BorderRadius.all(Radius.circular(12)),
+                                        color: TailwindColors.whiteLight,
+                                        
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: TailwindColors.whiteActive!,
+                                            blurRadius: 15.0,
+                                            spreadRadius: 0.5,
+                                            offset: const Offset(3.0, 3.0),
+                                          )
+                                        ],
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(12.0),
+                                        child: Column(
+                                          children: <Widget>[
+                                            ClipRRect(
+                                              borderRadius: const BorderRadius.all(Radius.circular(12)),
+                                              child: Container(
+                                                height: 120,
+                                                width: MediaQuery.of(context).size.width,
+                                              ),
+                                            ),
+                                            const SizedBox(
+                                              height: 10,
+                                            ),
+                                            Text(
+                                              product['product_name'],
+                                              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.symmetric(vertical: 5),
+                                              child: Text(
+                                                product['description'],
+                                                style: TextStyle(fontSize: 11, color: TailwindColors.whiteDark),
+                                              ),
+                                            ),
+                                            Row(
+                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: <Widget>[
+                                                Text(
+                                                  product['category'],
+                                                  style: const TextStyle(
+                                                    color: TailwindColors.peachDefault,
+                                                    fontSize: 11,
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                            const SizedBox(
+                                              height: 5
+                                            ),
+                                            Text(
+                                              "Rp ${product['price']}",
+                                              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    )
+                                  );  
+                                }
+                              )
+                            )
+                          ]
+                        )
+                      );
+                    }
+                  },
+              )
+            )
+          ]
+        )
+      )  
+    );     
   }
 }
 

@@ -1,8 +1,7 @@
+import 'package:paku/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:paku/colors.dart';
 import 'package:paku/widgets/left_drawer.dart';
-import 'package:paku/screens/products/add_product.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:paku/screens/products/models/product.dart';
 
@@ -37,102 +36,81 @@ class _ProductsPageState extends State<ProductsPage> {
         title: const Text('PaKu'),
       ),
       drawer: const LeftDrawer(),
-      body: FutureBuilder(
-        future: fetchProduct(request),
-        builder: (context, AsyncSnapshot snapshot) {
-          if (snapshot.data == null) {
-            return const Center(child: CircularProgressIndicator());
-          } else {
-            if (!snapshot.hasData) {
-              return const Column(
-                children: [
-                  Text(
-                    'Belum ada data produk pada PaKu.',
-                    style: TextStyle(fontSize: 20, color: TailwindColors.sageDarker),
-                  ),
-                  SizedBox(height: 8),
-                ],
-              );
-            } else {
-              return SingleChildScrollView(
-                child: Column(
-                  children: <Widget>[
-                    const SizedBox(
-                      height: 15,
-                    ),
-                    const Text(
-                      "All Products",
-                      style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const AddProductPage(),
+      body: Padding(padding: const EdgeInsets.all(20.0),
+        child: Column(
+          children: <Widget>[
+            const SizedBox(
+              height: 15,
+            ),
+            const Text(
+              "All Products",
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(
+              height: 25,
+            ),
+            Expanded(
+              child: FutureBuilder(
+                future: fetchProduct(request),
+                builder: (context, AsyncSnapshot snapshot) {
+                  if (snapshot.data == null) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else {
+                    if (!snapshot.hasData) {
+                      return const Column(
+                        children: [
+                          Text(
+                            'Belum ada data produk pada PaKu.',
+                            style: TextStyle(fontSize: 20, color: TailwindColors.sageDarker),
                           ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: TailwindColors.sageDarkHover,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 15),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: const Text(
-                        "Add New Products",
-                        style: TextStyle(
-                            color: TailwindColors.whiteLight,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 25,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: GridView.builder(
-                        physics: const NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          mainAxisSpacing: 15,
-                          crossAxisSpacing: 15,
-                          childAspectRatio: 0.8,
-                        ),
-                        itemCount: snapshot.data!.length,
-                        itemBuilder: (context, index) {
-                          return InkWell(
-                            onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ProductDetailPage(
-                                  product: snapshot.data[index],
+                          SizedBox(height: 8),
+                        ],
+                      );
+                    } else {
+                      return SingleChildScrollView(
+                        child: Column(
+                          children: <Widget>[
+                            const SizedBox(
+                              height: 25,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 20),
+                              child: GridView.builder(
+                                physics: const NeverScrollableScrollPhysics(),
+                                shrinkWrap: true,
+                                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  mainAxisSpacing: 15,
+                                  crossAxisSpacing: 15,
+                                  childAspectRatio: 0.8,
                                 ),
+                                itemCount: snapshot.data!.length,
+                                itemBuilder: (context, index) {
+                                  return InkWell(
+                                    onTap: () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ProductDetailPage(
+                                          product: snapshot.data[index],
+                                        ),
+                                      ),
+                                    ),
+                                    child: ProductCard(product: snapshot.data[index]),
+                                  );
+                                },
                               ),
                             ),
-                            child: ProductCard(product: snapshot.data[index]),
-                          );
-                        },
-                      ),
-                    ),
-
-                    const SizedBox(
-                      height: 30,
-                    ),
-                  ],
-                ),
-              );
-            }
-          }
-        },
-      ),
+                          ],
+                        ),
+                      );
+                    }
+                  }
+                },
+              ),
+            )
+          ]
+        )
+      )
     );
   }
 }

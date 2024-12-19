@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'package:paku/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:pbp_django_auth/pbp_django_auth.dart';
-import 'package:paku/screens/products/products.dart';
 import 'package:paku/widgets/left_drawer.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:paku/screens/products/my_products.dart';
 
 class AddProductPage extends StatefulWidget {
   const AddProductPage({super.key});
@@ -16,10 +16,41 @@ class AddProductPage extends StatefulWidget {
 class _AddProductPageState extends State<AddProductPage> {
   final _formKey = GlobalKey<FormState>();
   String _productName = "";
-  String _restaurant = "";
   int _price = 0;
   String _description = "";
   String _category = "";
+
+  void _addProduct(BuildContext context, CookieRequest request) async {
+    final response = await request.postJson(
+      "http://localhost:8000/products/create-product-flutter/",
+      jsonEncode({
+        "productName": _productName,
+        "price": _price,
+        "description": _description,
+        "category": _category,
+      }),
+    );
+
+    if (context.mounted) {
+      if (response['status'] == 'success') {
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(const SnackBar(
+          content: Text("Produk baru berhasil disimpan!"),
+        ));
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => MyProductsPage()),
+        );
+      } else {
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(
+            SnackBar(content: Text(response['message'] ?? 'Tidak dapat menambahkan produk, silakan coba lagi.')),
+          );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,19 +95,6 @@ class _AddProductPageState extends State<AddProductPage> {
                     }
                     if (value.length > 255) {
                       return "Product name cannot exceed 255 characters!";
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-
-                buildTextField(
-                  label: "Restaurant",
-                  hint: "Enter restaurant name",
-                  onChanged: (value) => _restaurant = value,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Restaurant name cannot be empty!";
                     }
                     return null;
                   },
@@ -141,34 +159,7 @@ class _AddProductPageState extends State<AddProductPage> {
                     ),
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        final response = await request.postJson(
-                            "http://127.0.0.1:8000/products/create-product-flutter/",
-                            jsonEncode(<String, String>{
-                                'productName': _productName,
-                                'restaurant': _restaurant,
-                                'price': _price.toString(),
-                                'description': _description,
-                                'category': _category
-                            }),
-                        );
-                        if (context.mounted) {
-                            if (response['status'] == 'success') {
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(const SnackBar(
-                                content: Text("Produk baru berhasil disimpan!"),
-                                ));
-                                Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(builder: (context) => ProductsPage()),
-                                );
-                            } else {
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(const SnackBar(
-                                    content:
-                                        Text("Tidak dapat menambahkan produk, silakan coba lagi."),
-                                ));
-                            }
-                          }
+                        _addProduct(context, request);
                       }
                     },
                     child: const Text(
