@@ -40,7 +40,6 @@ class _MyProductsPageState extends State<MyProductsPage> {
   }
 
   void refreshProducts() {
-    // final request = context.read<CookieRequest>();
     setState(() {
       _products = fetchProducts(context.read<CookieRequest>());
     });
@@ -180,7 +179,7 @@ class _MyProductsPageState extends State<MyProductsPage> {
                                                 padding: const EdgeInsets.symmetric(vertical: 5),
                                                 child: Text(
                                                   product['description'],
-                                                  style: TextStyle(
+                                                  style: const TextStyle(
                                                     fontSize: 11,
                                                     color: TailwindColors.whiteDark,
                                                   ),
@@ -223,7 +222,10 @@ class _MyProductsPageState extends State<MyProductsPage> {
                                                   context,
                                                   MaterialPageRoute(
                                                     builder: (context) =>
-                                                        EditProductPage(product: product),
+                                                        EditProductPage(
+                                                          productId: product['id'],
+                                                          initialData: product,
+                                                        )
                                                   ),
                                                 ).then((_) => refreshProducts());
                                               },
