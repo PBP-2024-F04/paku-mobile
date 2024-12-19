@@ -137,7 +137,7 @@ class _MyProductsPageState extends State<MyProductsPage> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => ProductDetailPage(
-                                        product: products[index],
+                                        product: product,
                                       ),
                                     ),
                                   ),
@@ -275,7 +275,7 @@ class _MyProductsPageState extends State<MyProductsPage> {
 }
 
 class ProductDetailPage extends StatefulWidget {
-  final Product product;
+  final Map<String, dynamic> product;
 
   const ProductDetailPage({super.key, required this.product});
 
@@ -299,9 +299,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                const SizedBox(
-                  height: 3,
-                ),
+                const SizedBox(height: 3),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
@@ -321,24 +319,20 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     ),
                   ],
                 ),
-                const SizedBox(
-                  height: 15,
-                ),
+                const SizedBox(height: 15),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: <Widget>[
                     Expanded(
                       child: Text(
-                        widget.product.fields.productName,
-                        style: const TextStyle(
-                            fontSize: 22, fontWeight: FontWeight.w600),
+                        widget.product['product_name'],
+                        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
                       ),
                     ),
                     Text(
-                      "Rp ${widget.product.fields.price}",
-                      style: const TextStyle(
-                          fontSize: 25, fontWeight: FontWeight.w500),
+                      "Rp ${widget.product['price']}",
+                      style: const TextStyle(fontSize: 25, fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),
@@ -352,9 +346,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     ),
                     const SizedBox(width: 5),
                     Text(
-                      widget.product.fields.restaurant,
-                      style: const TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w500),
+                      widget.product['restaurant'] ?? 'No Restaurant',
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),
@@ -368,9 +361,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     ),
                     const SizedBox(width: 5),
                     Text(
-                      widget.product.fields.category,
-                      style: const TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w500),
+                      widget.product['category'] ?? 'No Category',
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),
@@ -381,7 +373,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 ),
                 const SizedBox(height: 5),
                 Text(
-                  widget.product.fields.description,
+                  widget.product['description'] ?? 'No Description',
                   style: _grayText(),
                 ),
                 const SizedBox(height: 15),
