@@ -32,11 +32,14 @@ class _ViewPostPageState extends State<ViewPostPage> {
       if (snapshot.data!.isEmpty) {
         return const Text("Belum ada komentar.");
       }
-      return ListView.builder(
-        scrollDirection: Axis.vertical,
-        shrinkWrap: true,
-        itemCount: snapshot.data!.length,
-        itemBuilder: (context, index) => CommentCard(snapshot.data![index]),
+      return Padding(
+        padding: const EdgeInsets.only(left: 10.0),
+        child: ListView.builder(
+          scrollDirection: Axis.vertical,
+          shrinkWrap: true,
+          itemCount: snapshot.data!.length,
+          itemBuilder: (context, index) => CommentCard(snapshot.data![index]),
+        ),
       );
     } else {
       return const Center(child: CircularProgressIndicator());

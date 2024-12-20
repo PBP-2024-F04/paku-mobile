@@ -22,11 +22,32 @@ class CommentCard extends StatelessWidget {
         ),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Row(
             children: [
-              Text(comment.text),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(comment.text),
+                  ],
+                ),
+              ),
+              if (comment.isMine)
+                PopupMenuButton<String>(
+                  itemBuilder: (BuildContext context) => [
+                    PopupMenuItem<String>(
+                      value: 'Edit',
+                      child: const Text('Edit'),
+                      onTap: () {},
+                    ),
+                    PopupMenuItem<String>(
+                      value: 'Delete',
+                      child: const Text('Delete'),
+                      onTap: () {},
+                    ),
+                  ],
+                ),
             ],
           ),
         ),
