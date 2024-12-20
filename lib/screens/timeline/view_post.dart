@@ -27,6 +27,22 @@ class _ViewPostPageState extends State<ViewPostPage> {
     return [];
   }
 
+  Widget _commentsBuilder(BuildContext context, AsyncSnapshot<List<Comment>> snapshot) {
+    if (snapshot.hasData && snapshot.data is List) {
+      if (snapshot.data!.isEmpty) {
+        return const Text("Belum ada komentar.");
+      }
+      return ListView.builder(
+        scrollDirection: Axis.vertical,
+        shrinkWrap: true,
+        itemCount: snapshot.data!.length,
+        itemBuilder: (context, index) => CommentCard(snapshot.data![index]),
+      );
+    } else {
+      return const Center(child: CircularProgressIndicator());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
@@ -41,25 +57,7 @@ class _ViewPostPageState extends State<ViewPostPage> {
               PostCard(widget.post),
               FutureBuilder(
                 future: _fetchComments(request),
-                builder: (context, AsyncSnapshot snapshot) {
-                  if (snapshot.data == null) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-
-                  if (snapshot.hasData) {
-                    return ListView.builder(
-                      scrollDirection: Axis.vertical,
-                      shrinkWrap: true,
-                      itemCount: snapshot.data.length,
-                      itemBuilder: (context, index) => CommentCard(snapshot.data[index]),
-                    );
-                  } else {
-                    return Text(
-                      'Belum ada komentar.',
-                      style: Theme.of(context).textTheme.labelLarge,
-                    );
-                  }
-                },
+                builder: _commentsBuilder,
               ),
             ],
           ),
