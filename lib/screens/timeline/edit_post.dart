@@ -20,6 +20,12 @@ class _EditPostPageState extends State<EditPostPage> {
 
   String _text = "";
 
+  @override
+  void initState() {
+    super.initState();
+    _text = widget.post.text;
+  }
+
   void _editPost(BuildContext context, CookieRequest request) async {
     final response = await request.postJson(
       "http://localhost:8000/timeline/json/posts/${widget.post.id}/edit",
@@ -45,12 +51,6 @@ class _EditPostPageState extends State<EditPostPage> {
           );
       }
     }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _text = widget.post.text;
   }
 
   @override

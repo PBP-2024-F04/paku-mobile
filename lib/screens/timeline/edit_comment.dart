@@ -19,6 +19,12 @@ class _EditCommentPageState extends State<EditCommentPage> {
 
   String _text = "";
 
+  @override
+  void initState() {
+    super.initState();
+    _text = widget.comment.text;
+  }
+
   void _editComment(BuildContext context, CookieRequest request) async {
     final response = await request.postJson(
       "http://localhost:8000/timeline/json/comments/${widget.comment.id}/edit",
@@ -42,12 +48,6 @@ class _EditCommentPageState extends State<EditCommentPage> {
           );
       }
     }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _text = widget.comment.text;
   }
 
   @override

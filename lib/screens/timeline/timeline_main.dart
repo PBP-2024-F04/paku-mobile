@@ -25,6 +25,25 @@ class _TimelineMainPageState extends State<TimelineMainPage> {
     return [];
   }
 
+  Widget _postsBuilder(
+    BuildContext context,
+    AsyncSnapshot<List<Post>> snapshot,
+  ) {
+    if (snapshot.hasData && snapshot.data is List) {
+      if (snapshot.data!.isEmpty) {
+        return const Text("Belum ada post.");
+      }
+      return ListView.builder(
+        scrollDirection: Axis.vertical,
+        shrinkWrap: true,
+        itemCount: snapshot.data!.length,
+        itemBuilder: (context, index) => PostCard(snapshot.data![index]),
+      );
+    } else {
+      return const Center(child: CircularProgressIndicator());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
@@ -58,25 +77,7 @@ class _TimelineMainPageState extends State<TimelineMainPage> {
               ),
               FutureBuilder(
                 future: _fetchPosts(request),
-                builder: (context, AsyncSnapshot snapshot) {
-                  if (snapshot.data == null) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-
-                  if (snapshot.hasData) {
-                    return ListView.builder(
-                      scrollDirection: Axis.vertical,
-                      shrinkWrap: true,
-                      itemCount: snapshot.data.length,
-                      itemBuilder: (context, index) => PostCard(snapshot.data[index]),
-                    );
-                  } else {
-                    return Text(
-                      'Belum ada post.',
-                      style: Theme.of(context).textTheme.labelLarge,
-                    );
-                  }
-                },
+                builder: _postsBuilder,
               )
             ],
           ),

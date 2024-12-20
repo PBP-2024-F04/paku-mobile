@@ -24,7 +24,7 @@ class _ViewPostPageState extends State<ViewPostPage> {
 
   void _createComment(BuildContext context, CookieRequest request) async {
     final response = await request.postJson(
-      "http://localhost:8000/timeline/json/posts/${widget.post.id}/create_comment",
+      "http://localhost:8000/timeline/json/posts/${widget.post.id}/comments/create",
       jsonEncode({ 'text': _comment }),
     );
 
@@ -51,7 +51,7 @@ class _ViewPostPageState extends State<ViewPostPage> {
 
   Future<List<Comment>> _fetchComments(CookieRequest request) async {
     final response = await request.get(
-      'http://localhost:8000/timeline/json/posts/${widget.post.id}/show_comments',
+      'http://localhost:8000/timeline/json/posts/${widget.post.id}/comments',
     );
 
     if (response is List<dynamic>) {

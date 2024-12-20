@@ -12,6 +12,51 @@ class PostCard extends StatelessWidget {
 
   const PostCard(this.post, {super.key});
 
+  void _editPost(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditPostPage(post),
+      ),
+    );
+  }
+
+  void _deletePost(BuildContext context, CookieRequest request) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Are you sure?"),
+        actions: [
+          TextButton(
+            child: const Text("Yes"),
+            onPressed: () async {
+              await request.postJson(
+                "http://localhost:8000/timeline/json/posts/${post.id}/delete",
+                "",
+              );
+
+              if (context.mounted) {
+                Navigator.of(context)
+                  ..pop()
+                  ..pushReplacement(
+                    MaterialPageRoute(
+                      builder: (context) => const TimelineMainPage(),
+                    ),
+                  );
+              }
+            },
+          ),
+          TextButton(
+            child: const Text("No"),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
@@ -67,54 +112,22 @@ class PostCard extends StatelessWidget {
                       onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => ViewPostPage(post)),
+                          builder: (context) => ViewPostPage(post),
+                        ),
                       ),
                     ),
-                    if (post.isMine)
-                      ...[
-                        PopupMenuItem<String>(
-                          value: 'Edit',
-                          child: const Text('Edit'),
-                          onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => EditPostPage(post)),
-                          ),
-                        ),
-                        PopupMenuItem<String>(
-                          value: 'Delete',
-                          child: const Text('Delete'),
-                          onTap: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: const Text("Are you sure?"),
-                                actions: [
-                                  TextButton(
-                                    child: const Text("Yes"),
-                                    onPressed: () {
-                                      request.postJson(
-                                          "http://localhost:8000/timeline/json/posts/${post.id}/delete",
-                                          "");
-                                      Navigator.of(context)
-                                        ..pop()
-                                        ..pushReplacement(MaterialPageRoute(
-                                            builder: (context) =>
-                                                const TimelineMainPage()));
-                                    },
-                                  ),
-                                  TextButton(
-                                    child: const Text("No"),
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-                      ],
+                    if (post.isMine) ...[
+                      PopupMenuItem<String>(
+                        value: 'Edit',
+                        child: const Text('Edit'),
+                        onTap: () => _editPost(context),
+                      ),
+                      PopupMenuItem<String>(
+                        value: 'Delete',
+                        child: const Text('Delete'),
+                        onTap: () => _deletePost(context, request),
+                      ),
+                    ],
                   ],
                 ),
               ],
