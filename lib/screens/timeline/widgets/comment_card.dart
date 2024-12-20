@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:paku/colors.dart';
+import 'package:paku/screens/timeline/edit_comment.dart';
 import 'package:paku/screens/timeline/models/comment.dart';
 import 'package:paku/screens/timeline/models/post.dart';
 import 'package:paku/screens/timeline/view_post.dart';
@@ -11,6 +12,22 @@ class CommentCard extends StatelessWidget {
   final Post post;
 
   const CommentCard(this.comment, this.post, {super.key});
+
+  void _editComment(BuildContext context) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => EditCommentPage(comment),
+      ),
+    );
+
+    if (context.mounted) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => ViewPostPage(post),
+        )
+      );
+    }
+  }
 
   void _deleteComment(BuildContext context, CookieRequest request) {
     showDialog(
@@ -26,13 +43,15 @@ class CommentCard extends StatelessWidget {
                 "",
               );
 
-              Navigator.of(context)
-                ..pop()
-                ..pushReplacement(
-                  MaterialPageRoute(
-                    builder: (context) => ViewPostPage(post),
-                  ),
-                );
+              if (context.mounted) {
+                Navigator.of(context)
+                  ..pop()
+                  ..pushReplacement(
+                    MaterialPageRoute(
+                      builder: (context) => ViewPostPage(post),
+                    ),
+                  );
+              }
             },
           ),
           TextButton(
@@ -80,7 +99,7 @@ class CommentCard extends StatelessWidget {
                     PopupMenuItem<String>(
                       value: 'Edit',
                       child: const Text('Edit'),
-                      onTap: () {},
+                      onTap: () => _editComment(context),
                     ),
                     PopupMenuItem<String>(
                       value: 'Delete',
