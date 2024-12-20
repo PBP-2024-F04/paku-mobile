@@ -1,14 +1,55 @@
 import 'package:flutter/material.dart';
 import 'package:paku/colors.dart';
 import 'package:paku/screens/timeline/models/comment.dart';
+import 'package:paku/screens/timeline/models/post.dart';
+import 'package:paku/screens/timeline/view_post.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
 
 class CommentCard extends StatelessWidget {
   final Comment comment;
+  final Post post;
 
-  const CommentCard(this.comment, {super.key});
+  const CommentCard(this.comment, this.post, {super.key});
+
+  void _deleteComment(BuildContext context, CookieRequest request) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Are you sure?"),
+        actions: [
+          TextButton(
+            child: const Text("Yes"),
+            onPressed: () async {
+              await request.postJson(
+                "http://localhost:8000/timeline/json/comments/${comment.id}/delete",
+                "",
+              );
+
+              Navigator.of(context)
+                ..pop()
+                ..pushReplacement(
+                  MaterialPageRoute(
+                    builder: (context) => ViewPostPage(post),
+                  ),
+                );
+            },
+          ),
+          TextButton(
+            child: const Text("No"),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
+
     return SizedBox(
       width: double.infinity,
       child: Card(
@@ -44,7 +85,7 @@ class CommentCard extends StatelessWidget {
                     PopupMenuItem<String>(
                       value: 'Delete',
                       child: const Text('Delete'),
-                      onTap: () {},
+                      onTap: () => _deleteComment(context, request),
                     ),
                   ],
                 ),

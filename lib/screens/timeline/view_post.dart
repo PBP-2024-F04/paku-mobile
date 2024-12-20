@@ -75,7 +75,7 @@ class _ViewPostPageState extends State<ViewPostPage> {
           scrollDirection: Axis.vertical,
           shrinkWrap: true,
           itemCount: snapshot.data!.length,
-          itemBuilder: (context, index) => CommentCard(snapshot.data![index]),
+          itemBuilder: (context, index) => CommentCard(snapshot.data![index], widget.post),
         ),
       );
     } else {
