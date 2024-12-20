@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:paku/screens/accounts/login.dart';
+import 'package:paku/screens/profile/profile.dart';
 import 'package:paku/theme.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'PaKu',
         theme: theme,
-        home: const LoginPage(),
+        home: const ProfilePage(),
       ),
     );
   }
