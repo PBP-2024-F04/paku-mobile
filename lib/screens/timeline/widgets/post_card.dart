@@ -61,43 +61,60 @@ class PostCard extends StatelessWidget {
                 ),
                 PopupMenuButton<String>(
                   itemBuilder: (BuildContext context) => [
-                    PopupMenuItem<String>(
-                      value: 'Edit',
-                      child: const Text('Edit'),
+                    PopupMenuItem(
+                      value: 'View',
+                      child: const Text('View'),
                       onTap: () => Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => EditPostPage(post)),
+                        MaterialPageRoute(
+                            builder: (context) => ViewPostPage(post)),
                       ),
                     ),
-                    PopupMenuItem<String>(
-                      value: 'Delete',
-                      child: const Text('Delete'),
-                      onTap: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: const Text("Are you sure?"),
-                            actions: [
-                              TextButton(
-                                child: const Text("Yes"),
-                                onPressed: () {
-                                  request.postJson("http://localhost:8000/timeline/json/posts/${post.id}/delete", "");
-                                  Navigator.of(context)
-                                    ..pop()
-                                    ..pushReplacement(MaterialPageRoute(builder: (context) => const TimelineMainPage()));
-                                },
+                    ...(post.isMine
+                        ? [
+                            PopupMenuItem<String>(
+                              value: 'Edit',
+                              child: const Text('Edit'),
+                              onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => EditPostPage(post)),
                               ),
-                              TextButton(
-                                child: const Text("No"),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                            ],
-                          ),
-                        );
-                      }
-                    ),
+                            ),
+                            PopupMenuItem<String>(
+                                value: 'Delete',
+                                child: const Text('Delete'),
+                                onTap: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      title: const Text("Are you sure?"),
+                                      actions: [
+                                        TextButton(
+                                          child: const Text("Yes"),
+                                          onPressed: () {
+                                            request.postJson(
+                                                "http://localhost:8000/timeline/json/posts/${post.id}/delete",
+                                                "");
+                                            Navigator.of(context)
+                                              ..pop()
+                                              ..pushReplacement(MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      const TimelineMainPage()));
+                                          },
+                                        ),
+                                        TextButton(
+                                          child: const Text("No"),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }),
+                          ]
+                        : []),
                   ],
                 ),
               ],
