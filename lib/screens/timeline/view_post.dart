@@ -33,7 +33,6 @@ class _ViewPostPageState extends State<ViewPostPage> {
 
     return Scaffold(
       appBar: AppBar(title: const Text("Post")),
-      drawer: const LeftDrawer(),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(30),
         child: Center(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:paku/colors.dart';
+import 'package:paku/widgets/left_drawer.dart';
 
 class Products extends StatelessWidget {
   // Contoh data produk
@@ -30,11 +31,8 @@ class Products extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("All Products"),
-        centerTitle: true,
-        backgroundColor: TailwindColors.sageDark,
-      ),
+      appBar: AppBar(title: const Text("PaKu")),
+      drawer: const LeftDrawer(),
       body: GridView.builder(
         padding: const EdgeInsets.all(12.0),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
