@@ -1,18 +1,73 @@
 import 'package:flutter/material.dart';
+import 'package:paku/screens/reviews/reviews.dart';
 import 'package:paku/screens/reviews/edit_review.dart';
-import 'package:paku/screens/reviews/delete_review.dart';
+import 'package:paku/screens/reviews/models/review.dart';
 import 'package:paku/colors.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
 
-class ReviewCard extends StatelessWidget {
+class MyReviewCard extends StatelessWidget {
   final Map<String, dynamic> review;
-  final Function(int) onDelete;
-  final Function(int, String) onEdit;
+  // final Function(int) onDelete;
+  // final Function(int, String) onEdit;
 
-  const ReviewCard(
-      {required this.review, required this.onDelete, required this.onEdit});
+  const MyReviewCard({
+    super.key,
+    required this.review,
+    // required this.onDelete,
+    // required this.onEdit,
+  });
+
+  void _editReview(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditReviewPage(review: review),
+      ),
+    );
+  }
+
+  void _deleteReview(BuildContext context, CookieRequest request) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Delete Review'),
+        content: Text('Are you sure you want to delete this review?'),
+        actions: [
+          TextButton(
+            child: const Text("Delete"),
+            onPressed: () async {
+              await request.postJson(
+                "http://localhost:8000/reviews/json/reviews/me/${review['id']}/delete",
+                "",
+              );
+
+              if (context.mounted) {
+                Navigator.of(context)
+                  ..pop()
+                  ..pushReplacement(
+                    MaterialPageRoute(
+                      builder: (context) => const ReviewPage(),
+                    ),
+                  );
+              }
+            },
+          ),
+          TextButton(
+            child: const Text("Cancel"),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
+
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       elevation: 4,
@@ -31,7 +86,7 @@ class ReviewCard extends StatelessWidget {
               style: TextStyle(color: Colors.grey),
             ),
             Text(
-              'Price: \$${review['price'].toStringAsFixed(2)}',
+              'Price: Rp${review['price'].toStringAsFixed(2)}',
               style: TextStyle(color: Colors.green),
             ),
             SizedBox(height: 10),
@@ -59,24 +114,11 @@ class ReviewCard extends StatelessWidget {
               children: [
                 IconButton(
                   icon: Icon(Icons.edit),
-                  onPressed: () async {
-                    final result = await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => EditReviewPage(
-                          initialRating: review['rating'],
-                          initialComment: review['comment'],
-                        ),
-                      ),
-                    );
-                    if (result != null) {
-                      onEdit(result['rating'], result['comment']);
-                    }
-                  },
+                  onPressed: () => _editReview(context),
                 ),
                 IconButton(
                   icon: Icon(Icons.delete),
-                  onPressed: () => onDelete(review['id']),
+                  onPressed: () => _deleteReview(context, request),
                 ),
               ],
             ),
