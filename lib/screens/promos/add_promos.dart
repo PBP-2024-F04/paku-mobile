@@ -1,12 +1,10 @@
-// lib/screens/promos/add_promos.dart
-
 import 'package:flutter/material.dart';
 import 'package:paku/colors.dart';
 import 'package:paku/widgets/left_drawer.dart';
-import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart'; // Import CookieRequest
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart'; // Import intl package
-import 'dart:convert'; // Untuk json encoding
+import 'package:intl/intl.dart'; // For date formatting
+import 'dart:convert'; // For jsonEncode
 
 class AddPromoPage extends StatefulWidget {
   @override
@@ -18,66 +16,85 @@ class _AddPromoPageState extends State<AddPromoPage> {
   TextEditingController _tanggalController = TextEditingController();
   String _judulPromo = '';
   String _deskripsiPromo = '';
-  String _tanggalBatas = '';
+  DateTime? _tanggalBatas;
 
-  // Fungsi untuk memilih tanggal dengan DatePicker
+  @override
+  void dispose() {
+    _tanggalController.dispose();
+    super.dispose();
+  }
+
   Future<void> _selectDate(BuildContext context) async {
-    DateTime initialDate;
-    if (_tanggalBatas.isNotEmpty) {
-      try {
-        initialDate = DateFormat('dd-MM-yyyy').parse(_tanggalBatas);
-      } catch (e) {
-        initialDate = DateTime.now();
-      }
-    } else {
-      initialDate = DateTime.now();
-    }
-
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: initialDate,
+      initialDate: _tanggalBatas ?? DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
     );
+
     if (picked != null) {
       setState(() {
+        _tanggalBatas = picked;
         _tanggalController.text = DateFormat('dd-MM-yyyy').format(picked);
-        _tanggalBatas = _tanggalController.text;
       });
     }
   }
 
-  // Fungsi untuk mengirim data promo ke Django
+  void _clearDate() {
+    setState(() {
+      _tanggalBatas = null;
+      _tanggalController.text = '';
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Tanggal batas penggunaan telah dihapus.')),
+    );
+  }
+
   Future<void> _submitPromo() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       final request = context.read<CookieRequest>();
 
       try {
-        final response = await request.post(
+        // Format the date as 'yyyy-MM-dd' or send null
+        String? formattedDate = _tanggalBatas != null
+            ? DateFormat('yyyy-MM-dd').format(_tanggalBatas!)
+            : null;
+
+        // Prepare the data to send
+        Map<String, dynamic> data = {
+          'promo_title': _judulPromo,
+          'promo_description': _deskripsiPromo,
+          'batas_penggunaan': formattedDate, // Send as string or null
+        };
+
+        // Debug: Log the JSON payload
+        print('JSON Payload: ${jsonEncode(data)}');
+
+        // Send the POST request
+        final response = await request.postJson(
           'http://localhost:8000/promos/create_promo_json/',
-          {
-            'promo_title': _judulPromo,
-            'promo_description': _deskripsiPromo,
-            'batas_penggunaan': _tanggalBatas,
-          },
+          jsonEncode(data),
         );
 
+        // Debug: Log the response
+        print('Add Promo Response: $response');
+
         if (response['status'] == 'success') {
-          // Menampilkan dialog sukses jika promo berhasil ditambahkan
           _showSuccessDialog(context);
         } else {
-          // Menampilkan dialog error jika terjadi masalah saat submit
-          _showErrorDialog(context);
+          _showErrorDialogWithMessage(
+            context,
+            response['message'] ?? 'Gagal menambahkan promo.',
+          );
         }
       } catch (e) {
-        print('Error submitting promo: $e');
+        print('Error adding promo: $e');
         _showErrorDialog(context);
       }
     }
   }
 
-  // Fungsi untuk menampilkan AlertDialog setelah submit berhasil
   void _showSuccessDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -90,15 +107,16 @@ class _AddPromoPageState extends State<AddPromoPage> {
             children: [
               Text("Judul Promo: $_judulPromo"),
               Text("Deskripsi: $_deskripsiPromo"),
-              Text("Batas Penggunaan: $_tanggalBatas"),
+              if (_tanggalBatas != null)
+                Text("Batas Penggunaan: ${DateFormat('dd-MM-yyyy').format(_tanggalBatas!)}"),
             ],
           ),
           actions: <Widget>[
             TextButton(
               child: Text("OK"),
               onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).pop(); // Kembali ke halaman sebelumnya
+                Navigator.of(context).pop(); // Close dialog
+                Navigator.of(context).pop(); // Return to the previous page
               },
             ),
           ],
@@ -107,14 +125,13 @@ class _AddPromoPageState extends State<AddPromoPage> {
     );
   }
 
-  // Fungsi untuk menampilkan dialog error
-  void _showErrorDialog(BuildContext context) {
+  void _showErrorDialogWithMessage(BuildContext context, String message) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text("Terjadi Kesalahan!"),
-          content: Text("Tidak dapat menambahkan promo. Silakan coba lagi."),
+          content: Text(message),
           actions: <Widget>[
             TextButton(
               child: Text("OK"),
@@ -128,10 +145,14 @@ class _AddPromoPageState extends State<AddPromoPage> {
     );
   }
 
+  void _showErrorDialog(BuildContext context) {
+    _showErrorDialogWithMessage(context, "Tidak dapat menambahkan promo. Silakan coba lagi.");
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("PaKu")),
+      appBar: AppBar(title: const Text("Tambah Promo")),
       drawer: const LeftDrawer(),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -217,25 +238,39 @@ class _AddPromoPageState extends State<AddPromoPage> {
                     ),
                     const SizedBox(height: 16),
 
-                    // Field 3: Batas Penggunaan dengan DatePicker
-                    TextFormField(
-                      controller: _tanggalController,
-                      decoration: InputDecoration(
-                        labelText: "Batas Penggunaan",
-                        labelStyle: Theme.of(context).textTheme.bodyMedium,
-                        hintText: "Masukkan tanggal batas penggunaan",
-                        suffixIcon: IconButton(
-                          icon: Icon(Icons.calendar_today),
-                          onPressed: () => _selectDate(context),
+                    // Field 3: Batas Penggunaan with DatePicker
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            controller: _tanggalController,
+                            decoration: InputDecoration(
+                              labelText: "Batas Penggunaan",
+                              labelStyle: Theme.of(context).textTheme.bodyMedium,
+                              hintText: "Masukkan tanggal batas penggunaan",
+                              suffixIcon: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: Icon(Icons.calendar_today),
+                                    onPressed: () => _selectDate(context),
+                                  ),
+                                  if (_tanggalBatas != null)
+                                    IconButton(
+                                      icon: Icon(Icons.clear),
+                                      onPressed: _clearDate,
+                                      tooltip: 'Hapus Tanggal',
+                                    ),
+                                ],
+                              ),
+                            ),
+                            readOnly: true, // Read-only to ensure DatePicker is used
+                            validator: (value) {
+                              return null; // Optional validation
+                            },
+                          ),
                         ),
-                      ),
-                      readOnly: true, // Membuat field hanya bisa diisi melalui DatePicker
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Batas penggunaan tidak boleh kosong.";
-                        }
-                        return null;
-                      },
+                      ],
                     ),
                     const SizedBox(height: 24),
 
@@ -245,7 +280,7 @@ class _AddPromoPageState extends State<AddPromoPage> {
                       children: [
                         ElevatedButton(
                           onPressed: () {
-                            Navigator.pop(context); // Tombol "Batal"
+                            Navigator.pop(context); // Cancel button
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: TailwindColors.yellowDefault,
@@ -256,7 +291,7 @@ class _AddPromoPageState extends State<AddPromoPage> {
                           ),
                         ),
                         ElevatedButton(
-                          onPressed: _submitPromo, // Submit ke Django
+                          onPressed: _submitPromo, // Submit promo
                           style: ElevatedButton.styleFrom(
                             backgroundColor: TailwindColors.sageDefault,
                           ),

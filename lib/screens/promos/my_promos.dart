@@ -1,5 +1,3 @@
-// lib/screens/promos/my_promos.dart
-
 import 'package:flutter/material.dart';
 import 'package:paku/colors.dart';
 import 'package:paku/screens/promos/add_promos.dart';
@@ -19,15 +17,15 @@ class MyPromos extends StatefulWidget {
 class _MyPromosState extends State<MyPromos> {
   Future<List<Promo>>? _future;
 
-  // Fungsi untuk mengambil daftar promo
+  // Function to fetch the list of promos
   Future<List<Promo>> fetchPromos(CookieRequest request) async {
     try {
-      // Pastikan URL sudah benar
+      // Ensure the URL is correct
       final response = await request.get('http://localhost:8000/promos/my_promo_list_json/');
 
       print('Fetch Promos Response: $response');
 
-      // Asumsikan response adalah List<dynamic>
+      // Assuming response is List<dynamic>
       return response.map<Promo>((json) => Promo.fromJson(json)).toList();
     } catch (e) {
       print('Error fetching promos: $e');
@@ -35,17 +33,16 @@ class _MyPromosState extends State<MyPromos> {
     }
   }
 
-  // Fungsi untuk menghapus promo
+  // Function to delete a promo
   Future<void> deletePromo(CookieRequest request, String promoId) async {
     try {
-      // Menggunakan endpoint _json yang baru
       final response = await request.post(
         'http://localhost:8000/promos/delete_promo_json/$promoId/',
-        {}, // Tidak perlu data tambahan
+        {}, // No additional data needed
       );
 
       if (response['success']) {
-        // Berhasil dihapus, refresh list promo
+        // Successfully deleted, refresh promo list
         setState(() {
           _future = fetchPromos(request);
         });
@@ -53,7 +50,7 @@ class _MyPromosState extends State<MyPromos> {
           SnackBar(content: Text(response['message'])),
         );
       } else {
-        // Tampilkan error
+        // Show error
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(response['message'] ?? 'Gagal menghapus promo')),
         );
@@ -66,44 +63,9 @@ class _MyPromosState extends State<MyPromos> {
     }
   }
 
-  // Fungsi untuk mengedit promo
-  Future<void> editPromo(CookieRequest request, Promo promo) async {
-    try {
-      final response = await request.post(
-        'http://localhost:8000/promos/edit_promo_json/${promo.id}/',
-        {
-          'promo_title': promo.promoTitle,
-          'promo_description': promo.promoDescription,
-          'batas_penggunaan': promo.batasPenggunaan,
-          // Tambahkan field lain sesuai kebutuhan
-        },
-      );
-
-      if (response['success']) {
-        // Berhasil diubah, refresh list promo
-        setState(() {
-          _future = fetchPromos(request);
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response['message'])),
-        );
-      } else {
-        // Tampilkan error
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response['message'] ?? 'Gagal mengubah promo')),
-        );
-      }
-    } catch (e) {
-      print('Error editing promo: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error editing promo')),
-      );
-    }
-  }
-
-  // Fungsi untuk membangun widget daftar promo
+  // Function to build the promo list widget
   Widget _promoBuilder(BuildContext context, AsyncSnapshot<List<Promo>> snapshot) {
-    final request = context.read<CookieRequest>(); // Akses request dari context
+    final request = context.read<CookieRequest>(); // Access request from context
 
     if (snapshot.hasData && snapshot.data is List) {
       if (snapshot.data!.isEmpty) {
@@ -121,7 +83,7 @@ class _MyPromosState extends State<MyPromos> {
         itemBuilder: (context, index) {
           var promo = snapshot.data![index];
           return Container(
-            width: double.infinity, // Mengisi lebar container
+            width: double.infinity, // Fill container width
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Card(
               elevation: 4,
@@ -161,7 +123,9 @@ class _MyPromosState extends State<MyPromos> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Berlaku hingga: ${promo.batasPenggunaan}',
+                      promo.batasPenggunaan != null
+                          ? 'Berlaku hingga: ${DateFormat('dd-MM-yyyy').format(promo.batasPenggunaan!)}'
+                          : 'Berlaku hingga: Tidak Ada Batas',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: Colors.grey,
                           ),
@@ -170,7 +134,7 @@ class _MyPromosState extends State<MyPromos> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // Tombol Edit
+                        // Edit Button
                         TextButton(
                           onPressed: () {
                             Navigator.push(
@@ -179,7 +143,7 @@ class _MyPromosState extends State<MyPromos> {
                                 builder: (context) => EditPromoPage(promo: promo),
                               ),
                             ).then((_) {
-                              // Refresh list setelah edit
+                              // Refresh list after edit
                               setState(() {
                                 _future = fetchPromos(request);
                               });
@@ -192,10 +156,10 @@ class _MyPromosState extends State<MyPromos> {
                           child: const Text('Edit'),
                         ),
                         const SizedBox(width: 8),
-                        // Tombol Delete dengan konfirmasi
+                        // Delete Button with confirmation
                         TextButton(
                           onPressed: () {
-                            // Konfirmasi sebelum menghapus
+                            // Confirm before deleting
                             showDialog(
                               context: context,
                               builder: (context) => AlertDialog(
@@ -273,7 +237,7 @@ class _MyPromosState extends State<MyPromos> {
                   context,
                   MaterialPageRoute(builder: (context) => AddPromoPage()),
                 ).then((_) {
-                  // Refresh list setelah menambahkan promo
+                  // Refresh list after adding promo
                   setState(() {
                     _future = fetchPromos(request);
                   });
@@ -285,18 +249,18 @@ class _MyPromosState extends State<MyPromos> {
               child: Text("Tambah Promo Baru", style: TextStyle(color: Colors.white)),
             ),
             const SizedBox(height: 16),
-            // Container dengan padding dan border
+            // Container with padding and border
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32.0), // Padding sekitar container
+                padding: const EdgeInsets.symmetric(horizontal: 32.0), // Padding around container
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 48.0, vertical: 16.0),
                   decoration: BoxDecoration(
-                    color: TailwindColors.peachDarker, // Warna latar belakang container
-                    borderRadius: BorderRadius.zero, // Tanpa sudut melengkung
+                    color: TailwindColors.peachDarker, // Container background color
+                    borderRadius: BorderRadius.zero, // No rounded corners
                     border: Border.all(
-                      color: TailwindColors.peachDarkActive, // Warna border
-                      width: 4, // Ketebalan border
+                      color: TailwindColors.peachDarkActive, // Border color
+                      width: 16, // Border width
                     ),
                   ),
                   child: RefreshIndicator(

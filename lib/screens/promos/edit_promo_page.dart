@@ -1,13 +1,11 @@
-// lib/screens/promos/edit_promo_page.dart
-
 import 'package:flutter/material.dart';
 import 'package:paku/colors.dart';
 import 'package:paku/widgets/left_drawer.dart';
-import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart'; // Import CookieRequest
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart'; // Import intl package
-import 'dart:convert'; // Untuk json encoding
 import 'package:paku/screens/promos/models/promo.dart';
+import 'dart:convert'; // Import for jsonEncode
 
 class EditPromoPage extends StatefulWidget {
   final Promo promo;
@@ -23,7 +21,7 @@ class _EditPromoPageState extends State<EditPromoPage> {
   TextEditingController _tanggalController = TextEditingController();
   late String _judulPromo;
   late String _deskripsiPromo;
-  late String _tanggalBatas;
+  DateTime? _tanggalBatas;
 
   @override
   void initState() {
@@ -31,21 +29,16 @@ class _EditPromoPageState extends State<EditPromoPage> {
     _judulPromo = widget.promo.promoTitle;
     _deskripsiPromo = widget.promo.promoDescription;
     _tanggalBatas = widget.promo.batasPenggunaan;
-    _tanggalController.text = _tanggalBatas;
+
+    if (_tanggalBatas != null) {
+      _tanggalController.text = DateFormat('dd-MM-yyyy').format(_tanggalBatas!);
+    } else {
+      _tanggalController.text = '';
+    }
   }
 
-  // Fungsi untuk memilih tanggal dengan DatePicker
   Future<void> _selectDate(BuildContext context) async {
-    DateTime initialDate;
-    if (_tanggalBatas.isNotEmpty) {
-      try {
-        initialDate = DateFormat('dd-MM-yyyy').parse(_tanggalBatas);
-      } catch (e) {
-        initialDate = DateTime.now();
-      }
-    } else {
-      initialDate = DateTime.now();
-    }
+    DateTime initialDate = _tanggalBatas ?? DateTime.now();
 
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -53,38 +46,66 @@ class _EditPromoPageState extends State<EditPromoPage> {
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
     );
+
     if (picked != null) {
       setState(() {
+        _tanggalBatas = picked;
         _tanggalController.text = DateFormat('dd-MM-yyyy').format(picked);
-        _tanggalBatas = _tanggalController.text;
       });
     }
   }
 
-  // Fungsi untuk mengirim data promo yang telah diedit ke Django
+  void _clearDate() {
+    setState(() {
+      _tanggalBatas = null;
+      _tanggalController.text = '';
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Tanggal batas penggunaan telah dihapus.')),
+    );
+  }
+
   Future<void> _submitEditPromo() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       final request = context.read<CookieRequest>();
 
       try {
-        final response = await request.post(
+        // Format the date as 'yyyy-MM-dd' if it's not null
+        String? formattedDate = _tanggalBatas != null
+            ? DateFormat('yyyy-MM-dd').format(_tanggalBatas!)
+            : null;
+
+        // Prepare the data to send
+        Map<String, dynamic> data = {
+          'promo_title': _judulPromo,
+          'promo_description': _deskripsiPromo,
+          'batas_penggunaan': formattedDate, // Send as string or null
+        };
+
+        // Convert the data to JSON
+        String jsonData = jsonEncode(data);
+
+        // Print the JSON being sent for debugging
+        print('JSON Payload: $jsonData');
+
+        // Send the POST request with the correct headers
+        final response = await request.postJson(
           'http://localhost:8000/promos/edit_promo_json/${widget.promo.id}/',
-          {
-            'promo_title': _judulPromo,
-            'promo_description': _deskripsiPromo,
-            'batas_penggunaan': _tanggalBatas,
-          },
+          jsonEncode(data),
         );
 
+        // Debug statement
+        print('Edit Promo Response: $response');
+
         if (response['success']) {
-          // Berhasil diupdate, kembali ke halaman sebelumnya
+          // Successfully updated, navigate back
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(response['message'])),
           );
           Navigator.pop(context);
         } else {
-          // Tampilkan error
+          // Show error from response
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(response['message'] ?? 'Gagal mengubah promo')),
           );
@@ -100,6 +121,7 @@ class _EditPromoPageState extends State<EditPromoPage> {
 
   @override
   Widget build(BuildContext context) {
+    // ... (UI code remains unchanged)
     return Scaffold(
       appBar: AppBar(title: const Text("Edit Promo")),
       drawer: const LeftDrawer(),
@@ -190,24 +212,40 @@ class _EditPromoPageState extends State<EditPromoPage> {
                     const SizedBox(height: 16),
 
                     // Field 3: Batas Penggunaan dengan DatePicker
-                    TextFormField(
-                      controller: _tanggalController,
-                      decoration: InputDecoration(
-                        labelText: "Batas Penggunaan",
-                        labelStyle: Theme.of(context).textTheme.bodyMedium,
-                        hintText: "Masukkan tanggal batas penggunaan",
-                        suffixIcon: IconButton(
-                          icon: Icon(Icons.calendar_today),
-                          onPressed: () => _selectDate(context),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            controller: _tanggalController,
+                            decoration: InputDecoration(
+                              labelText: "Batas Penggunaan",
+                              labelStyle: Theme.of(context).textTheme.bodyMedium,
+                              hintText: "Masukkan tanggal batas penggunaan",
+                              suffixIcon: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: Icon(Icons.calendar_today),
+                                    onPressed: () => _selectDate(context),
+                                  ),
+                                  if (_tanggalBatas != null)
+                                    IconButton(
+                                      icon: Icon(Icons.clear),
+                                      onPressed: _clearDate,
+                                      tooltip: 'Hapus Tanggal',
+                                    ),
+                                ],
+                              ),
+                            ),
+                            readOnly: true, // Make field read-only to use DatePicker
+                            validator: (value) {
+                              // If date is optional, return null
+                              // If required, add validation here
+                              return null;
+                            },
+                          ),
                         ),
-                      ),
-                      readOnly: true, // Membuat field hanya bisa diisi melalui DatePicker
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Batas penggunaan tidak boleh kosong.";
-                        }
-                        return null;
-                      },
+                      ],
                     ),
                     const SizedBox(height: 24),
 
@@ -217,7 +255,7 @@ class _EditPromoPageState extends State<EditPromoPage> {
                       children: [
                         ElevatedButton(
                           onPressed: () {
-                            Navigator.pop(context); // Tombol "Batal"
+                            Navigator.pop(context); // "Batal" button
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: TailwindColors.yellowDefault,
@@ -228,7 +266,7 @@ class _EditPromoPageState extends State<EditPromoPage> {
                           ),
                         ),
                         ElevatedButton(
-                          onPressed: _submitEditPromo, // Submit ke Django
+                          onPressed: _submitEditPromo, // Submit to Django
                           style: ElevatedButton.styleFrom(
                             backgroundColor: TailwindColors.sageDefault,
                           ),
