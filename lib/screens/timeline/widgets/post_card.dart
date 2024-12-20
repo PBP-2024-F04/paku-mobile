@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:paku/colors.dart';
+import 'package:paku/screens/timeline/edit_post.dart';
 import 'package:paku/screens/timeline/models/post.dart';
 import 'package:paku/screens/timeline/view_post.dart';
 
@@ -55,9 +56,13 @@ class PostCard extends StatelessWidget {
                 ),
                 PopupMenuButton<String>(
                   itemBuilder: (BuildContext context) => [
-                    const PopupMenuItem<String>(
+                    PopupMenuItem<String>(
                       value: 'Edit',
-                      child: Text('Edit'),
+                      child: const Text('Edit'),
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => EditPostPage(post)),
+                      ),
                     ),
                     const PopupMenuItem<String>(
                       value: 'Delete',
