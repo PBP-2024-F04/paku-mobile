@@ -15,13 +15,22 @@ class TimelineMainPage extends StatefulWidget {
 }
 
 class _TimelineMainPageState extends State<TimelineMainPage> {
-  Future<List<Post>> _fetchPosts(CookieRequest request) async {
-    final response = await request.get('http://localhost:8000/timeline/json/posts');
-    
+  Future<List<Post>>? _future;
+  String _query = "";
+
+  Future<List<Post>> _fetchPosts(
+    CookieRequest request, {
+    String query = "",
+  }) async {
+    final response = await request.get(
+      Uri.parse('http://localhost:8000/timeline/json/posts')
+          .replace(queryParameters: {"query": query}).toString(),
+    );
+
     if (response is List<dynamic>) {
       return response.map((data) => Post.fromJson(data)).toList();
     }
-    
+
     return [];
   }
 
@@ -47,6 +56,7 @@ class _TimelineMainPageState extends State<TimelineMainPage> {
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
+    _future ??= _fetchPosts(request);
 
     return Scaffold(
       appBar: AppBar(title: const Text("Timeline")),
@@ -68,15 +78,18 @@ class _TimelineMainPageState extends State<TimelineMainPage> {
                     ),
                   ),
                 ),
+                onChanged: (value) => setState(() => _query = value),
                 trailing: [
                   IconButton(
-                    onPressed: () {},
+                    onPressed: () => setState(() {
+                      _future = _fetchPosts(request, query: _query);
+                    }),
                     icon: const Icon(Icons.search),
                   )
                 ],
               ),
               FutureBuilder(
-                future: _fetchPosts(request),
+                future: _future,
                 builder: _postsBuilder,
               )
             ],
