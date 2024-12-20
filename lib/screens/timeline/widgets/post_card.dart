@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:paku/colors.dart';
 import 'package:paku/screens/timeline/edit_post.dart';
 import 'package:paku/screens/timeline/models/post.dart';
+import 'package:paku/screens/timeline/timeline_main.dart';
 import 'package:paku/screens/timeline/view_post.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
 
 class PostCard extends StatelessWidget {
   final Post post;
@@ -11,6 +14,8 @@ class PostCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
+
     return SizedBox(
       width: double.infinity,
       child: InkWell(
@@ -64,9 +69,34 @@ class PostCard extends StatelessWidget {
                         MaterialPageRoute(builder: (context) => EditPostPage(post)),
                       ),
                     ),
-                    const PopupMenuItem<String>(
+                    PopupMenuItem<String>(
                       value: 'Delete',
-                      child: Text('Delete'),
+                      child: const Text('Delete'),
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text("Are you sure?"),
+                            actions: [
+                              TextButton(
+                                child: const Text("Yes"),
+                                onPressed: () {
+                                  request.postJson("http://localhost:8000/timeline/json/posts/${post.id}/delete", "");
+                                  Navigator.of(context)
+                                    ..pop()
+                                    ..pushReplacement(MaterialPageRoute(builder: (context) => const TimelineMainPage()));
+                                },
+                              ),
+                              TextButton(
+                                child: const Text("No"),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            ],
+                          ),
+                        );
+                      }
                     ),
                   ],
                 ),
