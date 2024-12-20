@@ -1,4 +1,4 @@
-// lib/screens/promos/add_promos.dart
+// lib/screens/promos/edit_promo_page.dart
 
 import 'package:flutter/material.dart';
 import 'package:paku/colors.dart';
@@ -7,18 +7,32 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart'; // Import intl package
 import 'dart:convert'; // Untuk json encoding
+import 'package:paku/screens/promos/models/promo.dart';
 
-class AddPromoPage extends StatefulWidget {
+class EditPromoPage extends StatefulWidget {
+  final Promo promo;
+
+  EditPromoPage({required this.promo});
+
   @override
-  _AddPromoPageState createState() => _AddPromoPageState();
+  _EditPromoPageState createState() => _EditPromoPageState();
 }
 
-class _AddPromoPageState extends State<AddPromoPage> {
+class _EditPromoPageState extends State<EditPromoPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   TextEditingController _tanggalController = TextEditingController();
-  String _judulPromo = '';
-  String _deskripsiPromo = '';
-  String _tanggalBatas = '';
+  late String _judulPromo;
+  late String _deskripsiPromo;
+  late String _tanggalBatas;
+
+  @override
+  void initState() {
+    super.initState();
+    _judulPromo = widget.promo.promoTitle;
+    _deskripsiPromo = widget.promo.promoDescription;
+    _tanggalBatas = widget.promo.batasPenggunaan;
+    _tanggalController.text = _tanggalBatas;
+  }
 
   // Fungsi untuk memilih tanggal dengan DatePicker
   Future<void> _selectDate(BuildContext context) async {
@@ -47,15 +61,15 @@ class _AddPromoPageState extends State<AddPromoPage> {
     }
   }
 
-  // Fungsi untuk mengirim data promo ke Django
-  Future<void> _submitPromo() async {
+  // Fungsi untuk mengirim data promo yang telah diedit ke Django
+  Future<void> _submitEditPromo() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       final request = context.read<CookieRequest>();
 
       try {
         final response = await request.post(
-          'http://localhost:8000/promos/create_promo_json/',
+          'http://localhost:8000/promos/edit_promo_json/${widget.promo.id}/',
           {
             'promo_title': _judulPromo,
             'promo_description': _deskripsiPromo,
@@ -63,75 +77,31 @@ class _AddPromoPageState extends State<AddPromoPage> {
           },
         );
 
-        if (response['status'] == 'success') {
-          // Menampilkan dialog sukses jika promo berhasil ditambahkan
-          _showSuccessDialog(context);
+        if (response['success']) {
+          // Berhasil diupdate, kembali ke halaman sebelumnya
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(response['message'])),
+          );
+          Navigator.pop(context);
         } else {
-          // Menampilkan dialog error jika terjadi masalah saat submit
-          _showErrorDialog(context);
+          // Tampilkan error
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(response['message'] ?? 'Gagal mengubah promo')),
+          );
         }
       } catch (e) {
-        print('Error submitting promo: $e');
-        _showErrorDialog(context);
+        print('Error editing promo: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error editing promo')),
+        );
       }
     }
-  }
-
-  // Fungsi untuk menampilkan AlertDialog setelah submit berhasil
-  void _showSuccessDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Promo Berhasil Ditambahkan!"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("Judul Promo: $_judulPromo"),
-              Text("Deskripsi: $_deskripsiPromo"),
-              Text("Batas Penggunaan: $_tanggalBatas"),
-            ],
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text("OK"),
-              onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).pop(); // Kembali ke halaman sebelumnya
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  // Fungsi untuk menampilkan dialog error
-  void _showErrorDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Terjadi Kesalahan!"),
-          content: Text("Tidak dapat menambahkan promo. Silakan coba lagi."),
-          actions: <Widget>[
-            TextButton(
-              child: Text("OK"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("PaKu")),
+      appBar: AppBar(title: const Text("Edit Promo")),
       drawer: const LeftDrawer(),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -139,7 +109,7 @@ class _AddPromoPageState extends State<AddPromoPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              "Tambah Promo Baru",
+              "Edit Promo",
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
@@ -148,7 +118,7 @@ class _AddPromoPageState extends State<AddPromoPage> {
             ),
             const SizedBox(height: 8),
             Text(
-              "Silakan isi informasi promo yang ingin Anda tambahkan.",
+              "Silakan edit informasi promo yang ingin Anda ubah.",
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: TailwindColors.mossGreenDarker,
@@ -176,6 +146,7 @@ class _AddPromoPageState extends State<AddPromoPage> {
                   children: [
                     // Field 1: Judul Promo
                     TextFormField(
+                      initialValue: _judulPromo,
                       decoration: InputDecoration(
                         labelText: "Judul Promo",
                         labelStyle: Theme.of(context).textTheme.bodyMedium,
@@ -197,6 +168,7 @@ class _AddPromoPageState extends State<AddPromoPage> {
 
                     // Field 2: Deskripsi Promo
                     TextFormField(
+                      initialValue: _deskripsiPromo,
                       decoration: InputDecoration(
                         labelText: "Deskripsi Promo",
                         labelStyle: Theme.of(context).textTheme.bodyMedium,
@@ -256,12 +228,12 @@ class _AddPromoPageState extends State<AddPromoPage> {
                           ),
                         ),
                         ElevatedButton(
-                          onPressed: _submitPromo, // Submit ke Django
+                          onPressed: _submitEditPromo, // Submit ke Django
                           style: ElevatedButton.styleFrom(
                             backgroundColor: TailwindColors.sageDefault,
                           ),
                           child: Text(
-                            "Tambah Promo",
+                            "Simpan Perubahan",
                             style: TextStyle(color: Colors.white),
                           ),
                         ),

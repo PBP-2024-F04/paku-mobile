@@ -24,6 +24,14 @@ class Promo {
       batasPenggunaan: json['batas_penggunaan'],
     );
   }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'promo_title': promoTitle,
+        'restaurant_name': restaurantName,
+        'promo_description': promoDescription,
+        'batas_penggunaan': batasPenggunaan,
+      };
 }
 
 List<Promo> promoFromJson(String str) =>
