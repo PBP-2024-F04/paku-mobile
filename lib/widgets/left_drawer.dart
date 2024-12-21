@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:paku/screens/accounts/login.dart'; // Import LoginPage
+import 'package:paku/screens/accounts/login.dart';
 import 'package:paku/screens/promos/my_promos.dart';
 import 'package:paku/screens/promos/promos.dart';
 import 'package:paku/screens/reviews/reviews.dart';
 import 'package:paku/screens/products/products.dart';
 import 'package:paku/screens/timeline/timeline_main.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
-import 'dart:convert'; // Pastikan untuk mengimpor ini jika diperlukan
 
 Future<String> fetchUserRole(CookieRequest request) async {
   try {
-    // Ganti URL sesuai kebutuhan
     final response = await request.get('http://localhost:8000/accounts/json/get_user_role/');
 
     if (response != null && response['role'] != null) {
@@ -38,21 +36,19 @@ class _LeftDrawerState extends State<LeftDrawer> {
   @override
   void initState() {
     super.initState();
-    // Delay loadUserRole to ensure context is available
     WidgetsBinding.instance.addPostFrameCallback((_) {
       loadUserRole();
     });
   }
 
   Future<void> loadUserRole() async {
-    final request = context.read<CookieRequest>(); // Ambil CookieRequest dari Provider
+    final request = context.read<CookieRequest>(); 
     final role = await fetchUserRole(request);
     setState(() {
       userRole = role;
     });
   }
 
-  // Implementasi fungsi logout
   void _logout(BuildContext context, CookieRequest request) async {
     final response = await request.logout("http://localhost:8000/accounts/auth/logout/");
     String message = response["message"];
@@ -81,11 +77,11 @@ class _LeftDrawerState extends State<LeftDrawer> {
 
   @override
   Widget build(BuildContext context) {
-    final request = context.read<CookieRequest>(); // Diperlukan untuk logout
+    final request = context.read<CookieRequest>(); 
 
     return Drawer(
       child: userRole == null
-          ? Center(
+          ? const Center(
               child: CircularProgressIndicator(),
             )
           : ListView(
@@ -133,8 +129,7 @@ class _LeftDrawerState extends State<LeftDrawer> {
                     onTap: () {
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(
-                            builder: (context) => const TimelineMainPage()),
+                        MaterialPageRoute(builder: (context) => const TimelineMainPage()),
                       );
                     },
                   ),
@@ -182,8 +177,7 @@ class _LeftDrawerState extends State<LeftDrawer> {
                     onTap: () {
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(
-                            builder: (context) => const TimelineMainPage()),
+                        MaterialPageRoute(builder: (context) => const TimelineMainPage()),
                       );
                     },
                   ),
@@ -208,14 +202,11 @@ class _LeftDrawerState extends State<LeftDrawer> {
                     },
                   ),
                 ],
-                // Tambahkan Divider sebelum Logout
                 const Divider(),
-                // Tambahkan ListTile untuk Logout
                 ListTile(
                   leading: const Icon(Icons.logout),
                   title: const Text('Logout'),
                   onTap: () {
-                    // Panggil fungsi logout
                     _logout(context, request);
                   },
                 ),
