@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:paku/screens/products/my_products.dart';
 import 'package:provider/provider.dart';
 import 'package:paku/screens/promos/my_promos.dart';
 import 'package:paku/screens/promos/promos.dart';
 import 'package:paku/screens/reviews/reviews.dart';
+import 'package:paku/screens/products/my_products.dart';
 import 'package:paku/screens/products/products.dart';
 import 'package:paku/screens/timeline/timeline_main.dart';
-import 'package:paku/colors.dart'; 
+import 'package:paku/colors.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:paku/widgets/left_drawer.dart';
 
@@ -18,72 +18,78 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  String? userRole;
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      loadUserRole();
-    });
-  }
-
-  Future<void> loadUserRole() async {
-    final request = context.read<CookieRequest>();
-    final role = await fetchUserRole(request);
-    setState(() {
-      userRole = role;
-    });
-  }
-
-  Future<String> fetchUserRole(CookieRequest request) async {
+  Future<String?> _fetchUserRole(CookieRequest request) async {
     try {
-      final response = await request.get('http://localhost:8000/accounts/json/get_user_role/');
-      if (response != null && response['role'] != null) {
-        return response['role'];
+      final response = await request.get(
+        'http://localhost:8000/profile/json/',
+      );
+
+      if (response != null && response["role"] != null) {
+        return response["role"];
       } else {
         throw Exception('Role not found in response');
       }
     } catch (e) {
       print('Error fetching user role: $e');
-      return 'Error fetching role';
+      return null;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final request = context.read<CookieRequest>();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("PaKu"),
       ),
       drawer: const LeftDrawer(),
-      body: userRole == null
-          ? const Center(child: CircularProgressIndicator())
-          : Padding(
+      body: FutureBuilder<String?>(
+        future: _fetchUserRole(request),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError || snapshot.data == null) {
+            return Center(
+              child: Text(
+                'Terjadi kesalahan saat memuat data. Coba lagi nanti.',
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: Colors.red,
+                      fontWeight: FontWeight.bold,
+                    ),
+                textAlign: TextAlign.center,
+              ),
+            );
+          } else {
+            String userRole = snapshot.data!;
+            return Padding(
               padding: const EdgeInsets.all(32.0),
               child: ListView(
                 children: userRole == 'Merchant'
                     ? _buildMerchantContent(context)
                     : _buildFoodieContent(context),
               ),
-            ),
+            );
+          }
+        },
+      ),
     );
   }
 
   List<Widget> _buildMerchantContent(BuildContext context) {
     return [
       Text(
-        "Palu Kuliner",
+        "PaKu",
         textAlign: TextAlign.center,
         style: Theme.of(context)
             .textTheme
-            .titleLarge
-            ?.copyWith(color: TailwindColors.sageDarker, fontWeight: FontWeight.bold),
+            .displaySmall
+            ?.copyWith(color: TailwindColors.sageDark, fontWeight: FontWeight.bold),
       ),
       const SizedBox(height: 4),
       Text(
         "Nikmati berbagai kuliner terbaik di Palu dan jelajahi menu favoritmu",
-        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
               fontWeight: FontWeight.bold,
               color: TailwindColors.sageDark,
             ),
@@ -93,7 +99,7 @@ class _HomePageState extends State<HomePage> {
       _buildCard(
         context,
         icon: const Icon(Icons.food_bank_outlined, size: 30, color: Colors.white),
-        title: "Products",
+        title: "My Products",
         description:
             "Tambahkan produk baru ke database Paku Kuliner dan biarkan pelanggan menjelajahi menu istimewa Anda!",
         cardColor: TailwindColors.sageDark,
@@ -152,23 +158,23 @@ class _HomePageState extends State<HomePage> {
   List<Widget> _buildFoodieContent(BuildContext context) {
     return [
       Text(
-        "Palu Kuliner",
+        "PaKu",
         textAlign: TextAlign.center,
         style: Theme.of(context)
             .textTheme
-            .titleLarge
-            ?.copyWith(color: TailwindColors.sageDarker, fontWeight: FontWeight.bold),
+            .displaySmall
+            ?.copyWith(color: TailwindColors.sageDark, fontWeight: FontWeight.bold),
       ),
       const SizedBox(height: 4),
       Text(
-        "Temukan Beragam Cita Rasa Palu hanya di Sini!",
+        "Nikmati berbagai kuliner terbaik di Palu dan jelajahi menu favoritmu",
         style: Theme.of(context).textTheme.bodySmall?.copyWith(
               fontWeight: FontWeight.bold,
               color: TailwindColors.sageDark,
             ),
         textAlign: TextAlign.center,
       ),
-      const SizedBox(height: 16),
+      const SizedBox(height: 24),
       _buildCard(
         context,
         icon: const Icon(Icons.food_bank_outlined, size: 30, color: Colors.white),
@@ -213,15 +219,15 @@ class _HomePageState extends State<HomePage> {
       ),
       _buildCard(
         context,
-        icon: const Icon(Icons.discount_outlined, size: 30, color: Colors.white),
+        icon: const Icon(Icons.star_border, size: 30, color: Colors.white),
         title: "Favorites",
         description:
             "Tandai produk favorit Anda! Gunakan label untuk menyimpan memori dan memudahkan pencarian kuliner berikutnya.",
-        cardColor: TailwindColors.yellowDark,
+        cardColor: TailwindColors.yellowDark, 
         onPressed: () {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => ReviewPage()),
+            MaterialPageRoute(builder: (context) => const ReviewPage()),
           );
         },
       ),
@@ -250,7 +256,7 @@ class _HomePageState extends State<HomePage> {
       required VoidCallback onPressed}) {
     return Card(
       color: cardColor,
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.zero, 
       ),
       margin: const EdgeInsets.symmetric(vertical: 2.0),
