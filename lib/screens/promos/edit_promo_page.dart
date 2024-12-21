@@ -1,36 +1,50 @@
-import 'package:flutter/material.dart';
-import 'package:paku/colors.dart';
-import 'package:paku/widgets/left_drawer.dart';
-import 'package:pbp_django_auth/pbp_django_auth.dart';
-import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
 import 'dart:convert';
 
-class AddPromoPage extends StatefulWidget {
-  const AddPromoPage({super.key});
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:paku/colors.dart';
+import 'package:paku/widgets/left_drawer.dart';
+import 'package:paku/screens/promos/models/promo.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
+
+class EditPromoPage extends StatefulWidget {
+  final Promo promo;
+
+  const EditPromoPage({required this.promo, super.key});
 
   @override
-  State<AddPromoPage> createState() => _AddPromoPageState();
+  State<EditPromoPage> createState() => _EditPromoPageState();
 }
 
-class _AddPromoPageState extends State<AddPromoPage> {
+class _EditPromoPageState extends State<EditPromoPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _tanggalController = TextEditingController();
 
-  String _judulPromo = '';
-  String _deskripsiPromo = '';
+  late String _judulPromo;
+  late String _deskripsiPromo;
   DateTime? _tanggalBatas;
 
   @override
-  void dispose() {
-    _tanggalController.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
+    _judulPromo = widget.promo.promoTitle;
+    _deskripsiPromo = widget.promo.promoDescription;
+    _tanggalBatas = widget.promo.batasPenggunaan;
+
+    if (_tanggalBatas != null) {
+      _tanggalController.text = DateFormat('dd-MM-yyyy').format(_tanggalBatas!);
+    } else {
+      _tanggalController.text = '';
+    }
   }
 
   Future<void> _selectDate(BuildContext context) async {
+    DateTime initialDate = _tanggalBatas ?? DateTime.now();
+
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: _tanggalBatas ?? DateTime.now(),
+      initialDate: initialDate,
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
     );
@@ -53,13 +67,13 @@ class _AddPromoPageState extends State<AddPromoPage> {
     );
   }
 
-  Future<void> _submitPromo(BuildContext context) async {
+  Future<void> _submitEditPromo(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       final request = context.read<CookieRequest>();
 
       try {
-        // Format the date as 'yyyy-MM-dd' or send null
+        // Format the date as 'yyyy-MM-dd' if it's not null
         String? formattedDate = _tanggalBatas != null
             ? DateFormat('yyyy-MM-dd').format(_tanggalBatas!)
             : null;
@@ -71,88 +85,41 @@ class _AddPromoPageState extends State<AddPromoPage> {
           'batas_penggunaan': formattedDate, // Send as string or null
         };
 
-        // Send the POST request
+        // Send the POST request with the correct headers
         final response = await request.postJson(
-          'http://localhost:8000/promos/create_promo_json/',
+          'http://localhost:8000/promos/edit_promo_json/${widget.promo.id}/',
           jsonEncode(data),
         );
 
         if (context.mounted) {
-          if (response['status'] == 'success') {
-            _showSuccessDialog(context);
+          if (response['success']) {
+            // Successfully updated, navigate back
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(response['message'])),
+            );
+            Navigator.pop(context);
           } else {
-            _showErrorDialogWithMessage(
-              context,
-              response['message'] ?? 'Gagal menambahkan promo.',
+            // Show error from response
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(response['message'] ?? 'Gagal mengubah promo')),
             );
           }
         }
       } catch (e) {
         if (context.mounted) {
-          _showErrorDialog(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Error editing promo')),
+          );
         }
       }
     }
   }
 
-  void _showSuccessDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Promo Berhasil Ditambahkan!"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("Judul Promo: $_judulPromo"),
-              Text("Deskripsi: $_deskripsiPromo"),
-              if (_tanggalBatas != null)
-                Text("Batas Penggunaan: ${DateFormat('dd-MM-yyyy').format(_tanggalBatas!)}"),
-            ],
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text("OK"),
-              onPressed: () {
-                Navigator.of(context).pop(); // Close dialog
-                Navigator.of(context).pop(); // Return to the previous page
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _showErrorDialogWithMessage(BuildContext context, String message) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Terjadi Kesalahan!"),
-          content: Text(message),
-          actions: <Widget>[
-            TextButton(
-              child: const Text("OK"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _showErrorDialog(BuildContext context) {
-    _showErrorDialogWithMessage(context, "Tidak dapat menambahkan promo. Silakan coba lagi.");
-  }
-
   @override
   Widget build(BuildContext context) {
+    // ... (UI code remains unchanged)
     return Scaffold(
-      appBar: AppBar(title: const Text("Tambah Promo")),
+      appBar: AppBar(title: const Text("Edit Promo")),
       drawer: const LeftDrawer(),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -160,7 +127,7 @@ class _AddPromoPageState extends State<AddPromoPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              "Tambah Promo Baru",
+              "Edit Promo",
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
@@ -169,7 +136,7 @@ class _AddPromoPageState extends State<AddPromoPage> {
             ),
             const SizedBox(height: 8),
             Text(
-              "Silakan isi informasi promo yang ingin Anda tambahkan.",
+              "Silakan edit informasi promo yang ingin Anda ubah.",
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: TailwindColors.mossGreenDarker,
@@ -197,6 +164,7 @@ class _AddPromoPageState extends State<AddPromoPage> {
                   children: [
                     // Field 1: Judul Promo
                     TextFormField(
+                      initialValue: _judulPromo,
                       decoration: InputDecoration(
                         labelText: "Judul Promo",
                         labelStyle: Theme.of(context).textTheme.bodyMedium,
@@ -218,6 +186,7 @@ class _AddPromoPageState extends State<AddPromoPage> {
 
                     // Field 2: Deskripsi Promo
                     TextFormField(
+                      initialValue: _deskripsiPromo,
                       decoration: InputDecoration(
                         labelText: "Deskripsi Promo",
                         labelStyle: Theme.of(context).textTheme.bodyMedium,
@@ -238,7 +207,7 @@ class _AddPromoPageState extends State<AddPromoPage> {
                     ),
                     const SizedBox(height: 16),
 
-                    // Field 3: Batas Penggunaan with DatePicker
+                    // Field 3: Batas Penggunaan dengan DatePicker
                     Row(
                       children: [
                         Expanded(
@@ -264,9 +233,11 @@ class _AddPromoPageState extends State<AddPromoPage> {
                                 ],
                               ),
                             ),
-                            readOnly: true, // Read-only to ensure DatePicker is used
+                            readOnly: true, // Make field read-only to use DatePicker
                             validator: (value) {
-                              return null; // Optional validation
+                              // If date is optional, return null
+                              // If required, add validation here
+                              return null;
                             },
                           ),
                         ),
@@ -277,9 +248,10 @@ class _AddPromoPageState extends State<AddPromoPage> {
                     // Button Group
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [ ElevatedButton(
+                      children: [
+                        ElevatedButton(
                           onPressed: () {
-                            Navigator.pop(context); // Cancel button
+                            Navigator.pop(context); // "Batal" button
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: TailwindColors.yellowDefault,
@@ -290,12 +262,12 @@ class _AddPromoPageState extends State<AddPromoPage> {
                           ),
                         ),
                         ElevatedButton(
-                          onPressed: () => _submitPromo(context),
+                          onPressed: () => _submitEditPromo(context),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: TailwindColors.sageDefault,
                           ),
                           child: const Text(
-                            "Tambah Promo",
+                            "Simpan Perubahan",
                             style: TextStyle(color: Colors.white),
                           ),
                         ),

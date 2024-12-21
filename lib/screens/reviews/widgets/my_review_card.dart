@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:paku/screens/reviews/reviews.dart';
 import 'package:paku/screens/reviews/edit_review.dart';
-import 'package:paku/colors.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:paku/screens/reviews/models/review.dart';
@@ -29,8 +28,8 @@ class MyReviewCard extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Delete Review'),
-        content: Text('Are you sure you want to delete this review?'),
+        title: const Text('Delete Review'),
+        content: const Text('Are you sure you want to delete this review?'),
         actions: [
           TextButton(
             child: const Text("Delete"),

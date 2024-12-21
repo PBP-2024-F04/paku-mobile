@@ -1,15 +1,67 @@
 import 'package:flutter/material.dart';
 import 'package:paku/colors.dart';
+import 'package:paku/screens/profile/profile.dart';
+import 'package:paku/screens/timeline/edit_post.dart';
 import 'package:paku/screens/timeline/models/post.dart';
+import 'package:paku/screens/timeline/timeline_main.dart';
 import 'package:paku/screens/timeline/view_post.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
 
 class PostCard extends StatelessWidget {
   final Post post;
 
   const PostCard(this.post, {super.key});
 
+  void _editPost(BuildContext context) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditPostPage(post),
+      ),
+    );
+  }
+
+  void _deletePost(BuildContext context, CookieRequest request) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Are you sure?"),
+        actions: [
+          TextButton(
+            child: const Text("Yes"),
+            onPressed: () async {
+              await request.postJson(
+                "http://localhost:8000/timeline/json/posts/${post.id}/delete",
+                "",
+              );
+
+              if (context.mounted) {
+                Navigator.of(context)
+                  ..pop()
+                  ..pushReplacement(
+                    MaterialPageRoute(
+                      builder: (context) => const TimelineMainPage(),
+                    ),
+                  );
+              }
+            },
+          ),
+          TextButton(
+            child: const Text("No"),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
+
     return SizedBox(
       width: double.infinity,
       child: InkWell(
@@ -53,17 +105,55 @@ class PostCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                PopupMenuButton<String>(
-                  itemBuilder: (BuildContext context) => [
-                    const PopupMenuItem<String>(
-                      value: 'Edit',
-                      child: Text('Edit'),
+                IconButton(
+                  onPressed: () => showModalBottomSheet(
+                    context: context,
+                    builder: (context) => Container(
+                      padding: const EdgeInsets.all(16.0),
+                      height: MediaQuery.of(context).size.height * 0.35,
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ListTile(
+                              title: const Text('View'),
+                              leading: const Icon(Icons.arrow_outward_outlined),
+                              onTap: () => Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ViewPostPage(post),
+                                ),
+                              ),
+                            ),
+                            ListTile(
+                              title: const Text('Profile'),
+                              leading: const Icon(Icons.person_outlined),
+                              onTap: () => Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      ProfilePage(username: post.user.username),
+                                ),
+                              ),
+                            ),
+                            if (post.isMine) ...[
+                              ListTile(
+                                title: const Text('Edit'),
+                                leading: const Icon(Icons.edit_outlined),
+                                onTap: () => _editPost(context),
+                              ),
+                              ListTile(
+                                title: const Text('Delete'),
+                                leading: const Icon(Icons.delete_outlined),
+                                onTap: () => _deletePost(context, request),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
                     ),
-                    const PopupMenuItem<String>(
-                      value: 'Delete',
-                      child: Text('Delete'),
-                    ),
-                  ],
+                  ),
+                  icon: const Icon(Icons.more_vert),
                 ),
               ],
             ),

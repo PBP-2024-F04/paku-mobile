@@ -89,6 +89,7 @@ class _ReviewPageState extends State<ReviewPage>
         title: const Text("PaKu"),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(kToolbarHeight),
+          preferredSize: const Size.fromHeight(kToolbarHeight),
           child: TabBar(
             controller: _tabController,
             tabs: [

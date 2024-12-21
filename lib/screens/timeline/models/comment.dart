@@ -1,12 +1,14 @@
 // To parse this JSON data, do
 //
-//   final comment = commentFromJson(jsonString);
+//     final comment = commentFromJson(jsonString);
 
 import 'dart:convert';
 
-List<Comment> commentFromJson(String str) => List<Comment>.from(json.decode(str).map((x) => Comment.fromJson(x)));
+List<Comment> commentFromJson(String str) =>
+    List<Comment>.from(json.decode(str).map((x) => Comment.fromJson(x)));
 
-String commentToJson(List<Comment> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+String commentToJson(List<Comment> data) =>
+    json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
 class Comment {
   String id;
@@ -16,6 +18,7 @@ class Comment {
   String userRole;
   String userId;
   bool isEdited;
+  bool isMine;
 
   Comment({
     required this.id,
@@ -25,26 +28,28 @@ class Comment {
     required this.userRole,
     required this.userId,
     required this.isEdited,
+    required this.isMine,
   });
 
   factory Comment.fromJson(Map<String, dynamic> json) => Comment(
-    id: json["id"],
-    text: json["text"],
-    username: json["username"],
-    displayname: json["displayname"],
-    userRole: json["user_role"],
-    userId: json["user_id"],
-    isEdited: json["is_edited"],
-  );
+        id: json["id"],
+        text: json["text"],
+        username: json["username"],
+        displayname: json["displayname"],
+        userRole: json["user_role"],
+        userId: json["user_id"],
+        isEdited: json["is_edited"],
+        isMine: json["is_mine"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "id": id,
-    "text": text,
-    "username": username,
-    "displayname": displayname,
-    "user_role": userRole,
-    "user_id": userId,
-    "is_edited": isEdited,
-  };
+        "id": id,
+        "text": text,
+        "username": username,
+        "displayname": displayname,
+        "user_role": userRole,
+        "user_id": userId,
+        "is_edited": isEdited,
+        "is_mine": isMine,
+      };
 }
-

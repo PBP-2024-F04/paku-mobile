@@ -66,7 +66,7 @@ class ProductReviewCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  '${review['created_at'].toLocal().toString().split(' ')[0]}',
+                  review['created_at'].toLocal().toString().split(' ')[0],
                   style: const TextStyle(
                     fontSize: 12,
                     color: Colors.grey,
