@@ -14,7 +14,7 @@ class PostCard extends StatelessWidget {
   const PostCard(this.post, {super.key});
 
   void _editPost(BuildContext context) {
-    Navigator.push(
+    Navigator.pushReplacement(
       context,
       MaterialPageRoute(
         builder: (context) => EditPostPage(post),
@@ -105,41 +105,55 @@ class PostCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                PopupMenuButton<String>(
-                  itemBuilder: (BuildContext context) => [
-                    PopupMenuItem(
-                      value: 'View',
-                      child: const Text('View'),
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ViewPostPage(post),
+                IconButton(
+                  onPressed: () => showModalBottomSheet(
+                    context: context,
+                    builder: (context) => Container(
+                      padding: const EdgeInsets.all(16.0),
+                      height: MediaQuery.of(context).size.height * 0.35,
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ListTile(
+                              title: const Text('View'),
+                              leading: const Icon(Icons.arrow_outward_outlined),
+                              onTap: () => Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ViewPostPage(post),
+                                ),
+                              ),
+                            ),
+                            ListTile(
+                              title: const Text('Profile'),
+                              leading: const Icon(Icons.person_outlined),
+                              onTap: () => Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      ProfilePage(username: post.user.username),
+                                ),
+                              ),
+                            ),
+                            if (post.isMine) ...[
+                              ListTile(
+                                title: const Text('Edit'),
+                                leading: const Icon(Icons.edit_outlined),
+                                onTap: () => _editPost(context),
+                              ),
+                              ListTile(
+                                title: const Text('Delete'),
+                                leading: const Icon(Icons.delete_outlined),
+                                onTap: () => _deletePost(context, request),
+                              ),
+                            ],
+                          ],
                         ),
                       ),
                     ),
-                    PopupMenuItem(
-                      value: 'View Profile',
-                      child: const Text('View Profile'),
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ProfilePage(username: post.user.username),
-                        ),
-                      ),
-                    ),
-                    if (post.isMine) ...[
-                      PopupMenuItem<String>(
-                        value: 'Edit',
-                        child: const Text('Edit'),
-                        onTap: () => _editPost(context),
-                      ),
-                      PopupMenuItem<String>(
-                        value: 'Delete',
-                        child: const Text('Delete'),
-                        onTap: () => _deletePost(context, request),
-                      ),
-                    ],
-                  ],
+                  ),
+                  icon: const Icon(Icons.more_vert),
                 ),
               ],
             ),

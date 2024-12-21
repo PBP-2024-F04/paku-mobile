@@ -94,19 +94,32 @@ class CommentCard extends StatelessWidget {
                 ),
               ),
               if (comment.isMine)
-                PopupMenuButton<String>(
-                  itemBuilder: (BuildContext context) => [
-                    PopupMenuItem<String>(
-                      value: 'Edit',
-                      child: const Text('Edit'),
-                      onTap: () => _editComment(context),
+                IconButton(
+                  onPressed: () => showModalBottomSheet(
+                    context: context,
+                    builder: (context) => Container(
+                      padding: const EdgeInsets.all(16.0),
+                      height: MediaQuery.of(context).size.height * 0.35,
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ListTile(
+                              title: const Text('Edit'),
+                              leading: const Icon(Icons.edit_outlined),
+                              onTap: () => _editComment(context),
+                            ),
+                            ListTile(
+                              title: const Text('Delete'),
+                              leading: const Icon(Icons.delete_outlined),
+                              onTap: () => _deleteComment(context, request),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                    PopupMenuItem<String>(
-                      value: 'Delete',
-                      child: const Text('Delete'),
-                      onTap: () => _deleteComment(context, request),
-                    ),
-                  ],
+                  ),
+                  icon: const Icon(Icons.more_vert),
                 ),
             ],
           ),
