@@ -79,12 +79,12 @@ class _HomePageState extends State<HomePage> {
   List<Widget> _buildMerchantContent(BuildContext context) {
     return [
       Text(
-        "PaKu",
+        "Palu Kuliner",
         textAlign: TextAlign.center,
         style: Theme.of(context)
             .textTheme
-            .displaySmall
-            ?.copyWith(color: TailwindColors.sageDark, fontWeight: FontWeight.bold),
+            .titleLarge
+            ?.copyWith(color: TailwindColors.sageDarker, fontWeight: FontWeight.bold),
       ),
       const SizedBox(height: 4),
       Text(
@@ -158,12 +158,12 @@ class _HomePageState extends State<HomePage> {
   List<Widget> _buildFoodieContent(BuildContext context) {
     return [
       Text(
-        "PaKu",
+        "Palu Kuliner",
         textAlign: TextAlign.center,
         style: Theme.of(context)
             .textTheme
-            .displaySmall
-            ?.copyWith(color: TailwindColors.sageDark, fontWeight: FontWeight.bold),
+            .titleLarge
+            ?.copyWith(color: TailwindColors.sageDarker, fontWeight: FontWeight.bold),
       ),
       const SizedBox(height: 4),
       Text(
