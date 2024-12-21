@@ -15,19 +15,48 @@ class TimelineMainPage extends StatefulWidget {
 }
 
 class _TimelineMainPageState extends State<TimelineMainPage> {
-  Future<List<Post>> _fetchPosts(CookieRequest request) async {
-    final response = await request.get('http://localhost:8000/timeline/json/posts');
-    
+  Future<List<Post>>? _future;
+  String _query = "";
+
+  Future<List<Post>> _fetchPosts(
+    CookieRequest request, {
+    String query = "",
+  }) async {
+    final response = await request.get(
+      Uri.parse('http://localhost:8000/timeline/json/posts')
+          .replace(queryParameters: {"query": query}).toString(),
+    );
+
     if (response is List<dynamic>) {
       return response.map((data) => Post.fromJson(data)).toList();
     }
-    
+
     return [];
+  }
+
+  Widget _postsBuilder(
+    BuildContext context,
+    AsyncSnapshot<List<Post>> snapshot,
+  ) {
+    if (snapshot.hasData && snapshot.data is List) {
+      if (snapshot.data!.isEmpty) {
+        return const Text("Belum ada post.");
+      }
+      return ListView.builder(
+        scrollDirection: Axis.vertical,
+        shrinkWrap: true,
+        itemCount: snapshot.data!.length,
+        itemBuilder: (context, index) => PostCard(snapshot.data![index]),
+      );
+    } else {
+      return const Center(child: CircularProgressIndicator());
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
+    _future ??= _fetchPosts(request);
 
     return Scaffold(
       appBar: AppBar(title: const Text("Timeline")),
@@ -49,34 +78,19 @@ class _TimelineMainPageState extends State<TimelineMainPage> {
                     ),
                   ),
                 ),
+                onChanged: (value) => setState(() => _query = value),
                 trailing: [
                   IconButton(
-                    onPressed: () {},
+                    onPressed: () => setState(() {
+                      _future = _fetchPosts(request, query: _query);
+                    }),
                     icon: const Icon(Icons.search),
                   )
                 ],
               ),
               FutureBuilder(
-                future: _fetchPosts(request),
-                builder: (context, AsyncSnapshot snapshot) {
-                  if (snapshot.data == null) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-
-                  if (snapshot.hasData) {
-                    return ListView.builder(
-                      scrollDirection: Axis.vertical,
-                      shrinkWrap: true,
-                      itemCount: snapshot.data.length,
-                      itemBuilder: (context, index) => PostCard(snapshot.data[index]),
-                    );
-                  } else {
-                    return Text(
-                      'Belum ada post.',
-                      style: Theme.of(context).textTheme.labelLarge,
-                    );
-                  }
-                },
+                future: _future,
+                builder: _postsBuilder,
               )
             ],
           ),

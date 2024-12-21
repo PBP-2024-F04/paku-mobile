@@ -1,30 +1,23 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:paku/colors.dart';
+import 'package:paku/widgets/left_drawer.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
 
-class ProductEditFormPage extends StatefulWidget {
-  final String initialProductName;
-  final String initialRestaurant;
-  final int initialPrice;
-  final String initialDescription;
-  final String initialCategory;
+class EditProductPage extends StatefulWidget {
+  final String productId;
+  final Map<String, dynamic> initialData;
 
-  const ProductEditFormPage({
-    super.key,
-    required this.initialProductName,
-    required this.initialRestaurant,
-    required this.initialPrice,
-    required this.initialDescription,
-    required this.initialCategory,
-  });
+  const EditProductPage({super.key, required this.productId, required this.initialData});
 
   @override
-  State<ProductEditFormPage> createState() => _ProductEditFormPageState();
+  State<EditProductPage> createState() => _EditProductPageState();
 }
 
-class _ProductEditFormPageState extends State<ProductEditFormPage> {
+class _EditProductPageState extends State<EditProductPage> {
   final _formKey = GlobalKey<FormState>();
   late String _productName;
-  late String _restaurant;
   late int _price;
   late String _description;
   late String _category;
@@ -32,16 +25,50 @@ class _ProductEditFormPageState extends State<ProductEditFormPage> {
   @override
   void initState() {
     super.initState();
-    // Initialize the form fields with the initial values
-    _productName = widget.initialProductName;
-    _restaurant = widget.initialRestaurant;
-    _price = widget.initialPrice;
-    _description = widget.initialDescription;
-    _category = widget.initialCategory;
+    // Initialize fields with data passed from previous page
+    _productName = widget.initialData['product_name'] ?? "";
+    _price = widget.initialData['price'] ?? 0;
+    _description = widget.initialData['description'] ?? "";
+    _category = widget.initialData['category'] ?? "";
+  }
+
+  void _editProduct(BuildContext context, CookieRequest request) async {
+    try {
+      final response = await request.post(
+        "http://localhost:8000/products/me/${widget.productId}/edit-product-flutter/",
+        jsonEncode({
+          "productName": _productName,
+          "price": _price,
+          "description": _description,
+          "category": _category,
+        }),
+      );
+
+      if (context.mounted) {
+        if (response['status'] == 'success') {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Produk berhasil diperbarui!")),
+          );
+          Navigator.pop(context);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(response['message'] ?? "Gagal memperbarui produk")),
+          );
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Terjadi kesalahan: $e")),
+        );
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Edit Product'),
@@ -56,6 +83,7 @@ class _ProductEditFormPageState extends State<ProductEditFormPage> {
           ),
         ],
       ),
+      drawer: const LeftDrawer(),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
@@ -65,7 +93,7 @@ class _ProductEditFormPageState extends State<ProductEditFormPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  "Edit Your Product",
+                  "Edit Product",
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 16),
@@ -88,24 +116,10 @@ class _ProductEditFormPageState extends State<ProductEditFormPage> {
                 const SizedBox(height: 16),
 
                 buildTextField(
-                  label: "Restaurant",
-                  hint: "Enter restaurant name",
-                  initialValue: _restaurant,
-                  onChanged: (value) => _restaurant = value,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Restaurant name cannot be empty!";
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-
-                buildTextField(
                   label: "Price",
                   hint: "Enter product price",
-                  keyboardType: TextInputType.number,
                   initialValue: _price.toString(),
+                  keyboardType: TextInputType.number,
                   onChanged: (value) => _price = int.tryParse(value) ?? 0,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -126,8 +140,8 @@ class _ProductEditFormPageState extends State<ProductEditFormPage> {
                   label: "Description",
                   hint: "Enter product description",
                   initialValue: _description,
-                  onChanged: (value) => _description = value,
                   maxLines: 4,
+                  onChanged: (value) => _description = value,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return "Description cannot be empty!";
@@ -160,46 +174,13 @@ class _ProductEditFormPageState extends State<ProductEditFormPage> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    onPressed: () {
+                    onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              title: const Text("Product Updated"),
-                              content: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text("Product Name: $_productName"),
-                                  Text("Restaurant: $_restaurant"),
-                                  Text("Price: $_price"),
-                                  Text("Description: $_description"),
-                                  Text("Category: $_category"),
-                                ],
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                    Navigator.pop(context, {
-                                      'productName': _productName,
-                                      'restaurant': _restaurant,
-                                      'price': _price,
-                                      'description': _description,
-                                      'category': _category,
-                                    });
-                                  },
-                                  child: const Text("OK"),
-                                ),
-                              ],
-                            );
-                          },
-                        );
+                        _editProduct(context, request);
                       }
                     },
                     child: const Text(
-                      "Update",
+                      "Save",
                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                   ),
@@ -215,13 +196,14 @@ class _ProductEditFormPageState extends State<ProductEditFormPage> {
   Widget buildTextField({
     required String label,
     required String hint,
-    required String initialValue,
+    String? initialValue,
     TextInputType keyboardType = TextInputType.text,
     required Function(String) onChanged,
     String? Function(String?)? validator,
     int maxLines = 1,
   }) {
     return TextFormField(
+      initialValue: initialValue,
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
@@ -235,7 +217,6 @@ class _ProductEditFormPageState extends State<ProductEditFormPage> {
       onChanged: onChanged,
       validator: validator,
       maxLines: maxLines,
-      initialValue: initialValue,
     );
   }
 }

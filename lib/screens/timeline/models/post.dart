@@ -11,6 +11,7 @@ class Post {
   User user;
   String text;
   bool isEdited;
+  bool isMine;
   DateTime createdAt;
   DateTime updatedAt;
 
@@ -19,6 +20,7 @@ class Post {
     required this.user,
     required this.text,
     required this.isEdited,
+    required this.isMine,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -28,6 +30,7 @@ class Post {
         user: User.fromJson(json["user"]),
         text: json["text"],
         isEdited: json["is_edited"],
+        isMine: json["is_mine"],
         createdAt: DateTime.parse(json["created_at"]),
         updatedAt: DateTime.parse(json["updated_at"]),
       );
@@ -37,6 +40,7 @@ class Post {
         "user": user.toJson(),
         "text": text,
         "is_edited": isEdited,
+        "is_mine": isMine,
         "created_at": createdAt.toIso8601String(),
         "updated_at": updatedAt.toIso8601String(),
       };
