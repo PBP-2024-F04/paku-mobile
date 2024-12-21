@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:paku/screens/products/my_products.dart';
 import 'package:provider/provider.dart';
 import 'package:paku/screens/accounts/login.dart';
+import 'package:paku/screens/accounts/home.dart';
 import 'package:paku/screens/promos/my_promos.dart';
 import 'package:paku/screens/promos/promos.dart';
 import 'package:paku/screens/reviews/reviews.dart';
@@ -68,13 +69,22 @@ class _LeftDrawerState extends State<LeftDrawer> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    "PaKu",
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context)
-                        .textTheme
-                        .displaySmall
-                        ?.copyWith(color: Colors.white),
+                InkWell(
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => const HomePage()),
+                      );
+                    },
+                    child: Text(
+                      "PaKu",
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context)
+                          .textTheme
+                          .displaySmall
+                          ?.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
                   ),
                   Text(
                     "Jelajahi kuliner Palu!",
