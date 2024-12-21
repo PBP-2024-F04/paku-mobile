@@ -40,7 +40,7 @@ class _AddProductPageState extends State<AddProductPage> {
         ));
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => MyProductsPage()),
+          MaterialPageRoute(builder: (context) => const MyProductsPage()),
         );
       } else {
         ScaffoldMessenger.of(context)

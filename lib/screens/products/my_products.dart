@@ -143,15 +143,15 @@ class _MyProductsPageState extends State<MyProductsPage> {
                                   child: Stack(
                                     children: [
                                       Container(
-                                        decoration: BoxDecoration(
-                                          borderRadius: const BorderRadius.all(Radius.circular(12)),
+                                        decoration: const BoxDecoration(
+                                          borderRadius: BorderRadius.all(Radius.circular(12)),
                                           color: TailwindColors.whiteLight,
                                           boxShadow: [
                                             BoxShadow(
-                                              color: TailwindColors.whiteActive!,
+                                              color: TailwindColors.whiteActive,
                                               blurRadius: 15.0,
                                               spreadRadius: 0.5,
-                                              offset: const Offset(3.0, 3.0),
+                                              offset: Offset(3.0, 3.0),
                                             )
                                           ],
                                         ),
@@ -161,7 +161,7 @@ class _MyProductsPageState extends State<MyProductsPage> {
                                             children: <Widget>[
                                               ClipRRect(
                                                 borderRadius: const BorderRadius.all(Radius.circular(12)),
-                                                child: Container(
+                                                child: SizedBox(
                                                   height: 120,
                                                   width: MediaQuery.of(context).size.width,
                                                 ),
@@ -235,16 +235,20 @@ class _MyProductsPageState extends State<MyProductsPage> {
                                                 try {
                                                   final request = context.read<CookieRequest>();
                                                   await deleteProduct(request, product['id']);
-                                                  ScaffoldMessenger.of(context).showSnackBar(
-                                                    const SnackBar(
-                                                      content: Text("Produk berhasil dihapus."),
-                                                    ),
-                                                  );
+                                                  if (context.mounted) {
+                                                    ScaffoldMessenger.of(context).showSnackBar(
+                                                      const SnackBar(
+                                                        content: Text("Produk berhasil dihapus."),
+                                                      ),
+                                                    );
+                                                  }
                                                   refreshProducts();
                                                 } catch (e) {
-                                                  ScaffoldMessenger.of(context).showSnackBar(
-                                                    SnackBar(content: Text("Error: $e")),
-                                                  );
+                                                  if (context.mounted) {
+                                                    ScaffoldMessenger.of(context).showSnackBar(
+                                                      SnackBar(content: Text("Error: $e")),
+                                                    );
+                                                  }
                                                 }
                                               },
                                             ),
@@ -279,7 +283,7 @@ class ProductDetailPage extends StatefulWidget {
   const ProductDetailPage({super.key, required this.product});
 
   @override
-  _ProductDetailPageState createState() => _ProductDetailPageState();
+  State<ProductDetailPage> createState() => _ProductDetailPageState();
 }
 
 class _ProductDetailPageState extends State<ProductDetailPage> {
@@ -385,5 +389,5 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     );
   }
 
-  TextStyle _grayText() => TextStyle(color: TailwindColors.whiteDark, fontSize: 15);
+  TextStyle _grayText() => const TextStyle(color: TailwindColors.whiteDark, fontSize: 15);
 }
