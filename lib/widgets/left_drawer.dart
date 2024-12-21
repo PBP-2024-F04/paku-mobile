@@ -146,7 +146,7 @@ class _LeftDrawerState extends State<LeftDrawer> {
                     onTap: () {
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (context) => Promos()),
+                        MaterialPageRoute(builder: (context) => const Promos()),
                       );
                     },
                   ),
@@ -187,7 +187,7 @@ class _LeftDrawerState extends State<LeftDrawer> {
                     onTap: () {
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (context) => MyPromos()),
+                        MaterialPageRoute(builder: (context) => const MyPromos()),
                       );
                     },
                   ),
