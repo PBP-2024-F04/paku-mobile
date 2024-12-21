@@ -44,7 +44,6 @@ class _EditProductPageState extends State<EditProductPage> {
         }),
       );
 
-      print("Response: $response"); // Debugging
       if (response['status'] == 'success') {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Produk berhasil diperbarui!")),
@@ -56,7 +55,6 @@ class _EditProductPageState extends State<EditProductPage> {
         );
       }
     } catch (e) {
-      print("Error: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Terjadi kesalahan: $e")),
       );

@@ -327,6 +327,22 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      // floatingActionButton: FloatingActionButton.extended(
+      //   onPressed: () {
+      //     Navigator.push(
+      //       context,
+      //       MaterialPageRoute(
+      //         builder: (context) => CreateReviewPage(product: widget.product),
+      //       ),
+      //     );
+      //   },
+      //   backgroundColor: TailwindColors.yellowDefault,
+      //   label: const Text(
+      //     'Tulis Review',
+      //     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+      //   ),
+      //   icon: const Icon(Icons.rate_review),
+      // ),
     );
   }
 
