@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:paku/colors.dart';
+import 'package:paku/screens/profile/profile.dart';
 import 'package:paku/screens/timeline/edit_post.dart';
 import 'package:paku/screens/timeline/models/post.dart';
 import 'package:paku/screens/timeline/timeline_main.dart';
@@ -113,6 +114,16 @@ class PostCard extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (context) => ViewPostPage(post),
+                        ),
+                      ),
+                    ),
+                    PopupMenuItem(
+                      value: 'View Profile',
+                      child: const Text('View Profile'),
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ProfilePage(username: post.user.username),
                         ),
                       ),
                     ),
