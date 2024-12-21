@@ -73,23 +73,27 @@ class User {
 }
 
 class Product {
+  String idProduct;
   String productName;
   String restaurant;
   int price;
 
   Product({
+    required this.idProduct,
     required this.productName,
     required this.restaurant,
     required this.price,
   });
 
   factory Product.fromJson(Map<String, dynamic> json) => Product(
+        idProduct: json["product_id"],
         productName: json["product_name"],
         restaurant: json["restaurant"],
         price: json["price"],
       );
 
   Map<String, dynamic> toJson() => {
+        "product_id": idProduct,
         "product_name": productName,
         "restaurant": restaurant,
         "price": price,

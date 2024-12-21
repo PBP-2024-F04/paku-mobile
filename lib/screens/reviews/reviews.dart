@@ -3,7 +3,6 @@ import 'package:paku/colors.dart';
 import 'package:paku/widgets/left_drawer.dart';
 import 'package:paku/screens/reviews/widgets/review_card.dart';
 import 'package:paku/screens/reviews/widgets/my_review_card.dart';
-import 'package:paku/screens/reviews/create_review.dart';
 import 'package:paku/screens/reviews/models/review.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
@@ -122,6 +121,7 @@ class _ReviewPageState extends State<ReviewPage> with SingleTickerProviderStateM
                           final reviewData = {
                             'id': review.id,
                             'role': review.user.role,
+                            'product_id': review.product.idProduct,
                             'product_name': review.product.productName,
                             'restaurant': review.product.restaurant,
                             'price': review.product.price,
@@ -162,6 +162,7 @@ class _ReviewPageState extends State<ReviewPage> with SingleTickerProviderStateM
                           final reviewData = {
                             'id': review.id,
                             'role': review.user.role,
+                            'product_id': review.product.idProduct,
                             'product_name': review.product.productName,
                             'restaurant': review.product.restaurant,
                             'price': review.product.price,

@@ -1,7 +1,5 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:paku/screens/reviews/models/review.dart';
-import 'package:paku/screens/reviews/reviews.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 
@@ -30,7 +28,6 @@ class _CreateReviewPageState extends State<CreateReviewPage> {
   }
 
   Future<void> _submitReview(BuildContext context, CookieRequest request) async {
-    // Validate form
     if (!_formKey.currentState!.validate() || _rating == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -58,7 +55,6 @@ class _CreateReviewPageState extends State<CreateReviewPage> {
 
       if (mounted) {
         if (response['success'] == true) {
-          // Show success message
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Review submitted successfully!'),
@@ -68,7 +64,6 @@ class _CreateReviewPageState extends State<CreateReviewPage> {
 
           Navigator.pop(context, true);
         } else {
-          // Show error message
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Error: ${response['errors'] ?? 'Failed to submit review'}'),

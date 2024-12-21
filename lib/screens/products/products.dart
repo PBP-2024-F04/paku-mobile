@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:paku/widgets/left_drawer.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:paku/screens/products/models/product.dart';
-
+import 'package:paku/screens/reviews/product_review.dart';
 
 class ProductsPage extends StatefulWidget {
   const ProductsPage({super.key});
@@ -298,6 +298,29 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   style: _grayText(),
                 ),
                 const SizedBox(height: 15),
+
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ProductReviewPage(
+                          productId: widget.product.pk.toString(),
+                        ),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: TailwindColors.mossGreenDefault,
+                    foregroundColor: Colors.white,
+                    minimumSize: const Size(double.infinity, 50),
+                  ),
+                  child: const Text(
+                    "See Reviews",
+                    style: TextStyle(fontSize: 16),
+                  ),
+                ),
+
               ],
             ),
           ),

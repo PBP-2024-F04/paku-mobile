@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:paku/colors.dart';
 import 'package:paku/widgets/left_drawer.dart';
-import 'package:paku/screens/reviews/widgets/review_card.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:paku/screens/reviews/create_review.dart';
-import 'package:paku/screens/reviews/models/review.dart'; // Import the Review model
+import 'package:paku/screens/reviews/models/review.dart';
+import 'package:paku/screens/reviews/widgets/product_review_card.dart';
 
 class ProductReviewPage extends StatefulWidget {
   final String productId;
@@ -22,18 +22,22 @@ class ProductReviewPage extends StatefulWidget {
 class _ProductReviewPageState extends State<ProductReviewPage> {
   String? selectedRating = 'all';
 
-  Future<List<Map<String, dynamic>>> _fetchReviews(
-      CookieRequest request) async {
+  Future<List<Review>> _fetchReviews(CookieRequest request) async {
     try {
       final response = await request.get(
         'http://localhost:8000/reviews/json/product/${widget.productId}/reviews/',
       );
 
+      print('Raw response: $response'); // Debug print
+
       if (response is List) {
-        return List<Map<String, dynamic>>.from(response);
+        // Konversi setiap item menggunakan fromJson
+        return response.map((item) => Review.fromJson(item)).toList();
       }
       return [];
-    } catch (e) {
+    } catch (e, stackTrace) {
+      print('Error: $e');
+      print('Stack trace: $stackTrace');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error fetching reviews: $e')),
       );
@@ -74,12 +78,11 @@ class _ProductReviewPageState extends State<ProductReviewPage> {
             ),
             const SizedBox(height: 16),
 
-            // Reviews list
             Expanded(
-              child: FutureBuilder<List<Map<String, dynamic>>>(
+              child: FutureBuilder<List<Review>>(
                 future: _fetchReviews(request),
                 builder: (context,
-                    AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
+                    AsyncSnapshot<List<Review>> snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
                   }
@@ -98,22 +101,28 @@ class _ProductReviewPageState extends State<ProductReviewPage> {
                   if (selectedRating != 'all') {
                     reviews = reviews
                         .where((review) =>
-                            review['rating'].toString() == selectedRating)
+                            review.rating.toString() == selectedRating)
                         .toList();
                   }
 
                   return ListView.builder(
                     itemCount: reviews.length,
                     itemBuilder: (context, index) {
-                      final reviewData = reviews[index];
-                      return ReviewCard(review: reviewData);
+                      final review = reviews[index];
+                      return ProductReviewCard(
+                        review: {
+                          'username': review.user.username,
+                          'comment': review.comment,
+                          'rating': review.rating,
+                          'created_at': review.createdAt,
+                        },
+                      );
                     },
                   );
                 },
               ),
             ),
 
-            // Create Review Button
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 16.0),
               child: ElevatedButton(
@@ -127,7 +136,7 @@ class _ProductReviewPageState extends State<ProductReviewPage> {
                     ),
                   );
                   if (result == true) {
-                    setState(() {}); // Refresh the reviews list
+                    setState(() {});
                   }
                 },
                 style: ElevatedButton.styleFrom(

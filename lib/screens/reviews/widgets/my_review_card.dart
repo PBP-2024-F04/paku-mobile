@@ -1,21 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:paku/screens/reviews/reviews.dart';
 import 'package:paku/screens/reviews/edit_review.dart';
-import 'package:paku/screens/reviews/models/review.dart';
 import 'package:paku/colors.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 
 class MyReviewCard extends StatelessWidget {
   final Map<String, dynamic> review;
-  // final Function(int) onDelete;
-  // final Function(int, String) onEdit;
 
   const MyReviewCard({
     super.key,
     required this.review,
-    // required this.onDelete,
-    // required this.onEdit,
   });
 
   void _editReview(BuildContext context) {
