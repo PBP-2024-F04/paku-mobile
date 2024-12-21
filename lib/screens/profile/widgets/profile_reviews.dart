@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:paku/screens/profile/models/profile.dart';
 
 class ProfileReviewsPage extends StatelessWidget {
-  const ProfileReviewsPage({super.key});
+  final Profile profile;
+
+  const ProfileReviewsPage(this.profile, {super.key});
 
   @override
   Widget build(BuildContext context) {
