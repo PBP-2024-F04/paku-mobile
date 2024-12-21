@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:paku/screens/accounts/home.dart';
-import 'package:paku/screens/promos/my_promos.dart';
 import 'package:paku/screens/promos/promos.dart';
 import 'package:paku/screens/reviews/reviews.dart';
 import 'package:paku/screens/products/products.dart';
 import 'package:paku/screens/timeline/timeline_main.dart';
+import 'package:paku/screens/products/my_products.dart';
 
 class LeftDrawer extends StatelessWidget {
   const LeftDrawer({super.key});
@@ -86,11 +86,11 @@ class LeftDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.food_bank_outlined),
-            title: const Text('Reviews'),
+            title: const Text('My Products'),
             onTap: () {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => ReviewPage()),
+                MaterialPageRoute(builder: (context) => MyProductsPage()),
               );
             },
           ),

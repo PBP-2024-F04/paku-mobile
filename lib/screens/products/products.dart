@@ -5,6 +5,7 @@ import 'package:paku/widgets/left_drawer.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:paku/screens/products/models/product.dart';
 import 'package:paku/screens/reviews/product_review.dart';
+import 'package:paku/screens/reviews/create_review.dart';
 
 class ProductsPage extends StatefulWidget {
   const ProductsPage({super.key});
@@ -298,51 +299,28 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   style: _grayText(),
                 ),
                 const SizedBox(height: 15),
-
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ProductReviewPage(
-                          productId: widget.product.pk.toString(),
-                        ),
-                      ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: TailwindColors.mossGreenDefault,
-                    foregroundColor: Colors.white,
-                    minimumSize: const Size(double.infinity, 50),
-                  ),
-                  child: const Text(
-                    "See Reviews",
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ),
-
               ],
             ),
           ),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      // floatingActionButton: FloatingActionButton.extended(
-      //   onPressed: () {
-      //     Navigator.push(
-      //       context,
-      //       MaterialPageRoute(
-      //         builder: (context) => CreateReviewPage(product: widget.product),
-      //       ),
-      //     );
-      //   },
-      //   backgroundColor: TailwindColors.yellowDefault,
-      //   label: const Text(
-      //     'Tulis Review',
-      //     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-      //   ),
-      //   icon: const Icon(Icons.rate_review),
-      // ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => CreateReviewPage(productId: widget.product.pk.toString()),
+            ),
+          );
+        },
+        backgroundColor: TailwindColors.yellowDefault,
+        label: const Text(
+          'Tulis Review',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+        ),
+        icon: const Icon(Icons.rate_review),
+      ),
     );
   }
 
