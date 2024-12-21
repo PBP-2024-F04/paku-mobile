@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:paku/screens/accounts/home.dart';
+import 'package:paku/screens/profile/profile.dart';
 
 class LeftDrawer extends StatelessWidget {
   const LeftDrawer({super.key});
@@ -36,6 +37,16 @@ class LeftDrawer extends StatelessWidget {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => const HomePage()),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.person_outlined),
+            title: const Text("My Profile"),
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const ProfilePage()),
               );
             },
           ),
