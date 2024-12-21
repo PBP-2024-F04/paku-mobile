@@ -6,9 +6,9 @@ class TailwindColors {
   static const Color whiteDefault = Color(0xFFfffcf3);
   static const Color whiteHover = Color(0xFFe6e3db);
   static const Color whiteActive = Color(0xFFcccac2);
-  static const Color whiteLight = Color(0xFFfffffe); // Benar: 0xFFfffffe
-  static const Color whiteLightHover = Color(0xFFfffffd); // Benar: 0xFFfffffd
-  static const Color whiteLightActive = Color(0xFFfffefb); // Benar: 0xFFfffefb
+  static const Color whiteLight = Color(0xFFfffffe);
+  static const Color whiteLightHover = Color(0xFFfffffd);
+  static const Color whiteLightActive = Color(0xFFfffefb);
   static const Color whiteDark = Color(0xFFbfbdb6);
   static const Color whiteDarkHover = Color(0xFF999792);
   static const Color whiteDarkActive = Color(0xFF73716d);

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:paku/screens/products/my_products.dart';
 import 'package:provider/provider.dart';
 import 'package:paku/screens/accounts/login.dart';
 import 'package:paku/screens/promos/my_promos.dart';
@@ -114,7 +115,7 @@ class _LeftDrawerState extends State<LeftDrawer> {
           onTap: () {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => const ProductsPage()),
+              MaterialPageRoute(builder: (context) => const MyProductsPage()),
             );
           },
         ),
