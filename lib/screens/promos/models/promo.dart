@@ -1,49 +1,46 @@
-import 'package:intl/intl.dart';
+// To parse this JSON data, do
+//
+//     final promo = promoFromJson(jsonString);
+
+import 'dart:convert';
+
+List<Promo> promoFromJson(String str) =>
+    List<Promo>.from(json.decode(str).map((x) => Promo.fromJson(x)));
+
+String promoToJson(List<Promo> data) =>
+    json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
 class Promo {
-  final String id;
-  final String promoTitle;
-  final String promoDescription;
-  final DateTime? batasPenggunaan; // Nullable DateTime
+  String id;
+  String promoTitle;
+  String restaurantName;
+  String promoDescription;
+  DateTime? batasPenggunaan;
 
   Promo({
     required this.id,
     required this.promoTitle,
+    required this.restaurantName,
     required this.promoDescription,
-    this.batasPenggunaan,
+    required this.batasPenggunaan,
   });
 
-  factory Promo.fromJson(Map<String, dynamic> json) {
-    String? rawDate = json['batas_penggunaan'];
-    DateTime? parsedDate;
+  factory Promo.fromJson(Map<String, dynamic> json) => Promo(
+        id: json["id"],
+        promoTitle: json["promo_title"],
+        restaurantName: json["restaurant_name"],
+        promoDescription: json["promo_description"],
+        batasPenggunaan: json["batas_penggunaan"] == null
+            ? null
+            : DateTime.parse(json["batas_penggunaan"]),
+      );
 
-    if (rawDate != null && rawDate.toString().isNotEmpty) {
-      try {
-        // Parse the date from 'dd-MM-yyyy' format
-        parsedDate = DateFormat('dd-MM-yyyy').parse(rawDate);
-      } catch (e) {
-        parsedDate = null; // Set to null if parsing fails
-      }
-    } else {
-      parsedDate = null; // Set to null if rawDate is null or empty
-    }
-
-    return Promo(
-      id: json['id'].toString(),
-      promoTitle: json['promo_title'],
-      promoDescription: json['promo_description'],
-      batasPenggunaan: parsedDate,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'promo_title': promoTitle,
-      'promo_description': promoDescription,
-      'batas_penggunaan': batasPenggunaan != null
-          ? DateFormat('dd-MM-yyyy').format(batasPenggunaan!)
-          : null, // Handle null appropriately
-    };
-  }
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "promo_title": promoTitle,
+        "restaurant_name": restaurantName,
+        "promo_description": promoDescription,
+        "batas_penggunaan":
+            "${batasPenggunaan!.year.toString().padLeft(4, '0')}-${batasPenggunaan!.month.toString().padLeft(2, '0')}-${batasPenggunaan!.day.toString().padLeft(2, '0')}",
+      };
 }

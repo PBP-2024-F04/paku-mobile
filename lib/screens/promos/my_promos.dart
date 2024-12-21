@@ -1,71 +1,76 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:paku/colors.dart';
 import 'package:paku/screens/promos/add_promos.dart';
+import 'package:paku/screens/promos/models/promo.dart';
+import 'package:paku/screens/promos/edit_promo_page.dart';
 import 'package:paku/widgets/left_drawer.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart'; // Import intl package
-import 'dart:convert';
-import 'package:paku/screens/promos/models/promo.dart';
-import 'package:paku/screens/promos/edit_promo_page.dart';
 
 class MyPromos extends StatefulWidget {
+  const MyPromos({super.key});
+
   @override
-  _MyPromosState createState() => _MyPromosState();
+  State<MyPromos> createState() => _MyPromosState();
 }
 
 class _MyPromosState extends State<MyPromos> {
   Future<List<Promo>>? _future;
 
-  // Function to fetch the list of promos
-  Future<List<Promo>> fetchPromos(CookieRequest request) async {
-    try {
-      // Ensure the URL is correct
-      final response = await request.get('http://localhost:8000/promos/my_promo_list_json/');
+  Future<List<Promo>> _fetchPromos(CookieRequest request) async {
+    final response = await request.get(
+      'http://localhost:8000/promos/my_promo_list_json/',
+    );
 
-      print('Fetch Promos Response: $response');
-
-      // Assuming response is List<dynamic>
+    if (response is List<dynamic>) {
       return response.map<Promo>((json) => Promo.fromJson(json)).toList();
-    } catch (e) {
-      print('Error fetching promos: $e');
-      return [];
     }
+
+    return [];
   }
 
-  // Function to delete a promo
-  Future<void> deletePromo(CookieRequest request, String promoId) async {
+  Future<void> _deletePromo(
+    BuildContext context,
+    CookieRequest request,
+    String promoId,
+  ) async {
     try {
       final response = await request.post(
         'http://localhost:8000/promos/delete_promo_json/$promoId/',
-        {}, // No additional data needed
+        {},
       );
 
-      if (response['success']) {
-        // Successfully deleted, refresh promo list
-        setState(() {
-          _future = fetchPromos(request);
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response['message'])),
-        );
-      } else {
-        // Show error
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response['message'] ?? 'Gagal menghapus promo')),
-        );
+      if (context.mounted) {
+        if (response['success']) {
+          setState(() {
+            _future = _fetchPromos(request);
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(response['message'])),
+          );
+        } else {
+          // Show error
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text(response['message'] ?? 'Gagal menghapus promo')),
+          );
+        }
       }
     } catch (e) {
-      print('Error deleting promo: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error deleting promo')),
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Error deleting promo')),
+        );
+      }
     }
   }
 
-  // Function to build the promo list widget
-  Widget _promoBuilder(BuildContext context, AsyncSnapshot<List<Promo>> snapshot) {
-    final request = context.read<CookieRequest>(); // Access request from context
+  Widget _promoBuilder(
+    BuildContext context,
+    AsyncSnapshot<List<Promo>> snapshot,
+  ) {
+    final request = context.read<CookieRequest>();
 
     if (snapshot.hasData && snapshot.data is List) {
       if (snapshot.data!.isEmpty) {
@@ -81,15 +86,15 @@ class _MyPromosState extends State<MyPromos> {
         shrinkWrap: true,
         itemCount: snapshot.data!.length,
         itemBuilder: (context, index) {
-          var promo = snapshot.data![index];
+          final promo = snapshot.data![index];
           return Container(
-            width: double.infinity, // Fill container width
+            width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Card(
               elevation: 4,
               margin: const EdgeInsets.symmetric(vertical: 8),
               color: TailwindColors.whiteLight,
-              shape: RoundedRectangleBorder(
+              shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.zero,
               ),
               child: Padding(
@@ -123,9 +128,7 @@ class _MyPromosState extends State<MyPromos> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      promo.batasPenggunaan != null
-                          ? 'Berlaku hingga: ${DateFormat('dd-MM-yyyy').format(promo.batasPenggunaan!)}'
-                          : 'Berlaku hingga: Tidak Ada Batas',
+                      'Berlaku hingga: ${promo.batasPenggunaan != null ? DateFormat('dd-MM-yyyy').format(promo.batasPenggunaan!) : "Tidak ada batas"}',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: Colors.grey,
                           ),
@@ -140,12 +143,13 @@ class _MyPromosState extends State<MyPromos> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => EditPromoPage(promo: promo),
+                                builder: (context) =>
+                                    EditPromoPage(promo: promo),
                               ),
                             ).then((_) {
                               // Refresh list after edit
                               setState(() {
-                                _future = fetchPromos(request);
+                                _future = _fetchPromos(request);
                               });
                             });
                           },
@@ -163,19 +167,21 @@ class _MyPromosState extends State<MyPromos> {
                             showDialog(
                               context: context,
                               builder: (context) => AlertDialog(
-                                title: Text('Konfirmasi Hapus'),
-                                content: Text('Apakah kamu yakin ingin menghapus promo ini?'),
+                                title: const Text('Konfirmasi Hapus'),
+                                content: const Text(
+                                  'Apakah kamu yakin ingin menghapus promo ini?',
+                                ),
                                 actions: [
                                   TextButton(
                                     onPressed: () => Navigator.pop(context),
-                                    child: Text('Batal'),
+                                    child: const Text('Batal'),
                                   ),
                                   TextButton(
                                     onPressed: () {
                                       Navigator.pop(context);
-                                      deletePromo(request, promo.id);
+                                      _deletePromo(context, request, promo.id);
                                     },
-                                    child: Text('Hapus'),
+                                    child: const Text('Hapus'),
                                   ),
                                 ],
                               ),
@@ -196,17 +202,19 @@ class _MyPromosState extends State<MyPromos> {
           );
         },
       );
-    } else if (snapshot.hasError) {
-      return Center(child: Text('Error fetching promos: ${snapshot.error}'));
-    } else {
-      return const Center(child: CircularProgressIndicator());
     }
+
+    if (snapshot.hasError) {
+      return Center(child: Text('Error fetching promos: ${snapshot.error}'));
+    }
+
+    return const Center(child: CircularProgressIndicator());
   }
 
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
-    _future ??= fetchPromos(request);
+    _future ??= _fetchPromos(request);
 
     return Scaffold(
       appBar: AppBar(title: const Text("PaKu")),
@@ -217,7 +225,6 @@ class _MyPromosState extends State<MyPromos> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Title text "My Promos"
             Text(
               "My Promos",
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
@@ -235,38 +242,46 @@ class _MyPromosState extends State<MyPromos> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => AddPromoPage()),
+                  MaterialPageRoute(builder: (context) => const AddPromoPage()),
                 ).then((_) {
                   // Refresh list after adding promo
                   setState(() {
-                    _future = fetchPromos(request);
+                    _future = _fetchPromos(request);
                   });
                 });
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: TailwindColors.sageDefault,
               ),
-              child: Text("Tambah Promo Baru", style: TextStyle(color: Colors.white)),
+              child: const Text(
+                "Tambah Promo Baru",
+                style: TextStyle(color: Colors.white),
+              ),
             ),
             const SizedBox(height: 16),
             // Container with padding and border
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32.0), // Padding around container
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32.0,
+                ),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 48.0, vertical: 16.0),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 48.0,
+                    vertical: 16.0,
+                  ),
                   decoration: BoxDecoration(
-                    color: TailwindColors.peachDarker, // Container background color
-                    borderRadius: BorderRadius.zero, // No rounded corners
+                    color: TailwindColors.peachDarker,
+                    borderRadius: BorderRadius.zero,
                     border: Border.all(
-                      color: TailwindColors.peachDarkActive, // Border color
-                      width: 16, // Border width
+                      color: TailwindColors.peachDarkActive,
+                      width: 16,
                     ),
                   ),
                   child: RefreshIndicator(
                     onRefresh: () async {
                       setState(() {
-                        _future = fetchPromos(request);
+                        _future = _fetchPromos(request);
                       });
                     },
                     child: FutureBuilder<List<Promo>>(
