@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:paku/screens/accounts/home.dart';
-import 'package:paku/screens/promos/my_promos.dart';
 import 'package:paku/screens/promos/promos.dart';
 import 'package:paku/screens/reviews/reviews.dart';
 import 'package:paku/screens/products/products.dart';
@@ -90,7 +89,7 @@ class LeftDrawer extends StatelessWidget {
             onTap: () {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => ReviewPage()),
+                MaterialPageRoute(builder: (context) => const ReviewPage()),
               );
             },
           ),
