@@ -249,8 +249,6 @@ class _MyProductsPageState extends State<MyProductsPage> {
                                                 }
                                               },
                                             ),
-
-
                                           ],
                                         ),
                                       ),
@@ -312,11 +310,6 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                         size: 22,
                       ),
                     ),
-                    const Icon(
-                      Icons.favorite,
-                      size: 28,
-                      color: TailwindColors.redDefault,
-                    ),
                   ],
                 ),
                 const SizedBox(height: 15),
@@ -333,21 +326,6 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     Text(
                       "Rp ${widget.product['price']}",
                       style: const TextStyle(fontSize: 25, fontWeight: FontWeight.w500),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.restaurant,
-                      color: TailwindColors.yellowDefault,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 5),
-                    Text(
-                      widget.product['restaurant'] ?? 'No Restaurant',
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),
