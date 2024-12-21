@@ -22,7 +22,7 @@ class ProductReviewPage extends StatefulWidget {
 class _ProductReviewPageState extends State<ProductReviewPage> {
   String? selectedRating = 'all';
 
-  Future<List<Review>> _fetchReviews(BuildContext context, CookieRequest request) async {
+  Future<List<Review>> _fetchReviews(CookieRequest request) async {
     try {
       final response = await request.get(
         'http://localhost:8000/reviews/json/product/${widget.productId}/reviews/',
@@ -31,7 +31,6 @@ class _ProductReviewPageState extends State<ProductReviewPage> {
       if (response is List) {
         return response.map((item) => Review.fromJson(item)).toList();
       }
-
       return [];
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

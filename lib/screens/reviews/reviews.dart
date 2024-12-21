@@ -89,10 +89,9 @@ class _ReviewPageState extends State<ReviewPage>
         title: const Text("PaKu"),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(kToolbarHeight),
-          preferredSize: const Size.fromHeight(kToolbarHeight),
           child: TabBar(
             controller: _tabController,
-            tabs: [
+            tabs: const [
               Tab(
                 icon: Icon(Icons.rate_review),
                 text: 'All Reviews',
@@ -106,11 +105,11 @@ class _ReviewPageState extends State<ReviewPage>
             indicatorWeight: 3.0, 
             labelColor: TailwindColors.whiteActive,
             unselectedLabelColor: TailwindColors.whiteDarker,
-            labelStyle: TextStyle(
+            labelStyle: const TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: 16, 
             ),
-            unselectedLabelStyle: TextStyle(
+            unselectedLabelStyle: const TextStyle(
               fontSize: 14, 
             ),
           ),

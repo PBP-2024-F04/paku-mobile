@@ -4,6 +4,7 @@ import 'package:paku/screens/reviews/edit_review.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:paku/screens/reviews/models/review.dart';
+import 'package:paku/colors.dart';
 
 class MyReviewCard extends StatelessWidget {
   final Review review;
