@@ -122,16 +122,16 @@ class ProductCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        borderRadius: const BorderRadius.all(Radius.circular(12)),
+      decoration: const BoxDecoration(
+        borderRadius: BorderRadius.all(Radius.circular(12)),
         color: TailwindColors.whiteLight,
         
         boxShadow: [
           BoxShadow(
-            color: TailwindColors.whiteActive!,
+            color: TailwindColors.whiteActive,
             blurRadius: 15.0,
             spreadRadius: 0.5,
-            offset: const Offset(3.0, 3.0),
+            offset: Offset(3.0, 3.0),
           )
         ],
       ),
@@ -141,7 +141,7 @@ class ProductCard extends StatelessWidget {
           children: <Widget>[
             ClipRRect(
               borderRadius: const BorderRadius.all(Radius.circular(12)),
-              child: Container(
+              child: SizedBox(
                 height: 120,
                 width: MediaQuery.of(context).size.width,
               ),
@@ -157,7 +157,7 @@ class ProductCard extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 5),
               child: Text(
                 product.fields.restaurant,
-                style: TextStyle(fontSize: 11, color: TailwindColors.whiteDark),
+                style: const TextStyle(fontSize: 11, color: TailwindColors.whiteDark),
               ),
             ),
             Row(
@@ -193,7 +193,7 @@ class ProductDetailPage extends StatefulWidget {
   const ProductDetailPage({super.key, required this.product});
 
   @override
-  _ProductDetailPageState createState() => _ProductDetailPageState();
+  State<ProductDetailPage> createState() => _ProductDetailPageState();
 }
 
 class _ProductDetailPageState extends State<ProductDetailPage> {
@@ -323,5 +323,5 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     );
   }
 
-  TextStyle _grayText() => TextStyle(color: TailwindColors.whiteDark, fontSize: 15);
+  TextStyle _grayText() => const TextStyle(color: TailwindColors.whiteDark, fontSize: 15);
 }
