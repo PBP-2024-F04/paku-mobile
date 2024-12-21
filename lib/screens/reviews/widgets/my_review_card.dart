@@ -38,7 +38,7 @@ class MyReviewCard extends StatelessWidget {
             child: const Text("Delete"),
             onPressed: () async {
               await request.postJson(
-                "http://localhost:8000/reviews/json/reviews/me/${review['id']}/delete",
+                "http://localhost:8000/reviews/json/reviews/me/${review['id']}/delete/",
                 "",
               );
 

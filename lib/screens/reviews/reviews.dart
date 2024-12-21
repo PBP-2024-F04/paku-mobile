@@ -33,7 +33,7 @@ class _ReviewPageState extends State<ReviewPage> with SingleTickerProviderStateM
 
   Future<List<Review>> _fetchAllReviews(CookieRequest request) async {
     final response = await request.get(
-      'http://localhost:8000/reviews/get-reviews-flutter/',
+      'http://localhost:8000/reviews/json-reviews',
     );
     
     if (response is List<dynamic>) {
@@ -45,7 +45,7 @@ class _ReviewPageState extends State<ReviewPage> with SingleTickerProviderStateM
 
   Future<List<Review>> _fetchMyReviews(CookieRequest request) async {
     final response = await request.get(
-      'http://localhost:8000/reviews/get-my-reviews-flutter/',
+      'http://localhost:8000/reviews/json-reviews-me/',
     );
     
     if (response is List<dynamic>) {
