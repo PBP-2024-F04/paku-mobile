@@ -1,91 +1,226 @@
 import 'package:flutter/material.dart';
-import 'package:paku/screens/accounts/home.dart';
+import 'package:provider/provider.dart';
+import 'package:paku/screens/accounts/login.dart'; // Import LoginPage
 import 'package:paku/screens/promos/my_promos.dart';
 import 'package:paku/screens/promos/promos.dart';
 import 'package:paku/screens/reviews/reviews.dart';
 import 'package:paku/screens/products/products.dart';
 import 'package:paku/screens/timeline/timeline_main.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'dart:convert'; // Pastikan untuk mengimpor ini jika diperlukan
 
-class LeftDrawer extends StatelessWidget {
+Future<String> fetchUserRole(CookieRequest request) async {
+  try {
+    // Ganti URL sesuai kebutuhan
+    final response = await request.get('http://localhost:8000/accounts/json/get_user_role/');
+
+    if (response != null && response['role'] != null) {
+      return response['role'];
+    } else {
+      throw Exception('Role not found in response');
+    }
+  } catch (e) {
+    print('Error fetching user role: $e');
+    return 'Error fetching role';
+  }
+}
+
+class LeftDrawer extends StatefulWidget {
   const LeftDrawer({super.key});
 
   @override
+  _LeftDrawerState createState() => _LeftDrawerState();
+}
+
+class _LeftDrawerState extends State<LeftDrawer> {
+  String? userRole;
+
+  @override
+  void initState() {
+    super.initState();
+    // Delay loadUserRole to ensure context is available
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      loadUserRole();
+    });
+  }
+
+  Future<void> loadUserRole() async {
+    final request = context.read<CookieRequest>(); // Ambil CookieRequest dari Provider
+    final role = await fetchUserRole(request);
+    setState(() {
+      userRole = role;
+    });
+  }
+
+  // Implementasi fungsi logout
+  void _logout(BuildContext context, CookieRequest request) async {
+    final response = await request.logout("http://localhost:8000/accounts/auth/logout/");
+    String message = response["message"];
+
+    if (context.mounted) {
+      if (response['success']) {
+        String username = response["username"];
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(
+            SnackBar(content: Text("$message Sampai jumpa, $username.")),
+          );
+
+        Navigator.of(context).popUntil((route) => route.isFirst);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginPage()),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message)),
+        );
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final request = context.read<CookieRequest>(); // Diperlukan untuk logout
+
     return Drawer(
-      child: ListView(
-        children: [
-          DrawerHeader(
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary,
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+      child: userRole == null
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : ListView(
               children: [
-                Text(
-                  "PaKu",
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.displaySmall?.copyWith(color: Colors.white),
+                DrawerHeader(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "PaKu",
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context)
+                            .textTheme
+                            .displaySmall
+                            ?.copyWith(color: Colors.white),
+                      ),
+                      Text(
+                        "Jelajahi kuliner Palu!",
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context)
+                            .textTheme
+                            .labelLarge
+                            ?.copyWith(color: Colors.white),
+                      ),
+                    ],
+                  ),
                 ),
-                Text(
-                  "Jelajahi kuliner Palu!",
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.labelLarge?.copyWith(color: Colors.white),
+                if (userRole == 'Foodie') ...[
+                  ListTile(
+                    leading: const Icon(Icons.food_bank_outlined),
+                    title: const Text('Products'),
+                    onTap: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => Products()),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.home_outlined),
+                    title: const Text('Timeline'),
+                    onTap: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const TimelineMainPage()),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.star_border),
+                    title: const Text('Favorites'),
+                    onTap: () {
+                      // Navigasi ke halaman Favorites
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.discount_outlined),
+                    title: const Text('Promos'),
+                    onTap: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => Promos()),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.book_outlined),
+                    title: const Text('Reviews'),
+                    onTap: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => ReviewPage()),
+                      );
+                    },
+                  ),
+                ] else if (userRole == 'Merchant') ...[
+                  ListTile(
+                    leading: const Icon(Icons.food_bank_outlined),
+                    title: const Text('My Products'),
+                    onTap: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => Products()),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.home_outlined),
+                    title: const Text('Timeline'),
+                    onTap: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const TimelineMainPage()),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.discount_outlined),
+                    title: const Text('My Promos'),
+                    onTap: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => MyPromos()),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.book_outlined),
+                    title: const Text('Reviews'),
+                    onTap: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => ReviewPage()),
+                      );
+                    },
+                  ),
+                ],
+                // Tambahkan Divider sebelum Logout
+                const Divider(),
+                // Tambahkan ListTile untuk Logout
+                ListTile(
+                  leading: const Icon(Icons.logout),
+                  title: const Text('Logout'),
+                  onTap: () {
+                    // Panggil fungsi logout
+                    _logout(context, request);
+                  },
                 ),
               ],
             ),
-          ),
-          ListTile(
-            leading: const Icon(Icons.home_outlined),
-            title: const Text('Home'),
-            onTap: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => const HomePage()),
-              );
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.discount_outlined),
-            title: const Text('Promos'),
-            onTap: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => MyPromos()),
-              );
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.home_outlined),
-            title: const Text('Timeline'),
-            onTap: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => const TimelineMainPage()),
-              );
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.book_outlined),
-            title: const Text('Reviews'),
-            onTap: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => ReviewPage()),
-              );
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.food_bank_outlined),
-            title: const Text('Products'),
-            onTap: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => Products()),
-              );
-            },
-          ),
-        ],
-      ),
     );
   }
 }
