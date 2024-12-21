@@ -12,7 +12,7 @@ class CreateReviewPage extends StatefulWidget {
   });
 
   @override
-  _CreateReviewPageState createState() => _CreateReviewPageState();
+  State<CreateReviewPage> createState() => _CreateReviewPageState();
 }
 
 class _CreateReviewPageState extends State<CreateReviewPage> {
@@ -53,7 +53,7 @@ class _CreateReviewPageState extends State<CreateReviewPage> {
         jsonEncode(reviewData),
       );
 
-      if (mounted) {
+      if (context.mounted) {
         if (response['success'] == true) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -73,7 +73,7 @@ class _CreateReviewPageState extends State<CreateReviewPage> {
         }
       }
     } catch (e) {
-      if (mounted) {
+      if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error: $e'),
@@ -82,11 +82,9 @@ class _CreateReviewPageState extends State<CreateReviewPage> {
         );
       }
     } finally {
-      if (mounted) {
-        setState(() {
-          _isSubmitting = false;
-        });
-      }
+      setState(() {
+        _isSubmitting = false;
+      });
     }
   }
 

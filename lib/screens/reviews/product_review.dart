@@ -22,25 +22,23 @@ class ProductReviewPage extends StatefulWidget {
 class _ProductReviewPageState extends State<ProductReviewPage> {
   String? selectedRating = 'all';
 
-  Future<List<Review>> _fetchReviews(CookieRequest request) async {
+  Future<List<Review>> _fetchReviews(BuildContext context, CookieRequest request) async {
     try {
       final response = await request.get(
         'http://localhost:8000/reviews/json/product/${widget.productId}/reviews/',
       );
 
-      print('Raw response: $response'); // Debug print
-
       if (response is List) {
-        // Konversi setiap item menggunakan fromJson
         return response.map((item) => Review.fromJson(item)).toList();
       }
+
       return [];
-    } catch (e, stackTrace) {
-      print('Error: $e');
-      print('Stack trace: $stackTrace');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error fetching reviews: $e')),
-      );
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error fetching reviews: $e')),
+        );
+      }
       return [];
     }
   }
@@ -80,7 +78,7 @@ class _ProductReviewPageState extends State<ProductReviewPage> {
 
             Expanded(
               child: FutureBuilder<List<Review>>(
-                future: _fetchReviews(request),
+                future: _fetchReviews(context, request),
                 builder: (context,
                     AsyncSnapshot<List<Review>> snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {

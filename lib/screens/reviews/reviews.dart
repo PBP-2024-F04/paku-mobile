@@ -62,10 +62,10 @@ class _ReviewPageState extends State<ReviewPage> with SingleTickerProviderStateM
       appBar: AppBar(
         title: const Text("PaKu"),
         bottom: PreferredSize(
-          preferredSize: Size.fromHeight(kToolbarHeight),
+          preferredSize: const Size.fromHeight(kToolbarHeight),
           child: TabBar(
             controller: _tabController,
-            tabs: [
+            tabs: const [
               Tab(text: 'All Reviews'),
               Tab(text: 'My Reviews'),
             ],

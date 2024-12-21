@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:paku/screens/reviews/reviews.dart';
 import 'package:paku/screens/reviews/edit_review.dart';
-import 'package:paku/colors.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 
@@ -26,8 +25,8 @@ class MyReviewCard extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Delete Review'),
-        content: Text('Are you sure you want to delete this review?'),
+        title: const Text('Delete Review'),
+        content: const Text('Are you sure you want to delete this review?'),
         actions: [
           TextButton(
             child: const Text("Delete"),
@@ -74,20 +73,20 @@ class MyReviewCard extends StatelessWidget {
             // Product Info
             Text(
               review['product_name'],
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             Text(
               review['restaurant'],
-              style: TextStyle(color: Colors.grey),
+              style: const TextStyle(color: Colors.grey),
             ),
             Text(
               'Price: Rp${review['price'].toStringAsFixed(2)}',
-              style: TextStyle(color: Colors.green),
+              style: const TextStyle(color: Colors.green),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             // Review Comment
             Text(review['comment']),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             // Rating
             Row(
               children: List.generate(5, (index) {
@@ -97,22 +96,22 @@ class MyReviewCard extends StatelessWidget {
                 );
               }),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             // User Info
             Text(
               '- by ${review['username']} | ${review['created_at'].toLocal().toString().split(' ')[0]}',
-              style: TextStyle(fontSize: 12, color: Colors.grey),
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
             ),
             // Edit and Delete Icons
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 IconButton(
-                  icon: Icon(Icons.edit),
+                  icon: const Icon(Icons.edit),
                   onPressed: () => _editReview(context),
                 ),
                 IconButton(
-                  icon: Icon(Icons.delete),
+                  icon: const Icon(Icons.delete),
                   onPressed: () => _deleteReview(context, request),
                 ),
               ],
