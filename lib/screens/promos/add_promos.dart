@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:paku/colors.dart';
 import 'package:paku/widgets/left_drawer.dart';
-import 'package:pbp_django_auth/pbp_django_auth.dart'; // Import CookieRequest
+import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart'; // For date formatting
-import 'dart:convert'; // For jsonEncode
+import 'package:intl/intl.dart';
+import 'dart:convert';
 
 class AddPromoPage extends StatefulWidget {
+  const AddPromoPage({super.key});
+
   @override
-  _AddPromoPageState createState() => _AddPromoPageState();
+  State<AddPromoPage> createState() => _AddPromoPageState();
 }
 
 class _AddPromoPageState extends State<AddPromoPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  TextEditingController _tanggalController = TextEditingController();
+  final TextEditingController _tanggalController = TextEditingController();
+
   String _judulPromo = '';
   String _deskripsiPromo = '';
   DateTime? _tanggalBatas;
@@ -46,11 +49,11 @@ class _AddPromoPageState extends State<AddPromoPage> {
       _tanggalController.text = '';
     });
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Tanggal batas penggunaan telah dihapus.')),
+      const SnackBar(content: Text('Tanggal batas penggunaan telah dihapus.')),
     );
   }
 
-  Future<void> _submitPromo() async {
+  Future<void> _submitPromo(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       final request = context.read<CookieRequest>();
@@ -68,29 +71,26 @@ class _AddPromoPageState extends State<AddPromoPage> {
           'batas_penggunaan': formattedDate, // Send as string or null
         };
 
-        // Debug: Log the JSON payload
-        print('JSON Payload: ${jsonEncode(data)}');
-
         // Send the POST request
         final response = await request.postJson(
           'http://localhost:8000/promos/create_promo_json/',
           jsonEncode(data),
         );
 
-        // Debug: Log the response
-        print('Add Promo Response: $response');
-
-        if (response['status'] == 'success') {
-          _showSuccessDialog(context);
-        } else {
-          _showErrorDialogWithMessage(
-            context,
-            response['message'] ?? 'Gagal menambahkan promo.',
-          );
+        if (context.mounted) {
+          if (response['status'] == 'success') {
+            _showSuccessDialog(context);
+          } else {
+            _showErrorDialogWithMessage(
+              context,
+              response['message'] ?? 'Gagal menambahkan promo.',
+            );
+          }
         }
       } catch (e) {
-        print('Error adding promo: $e');
-        _showErrorDialog(context);
+        if (context.mounted) {
+          _showErrorDialog(context);
+        }
       }
     }
   }
@@ -100,7 +100,7 @@ class _AddPromoPageState extends State<AddPromoPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Promo Berhasil Ditambahkan!"),
+          title: const Text("Promo Berhasil Ditambahkan!"),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -113,7 +113,7 @@ class _AddPromoPageState extends State<AddPromoPage> {
           ),
           actions: <Widget>[
             TextButton(
-              child: Text("OK"),
+              child: const Text("OK"),
               onPressed: () {
                 Navigator.of(context).pop(); // Close dialog
                 Navigator.of(context).pop(); // Return to the previous page
@@ -130,11 +130,11 @@ class _AddPromoPageState extends State<AddPromoPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Terjadi Kesalahan!"),
+          title: const Text("Terjadi Kesalahan!"),
           content: Text(message),
           actions: <Widget>[
             TextButton(
-              child: Text("OK"),
+              child: const Text("OK"),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -183,7 +183,7 @@ class _AddPromoPageState extends State<AddPromoPage> {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
+                  boxShadow: const [
                     BoxShadow(
                       color: Colors.black12,
                       blurRadius: 8,
@@ -252,12 +252,12 @@ class _AddPromoPageState extends State<AddPromoPage> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   IconButton(
-                                    icon: Icon(Icons.calendar_today),
+                                    icon: const Icon(Icons.calendar_today),
                                     onPressed: () => _selectDate(context),
                                   ),
                                   if (_tanggalBatas != null)
                                     IconButton(
-                                      icon: Icon(Icons.clear),
+                                      icon: const Icon(Icons.clear),
                                       onPressed: _clearDate,
                                       tooltip: 'Hapus Tanggal',
                                     ),
@@ -277,25 +277,24 @@ class _AddPromoPageState extends State<AddPromoPage> {
                     // Button Group
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        ElevatedButton(
+                      children: [ ElevatedButton(
                           onPressed: () {
                             Navigator.pop(context); // Cancel button
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: TailwindColors.yellowDefault,
                           ),
-                          child: Text(
+                          child: const Text(
                             "Batal",
                             style: TextStyle(color: Colors.white),
                           ),
                         ),
                         ElevatedButton(
-                          onPressed: _submitPromo, // Submit promo
+                          onPressed: () => _submitPromo(context),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: TailwindColors.sageDefault,
                           ),
-                          child: Text(
+                          child: const Text(
                             "Tambah Promo",
                             style: TextStyle(color: Colors.white),
                           ),
