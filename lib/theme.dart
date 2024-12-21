@@ -46,6 +46,8 @@ var theme = ThemeData(
   inputDecorationTheme: InputDecorationTheme(
     hintStyle: GoogleFonts.lato(color: TailwindColors.mossGreenDarker),
     border: const OutlineInputBorder(borderRadius: BorderRadius.zero),
+    filled: true,
+    fillColor: Colors.white,
   ),
 
   elevatedButtonTheme: ElevatedButtonThemeData(

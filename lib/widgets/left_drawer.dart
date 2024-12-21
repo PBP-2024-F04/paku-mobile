@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:paku/screens/accounts/home.dart';
 import 'package:paku/screens/profile/profile.dart';
+import 'package:paku/screens/timeline/timeline_main.dart';
 
 class LeftDrawer extends StatelessWidget {
   const LeftDrawer({super.key});
@@ -41,8 +42,18 @@ class LeftDrawer extends StatelessWidget {
             },
           ),
           ListTile(
+            leading: const Icon(Icons.home_outlined),
+            title: const Text('Timeline'),
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const TimelineMainPage()),
+              );
+            },
+          ),
+          ListTile(
             leading: const Icon(Icons.person_outlined),
-            title: const Text("My Profile"),
+            title: const Text('My Profile'),
             onTap: () {
               Navigator.pushReplacement(
                 context,
