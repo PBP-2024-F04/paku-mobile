@@ -76,14 +76,14 @@ class _ProfilePageState extends State<ProfilePage> {
           Expanded(
             child: TabBarView(
               children: snapshot.data!.role == "Foodie"
-                  ? (const [
-                      ProfilePostsPage(),
-                      ProfileReviewsPage(),
-                      ProfileFavoritesPage(),
+                  ? ([
+                      ProfilePostsPage(snapshot.data!),
+                      const ProfileReviewsPage(),
+                      const ProfileFavoritesPage(),
                     ])
-                  : (const [
-                      ProfilePostsPage(),
-                      ProfileProductsPage(),
+                  : ([
+                      ProfilePostsPage(snapshot.data!),
+                      const ProfileProductsPage(),
                     ]),
             ),
           ),
