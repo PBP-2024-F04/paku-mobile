@@ -1,5 +1,10 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
 import 'package:paku/colors.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:paku/widgets/left_drawer.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:paku/screens/products/my_products.dart';
 
 class AddProductPage extends StatefulWidget {
   const AddProductPage({super.key});
@@ -11,16 +16,49 @@ class AddProductPage extends StatefulWidget {
 class _AddProductPageState extends State<AddProductPage> {
   final _formKey = GlobalKey<FormState>();
   String _productName = "";
-  String _restaurant = "";
   int _price = 0;
   String _description = "";
   String _category = "";
 
+  void _addProduct(BuildContext context, CookieRequest request) async {
+    final response = await request.postJson(
+      "http://localhost:8000/products/create-product-flutter/",
+      jsonEncode({
+        "productName": _productName,
+        "price": _price,
+        "description": _description,
+        "category": _category,
+      }),
+    );
+
+    if (context.mounted) {
+      if (response['status'] == 'success') {
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(const SnackBar(
+          content: Text("Produk baru berhasil disimpan!"),
+        ));
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => MyProductsPage()),
+        );
+      } else {
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(
+            SnackBar(content: Text(response['message'] ?? 'Tidak dapat menambahkan produk, silakan coba lagi.')),
+          );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
+    
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add New Product'),
+        title: const Text('PaKu'),
         centerTitle: true,
         backgroundColor: TailwindColors.sageDark,
         actions: [
@@ -32,6 +70,7 @@ class _AddProductPageState extends State<AddProductPage> {
           ),
         ],
       ),
+      drawer: const LeftDrawer(),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
@@ -41,7 +80,7 @@ class _AddProductPageState extends State<AddProductPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  "Create Your Product",
+                  "Add New Product",
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 16),
@@ -56,19 +95,6 @@ class _AddProductPageState extends State<AddProductPage> {
                     }
                     if (value.length > 255) {
                       return "Product name cannot exceed 255 characters!";
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-
-                buildTextField(
-                  label: "Restaurant",
-                  hint: "Enter restaurant name",
-                  onChanged: (value) => _restaurant = value,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Restaurant name cannot be empty!";
                     }
                     return null;
                   },
@@ -131,36 +157,9 @@ class _AddProductPageState extends State<AddProductPage> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    onPressed: () {
+                    onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              title: const Text("Product Added"),
-                              content: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text("Product Name: $_productName"),
-                                  Text("Restaurant: $_restaurant"),
-                                  Text("Price: $_price"),
-                                  Text("Description: $_description"),
-                                  Text("Category: $_category"),
-                                ],
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                    _formKey.currentState!.reset();
-                                  },
-                                  child: const Text("OK"),
-                                ),
-                              ],
-                            );
-                          },
-                        );
+                        _addProduct(context, request);
                       }
                     },
                     child: const Text(

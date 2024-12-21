@@ -1,199 +1,311 @@
-import 'package:flutter/material.dart';
 import 'package:paku/colors.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:paku/widgets/left_drawer.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:paku/screens/products/models/product.dart';
 
-class Products extends StatelessWidget {
-  // Contoh data produk
-  final List<Map<String, dynamic>> products = [
-    {
-      "productName": "Burger",
-      "restaurant": "Burger Place",
-      "price": 50000,
-      "description": "Delicious beef burger with cheese",
-      "category": "Fast Food",
-    },
-    {
-      "productName": "Pizza",
-      "restaurant": "Pizza House",
-      "price": 75000,
-      "description": "Large pizza with pepperoni topping",
-      "category": "Italian",
-    },
-    {
-      "productName": "Sushi",
-      "restaurant": "Sushi World",
-      "price": 100000,
-      "description": "Fresh sushi with salmon and tuna",
-      "category": "Japanese",
-    },
-  ];
+
+class ProductsPage extends StatefulWidget {
+  const ProductsPage({super.key});
+
+  @override
+  State<ProductsPage> createState() => _ProductsPageState();
+}
+
+class _ProductsPageState extends State<ProductsPage> {
+  Future<List<Product>> fetchProduct(CookieRequest request) async {
+    final response = await request.get('http://127.0.0.1:8000/products/json/');
+    
+    var data = response;
+    
+    List<Product> listProduct = [];
+    for (var d in data) {
+      if (d != null) {
+        listProduct.add(Product.fromJson(d));
+      }
+    }
+    return listProduct;
+  }
 
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
     return Scaffold(
-      appBar: AppBar(title: const Text("PaKu")),
+      appBar: AppBar(
+        title: const Text('PaKu'),
+      ),
       drawer: const LeftDrawer(),
-      body: GridView.builder(
-        padding: const EdgeInsets.all(12.0),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 12.0,
-          mainAxisSpacing: 12.0,
-          childAspectRatio: 3 / 4,
-        ),
-        itemCount: products.length,
-        itemBuilder: (context, index) {
-          final product = products[index];
-          return MouseRegion(
-            cursor: SystemMouseCursors.click,
-            child: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ProductDetailPage(product: product),
-                  ),
-                );
-              },
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12.0),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Colors.black,
-                      blurRadius: 4,
-                      offset: Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Card(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.0),
-                  ),
-                  elevation: 4,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Container(
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12.0),
-                              image: DecorationImage(
-                                image: AssetImage("assets/images/${product['category'].toLowerCase()}.jpg"),
-                                fit: BoxFit.cover,
+      body: Padding(padding: const EdgeInsets.all(20.0),
+        child: Column(
+          children: <Widget>[
+            const SizedBox(
+              height: 15,
+            ),
+            const Text(
+              "All Products",
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(
+              height: 25,
+            ),
+            Expanded(
+              child: FutureBuilder(
+                future: fetchProduct(request),
+                builder: (context, AsyncSnapshot snapshot) {
+                  if (snapshot.data == null) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else {
+                    if (!snapshot.hasData) {
+                      return const Column(
+                        children: [
+                          Text(
+                            'Belum ada data produk pada PaKu.',
+                            style: TextStyle(fontSize: 20, color: TailwindColors.sageDarker),
+                          ),
+                          SizedBox(height: 8),
+                        ],
+                      );
+                    } else {
+                      return SingleChildScrollView(
+                        child: Column(
+                          children: <Widget>[
+                            const SizedBox(
+                              height: 25,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 20),
+                              child: GridView.builder(
+                                physics: const NeverScrollableScrollPhysics(),
+                                shrinkWrap: true,
+                                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  mainAxisSpacing: 15,
+                                  crossAxisSpacing: 15,
+                                  childAspectRatio: 0.8,
+                                ),
+                                itemCount: snapshot.data!.length,
+                                itemBuilder: (context, index) {
+                                  return InkWell(
+                                    onTap: () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ProductDetailPage(
+                                          product: snapshot.data[index],
+                                        ),
+                                      ),
+                                    ),
+                                    child: ProductCard(product: snapshot.data[index]),
+                                  );
+                                },
                               ),
                             ),
-                          ),
+                          ],
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          product["productName"],
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        Text(
-                          product["restaurant"],
-                          style: const TextStyle(color: TailwindColors.whiteDark),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const Spacer(),
-                        Text(
-                          "Rp ${product["price"]}",
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: TailwindColors.sageDarkHover,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+                      );
+                    }
+                  }
+                },
+              ),
+            )
+          ]
+        )
+      )
+    );
+  }
+}
+
+class ProductCard extends StatelessWidget {
+  final Product product;
+
+  const ProductCard({super.key, required this.product});
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: const BorderRadius.all(Radius.circular(12)),
+        color: TailwindColors.whiteLight,
+        
+        boxShadow: [
+          BoxShadow(
+            color: TailwindColors.whiteActive!,
+            blurRadius: 15.0,
+            spreadRadius: 0.5,
+            offset: const Offset(3.0, 3.0),
+          )
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
+          children: <Widget>[
+            ClipRRect(
+              borderRadius: const BorderRadius.all(Radius.circular(12)),
+              child: Container(
+                height: 120,
+                width: MediaQuery.of(context).size.width,
               ),
             ),
-          );
-        },
+            const SizedBox(
+              height: 10,
+            ),
+            Text(
+              product.fields.productName,
+              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 5),
+              child: Text(
+                product.fields.restaurant,
+                style: TextStyle(fontSize: 11, color: TailwindColors.whiteDark),
+              ),
+            ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  product.fields.category,
+                  style: const TextStyle(
+                    color: TailwindColors.peachDefault,
+                    fontSize: 11,
+                  ),
+                )
+              ],
+            ),
+            const SizedBox(
+              height: 5
+            ),
+            Text(
+              "Rp ${product.fields.price}",
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
-class ProductDetailPage extends StatelessWidget {
-  final Map<String, dynamic> product;
+class ProductDetailPage extends StatefulWidget {
+  final Product product;
 
   const ProductDetailPage({super.key, required this.product});
+
+  @override
+  _ProductDetailPageState createState() => _ProductDetailPageState();
+}
+
+class _ProductDetailPageState extends State<ProductDetailPage> {
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(product["productName"]),
-        backgroundColor: TailwindColors.sageDark,
-        centerTitle: true,
+        title: const Text("PaKu"),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                height: 200,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16.0),
-                  image: DecorationImage(
-                    image: AssetImage("assets/images/${product['category'].toLowerCase()}.jpg"),
-                    fit: BoxFit.cover,
-                  ),
+      drawer: const LeftDrawer(),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                const SizedBox(
+                  height: 3,
                 ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                product["productName"],
-                style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                "Restaurant: ${product["restaurant"]}",
-                style: const TextStyle(fontSize: 16, fontStyle: FontStyle.italic, color: TailwindColors.whiteDark),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                "Category: ${product["category"]}",
-                style: const TextStyle(fontSize: 16),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                "Price: Rp ${product["price"]}",
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: TailwindColors.sageDarkHover,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Icon(
+                        Icons.arrow_back_ios,
+                        size: 22,
+                      ),
+                    ),
+                    const Icon(
+                      Icons.favorite,
+                      size: 28,
+                      color: TailwindColors.redDefault,
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                "Description:",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                product["description"],
-                style: const TextStyle(fontSize: 16, height: 1.5),
-              ),
-            ],
+                const SizedBox(
+                  height: 15,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: <Widget>[
+                    Expanded(
+                      child: Text(
+                        widget.product.fields.productName,
+                        style: const TextStyle(
+                            fontSize: 22, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                    Text(
+                      "Rp ${widget.product.fields.price}",
+                      style: const TextStyle(
+                          fontSize: 25, fontWeight: FontWeight.w500),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.restaurant,
+                      color: TailwindColors.yellowDefault,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 5),
+                    Text(
+                      widget.product.fields.restaurant,
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.w500),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.category,
+                      color: TailwindColors.whiteDarkActive,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 5),
+                    Text(
+                      widget.product.fields.category,
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.w500),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 15),
+                const Text(
+                  "Details",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  widget.product.fields.description,
+                  style: _grayText(),
+                ),
+                const SizedBox(height: 15),
+              ],
+            ),
           ),
         ),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
+
+  TextStyle _grayText() => TextStyle(color: TailwindColors.whiteDark, fontSize: 15);
 }
