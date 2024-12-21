@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:paku/screens/accounts/login.dart';
+import 'package:paku/screens/accounts/home.dart';
+import 'package:paku/screens/promos/my_promos.dart';
+import 'package:paku/screens/landing.dart';
 import 'package:paku/theme.dart';
-import 'package:paku/screens/products/products.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
+import 'package:paku/screens/products/products.dart';
+import 'package:paku/screens/products/add_product.dart';
+
 
 void main() => runApp(const MyApp());
 
