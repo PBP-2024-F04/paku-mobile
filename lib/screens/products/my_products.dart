@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:paku/widgets/left_drawer.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
-import 'package:paku/screens/products/models/product.dart';
 import 'package:paku/screens/products/add_product.dart';
 import 'package:paku/screens/products/edit_product.dart';
 

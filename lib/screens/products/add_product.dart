@@ -93,8 +93,8 @@ class _AddProductPageState extends State<AddProductPage> {
                     if (value == null || value.isEmpty) {
                       return "Product name cannot be empty!";
                     }
-                    if (value.length > 255) {
-                      return "Product name cannot exceed 255 characters!";
+                    if (value.length > 50) {
+                      return "Product name cannot exceed 50 characters!";
                     }
                     return null;
                   },
