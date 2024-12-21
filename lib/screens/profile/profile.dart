@@ -18,11 +18,10 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  final String status = "Foodie";
-
   Future<Profile> _future(BuildContext context, CookieRequest request) async {
-    await Future.delayed(const Duration(seconds: 2));
-    final result = await request.get("http://localhost:8000/profile/json");
+    final result = await request.get(
+      "http://localhost:8000/profile/json/${widget.username ?? ""}",
+    );
     return Profile.fromJson(result);
   }
 
@@ -54,7 +53,7 @@ class _ProfilePageState extends State<ProfilePage> {
     }
 
     return DefaultTabController(
-      length: status == "Foodie" ? 3 : 2,
+      length: snapshot.data!.role == "Foodie" ? 3 : 2,
       child: Column(
         children: [
           const SizedBox(height: 10.0),
