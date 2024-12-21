@@ -6,6 +6,7 @@ import 'package:paku/screens/reviews/widgets/my_review_card.dart';
 import 'package:paku/screens/reviews/models/review.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
+import 'package:paku/screens/products/products.dart';
 
 class ReviewPage extends StatefulWidget {
   const ReviewPage({super.key});
@@ -14,7 +15,8 @@ class ReviewPage extends StatefulWidget {
   State<ReviewPage> createState() => _ReviewPageState();
 }
 
-class _ReviewPageState extends State<ReviewPage> with SingleTickerProviderStateMixin {
+class _ReviewPageState extends State<ReviewPage>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   String? selectedRating = 'all';
 
@@ -31,27 +33,51 @@ class _ReviewPageState extends State<ReviewPage> with SingleTickerProviderStateM
   }
 
   Future<List<Review>> _fetchAllReviews(CookieRequest request) async {
-    final response = await request.get(
-      'http://localhost:8000/reviews/json-reviews',
-    );
-    
-    if (response is List<dynamic>) {
-      return response.map((data) => Review.fromJson(data)).toList();
+    try {
+      final response = await request.get(
+        'http://localhost:8000/reviews/json-reviews',
+      );
+
+      if (response is List<dynamic>) {
+        final reviews = response.map((data) => Review.fromJson(data)).toList();
+
+        if (selectedRating != 'all') {
+          return reviews
+              .where((review) => review.rating == int.parse(selectedRating!))
+              .toList();
+        }
+
+        return reviews;
+      }
+      return [];
+    } catch (e) {
+      print('Error fetching reviews: $e');
+      rethrow; 
     }
-    
-    return [];
   }
 
   Future<List<Review>> _fetchMyReviews(CookieRequest request) async {
-    final response = await request.get(
-      'http://localhost:8000/reviews/json-reviews-me/',
-    );
-    
-    if (response is List<dynamic>) {
-      return response.map((data) => Review.fromJson(data)).toList();
+    try {
+      final response = await request.get(
+        'http://localhost:8000/reviews/json-reviews-me/',
+      );
+
+      if (response is List<dynamic>) {
+        final reviews = response.map((data) => Review.fromJson(data)).toList();
+
+        if (selectedRating != 'all') {
+          return reviews
+              .where((review) => review.rating == int.parse(selectedRating!))
+              .toList();
+        }
+
+        return reviews;
+      }
+      return [];
+    } catch (e) {
+      print('Error fetching my reviews: $e');
+      rethrow; 
     }
-    
-    return [];
   }
 
   @override
@@ -62,16 +88,30 @@ class _ReviewPageState extends State<ReviewPage> with SingleTickerProviderStateM
       appBar: AppBar(
         title: const Text("PaKu"),
         bottom: PreferredSize(
-          preferredSize: Size.fromHeight(kToolbarHeight),
+          preferredSize: const Size.fromHeight(kToolbarHeight),
           child: TabBar(
             controller: _tabController,
             tabs: [
-              Tab(text: 'All Reviews'),
-              Tab(text: 'My Reviews'),
+              Tab(
+                icon: Icon(Icons.rate_review),
+                text: 'All Reviews',
+              ),
+              Tab(
+                icon: Icon(Icons.person),
+                text: 'My Reviews',
+              ),
             ],
             indicatorColor: TailwindColors.whiteActive,
+            indicatorWeight: 3.0, 
             labelColor: TailwindColors.whiteActive,
             unselectedLabelColor: TailwindColors.whiteDarker,
+            labelStyle: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 16, 
+            ),
+            unselectedLabelStyle: TextStyle(
+              fontSize: 14, 
+            ),
           ),
         ),
       ),
@@ -100,86 +140,82 @@ class _ReviewPageState extends State<ReviewPage> with SingleTickerProviderStateM
             child: TabBarView(
               controller: _tabController,
               children: [
-                // All Reviews Tab
+                
                 FutureBuilder(
                   future: _fetchAllReviews(request),
-                  builder: (context, AsyncSnapshot snapshot) {
-                    if (snapshot.data == null) {
+                  builder: (context, AsyncSnapshot<List<Review>> snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator());
                     }
 
-                    if (snapshot.hasData) {
-                      final filteredReviews = snapshot.data.where((review) {
-                        if (selectedRating == 'all') return true;
-                        return review.rating.toString() == selectedRating;
-                      }).toList();
-
-                      return ListView.builder(
-                        itemCount: filteredReviews.length,
-                        itemBuilder: (context, index) {
-                          final review = filteredReviews[index];
-                          final reviewData = {
-                            'id': review.id,
-                            'role': review.user.role,
-                            'product_id': review.product.idProduct,
-                            'product_name': review.product.productName,
-                            'restaurant': review.product.restaurant,
-                            'price': review.product.price,
-                            'rating': review.rating,
-                            'comment': review.comment,
-                            'username': review.user.username,
-                            'created_at': review.createdAt,
-                          };
-
-                          return ReviewCard(review: reviewData);
-                        },
-                      );
-                    } else {
-                      return const Center(
-                        child: Text('No reviews found'),
-                      );
+                    if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
                     }
+
+                    if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return const Center(child: Text('No reviews found.'));
+                    }
+
+                    return ListView.builder(
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (context, index) {
+                        final review = snapshot.data![index];
+                        return ReviewCard(
+                          review: review,
+                          onTap: () {
+                            if (review.product != null) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ProductDetailPage(
+                                    product: review.product,
+                                  ),
+                                ),
+                              );
+                            }
+                          },
+                        );
+                      },
+                    );
                   },
                 ),
-                // My Reviews Tab
+           
                 FutureBuilder(
                   future: _fetchMyReviews(request),
-                  builder: (context, AsyncSnapshot snapshot) {
-                    if (snapshot.data == null) {
+                  builder: (context, AsyncSnapshot<List<Review>> snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator());
                     }
 
-                    if (snapshot.hasData) {
-                      final filteredReviews = snapshot.data.where((review) {
-                        if (selectedRating == 'all') return true;
-                        return review.rating.toString() == selectedRating;
-                      }).toList();
-
-                      return ListView.builder(
-                        itemCount: filteredReviews.length,
-                        itemBuilder: (context, index) {
-                          final review = filteredReviews[index];
-                          final reviewData = {
-                            'id': review.id,
-                            'role': review.user.role,
-                            'product_id': review.product.idProduct,
-                            'product_name': review.product.productName,
-                            'restaurant': review.product.restaurant,
-                            'price': review.product.price,
-                            'rating': review.rating,
-                            'comment': review.comment,
-                            'username': review.user.username,
-                            'created_at': review.createdAt,
-                          };
-
-                          return MyReviewCard(review: reviewData);
-                        },
-                      );
-                    } else {
-                      return const Center(
-                        child: Text('No reviews found'),
-                      );
+                    if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
                     }
+
+                    if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return const Center(child: Text('No reviews found.'));
+                    }
+
+                    return ListView.builder(
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (context, index) {
+                        final review = snapshot.data![index];
+                        return MyReviewCard(
+                          review: review,
+                          onTap: () {
+                            if (review.product != null) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ProductDetailPage(
+                                    product: review.product,
+                                  ),
+                                ),
+                              );
+                            }
+                          },
+                        );
+                      },
+                    );
                   },
                 ),
               ],
@@ -187,18 +223,6 @@ class _ReviewPageState extends State<ReviewPage> with SingleTickerProviderStateM
           ),
         ],
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () async {
-      //     final result = await Navigator.push(
-      //       context,
-      //       MaterialPageRoute(builder: (context) => CreateReviewPage()),
-      //     );
-      //     if (result == true) {
-      //       setState(() {}); // Refresh the page
-      //     }
-      //   },
-      //   child: Icon(Icons.add),
-      // ),
     );
   }
 }
