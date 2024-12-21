@@ -6,6 +6,7 @@ import 'package:paku/screens/promos/promos.dart';
 import 'package:paku/screens/reviews/reviews.dart';
 import 'package:paku/screens/products/products.dart';
 import 'package:paku/screens/timeline/timeline_main.dart';
+import 'package:paku/screens/accounts/home.dart'; // Pastikan Anda mengimpor HomePage
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 
 Future<String> fetchUserRole(CookieRequest request) async {
@@ -93,14 +94,24 @@ class _LeftDrawerState extends State<LeftDrawer> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        "PaKu",
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context)
-                            .textTheme
-                            .displaySmall
-                            ?.copyWith(color: Colors.white),
+                      InkWell(
+                        onTap: () {
+                          Navigator.pop(context);
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => const HomePage()),
+                          );
+                        },
+                        child: Text(
+                          "PaKu",
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context)
+                              .textTheme
+                              .displaySmall
+                              ?.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
                       ),
+                      const SizedBox(height: 8),
                       Text(
                         "Jelajahi kuliner Palu!",
                         textAlign: TextAlign.center,
@@ -138,6 +149,7 @@ class _LeftDrawerState extends State<LeftDrawer> {
                     title: const Text('Favorites'),
                     onTap: () {
                       // Navigasi ke halaman Favorites
+                      // Tambahkan navigasi sesuai kebutuhan
                     },
                   ),
                   ListTile(
