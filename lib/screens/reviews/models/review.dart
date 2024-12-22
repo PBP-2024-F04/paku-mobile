@@ -3,6 +3,7 @@
 //     final review = reviewFromJson(jsonString);
 
 import 'dart:convert';
+import 'package:paku/screens/products/models/product.dart';
 
 List<Review> reviewFromJson(String str) => List<Review>.from(json.decode(str).map((x) => Review.fromJson(x)));
 
@@ -72,30 +73,38 @@ class User {
       };
 }
 
-class Product {
-  String idProduct;
-  String productName;
-  String restaurant;
-  int price;
+// class Product {
+//   String productId;
+//   String productName;
+//   String restaurant;
+//   int price;
+//   String category;
+//   String description;
 
-  Product({
-    required this.idProduct,
-    required this.productName,
-    required this.restaurant,
-    required this.price,
-  });
+//   Product({
+//     required this.productId,
+//     required this.productName,
+//     required this.restaurant,
+//     required this.price,
+//     required this.category,
+//     required this.description,
+//   });
 
-  factory Product.fromJson(Map<String, dynamic> json) => Product(
-        idProduct: json["product_id"],
-        productName: json["product_name"],
-        restaurant: json["restaurant"],
-        price: json["price"],
-      );
+//   factory Product.fromJson(Map<String, dynamic> json) => Product(
+//     productId: json["product_id"],
+//     productName: json["product_name"],
+//     restaurant: json["restaurant"],
+//     price: json["price"],
+//     category: json["category"],
+//     description: json["description"],
+//   );
 
-  Map<String, dynamic> toJson() => {
-        "product_id": idProduct,
-        "product_name": productName,
-        "restaurant": restaurant,
-        "price": price,
-      };
-}
+//   Map<String, dynamic> toJson() => {
+//     "product_id": productId,
+//     "product_name": productName,
+//     "restaurant": restaurant,
+//     "price": price,
+//     "category": category,
+//     "description": description,
+//   };
+// }

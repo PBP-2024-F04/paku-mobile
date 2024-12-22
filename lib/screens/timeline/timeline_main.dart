@@ -15,70 +15,107 @@ class TimelineMainPage extends StatefulWidget {
 }
 
 class _TimelineMainPageState extends State<TimelineMainPage> {
-  Future<List<Post>> _fetchPosts(CookieRequest request) async {
-    final response = await request.get('http://localhost:8000/timeline/json/posts');
-    
+  Future<List<Post>>? _future;
+  String _query = "";
+
+  Future<List<Post>> _fetchPosts(
+    CookieRequest request, {
+    String query = "",
+  }) async {
+    final response = await request.get(
+      Uri.parse('http://localhost:8000/timeline/json/posts')
+          .replace(queryParameters: {"query": query}).toString(),
+    );
+
     if (response is List<dynamic>) {
       return response.map((data) => Post.fromJson(data)).toList();
     }
-    
+
     return [];
+  }
+
+  Widget _postsBuilder(
+    BuildContext context,
+    AsyncSnapshot<List<Post>> snapshot,
+  ) {
+    if (snapshot.hasData && snapshot.data is List) {
+      if (snapshot.data!.isEmpty) {
+        return Padding(
+          padding: const EdgeInsets.only(left: 10.0),
+          child: ListView.builder(
+            scrollDirection: Axis.vertical,
+            shrinkWrap: true,
+            itemCount: 1,
+            itemBuilder: (context, index) => const Center(child: Text("Belum ada post.")),
+          ),
+        );
+      }
+      return ListView.builder(
+        scrollDirection: Axis.vertical,
+        shrinkWrap: true,
+        itemCount: snapshot.data!.length,
+        itemBuilder: (context, index) => PostCard(snapshot.data![index]),
+      );
+    } else {
+      return const Center(child: CircularProgressIndicator());
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
+    _future ??= _fetchPosts(request);
 
     return Scaffold(
       appBar: AppBar(title: const Text("Timeline")),
       drawer: const LeftDrawer(),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(30),
-        child: Center(
-          child: Column(
-            children: [
-              SearchBar(
-                hintText: 'Search...',
-                elevation: const WidgetStatePropertyAll(0),
-                shape: const WidgetStatePropertyAll(
-                  RoundedRectangleBorder(
-                    borderRadius: BorderRadius.zero,
-                    side: BorderSide(
-                      color: TailwindColors.mossGreenDark,
-                      width: 2,
+      body: Center(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 800),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              vertical: 16.0,
+              horizontal: 24.0,
+            ),
+            child: RefreshIndicator(
+              onRefresh: () async {
+                setState(() {
+                  _future = _fetchPosts(request, query: _query);
+                });
+              },
+              child: Column(
+                children: [
+                  SearchBar(
+                    hintText: 'Cari kata kunci',
+                    elevation: const WidgetStatePropertyAll(0),
+                    shape: const WidgetStatePropertyAll(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.zero,
+                        side: BorderSide(
+                          color: TailwindColors.mossGreenDark,
+                          width: 1,
+                        ),
+                      ),
+                    ),
+                    onChanged: (value) => setState(() => _query = value),
+                    trailing: [
+                      IconButton(
+                        onPressed: () => setState(() {
+                          _future = _fetchPosts(request, query: _query);
+                        }),
+                        icon: const Icon(Icons.search),
+                      )
+                    ],
+                  ),
+                  Expanded(
+                    child: FutureBuilder(
+                      future: _future,
+                      builder: _postsBuilder,
                     ),
                   ),
-                ),
-                trailing: [
-                  IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.search),
-                  )
                 ],
               ),
-              FutureBuilder(
-                future: _fetchPosts(request),
-                builder: (context, AsyncSnapshot snapshot) {
-                  if (snapshot.data == null) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-
-                  if (snapshot.hasData) {
-                    return ListView.builder(
-                      scrollDirection: Axis.vertical,
-                      shrinkWrap: true,
-                      itemCount: snapshot.data.length,
-                      itemBuilder: (context, index) => PostCard(snapshot.data[index]),
-                    );
-                  } else {
-                    return Text(
-                      'Belum ada post.',
-                      style: Theme.of(context).textTheme.labelLarge,
-                    );
-                  }
-                },
-              )
-            ],
+            ),
           ),
         ),
       ),

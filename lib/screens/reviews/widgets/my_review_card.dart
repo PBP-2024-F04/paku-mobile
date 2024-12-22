@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:paku/screens/reviews/reviews.dart';
 import 'package:paku/screens/reviews/edit_review.dart';
-import 'package:paku/colors.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
+import 'package:paku/screens/reviews/models/review.dart';
+import 'package:paku/colors.dart';
 
 class MyReviewCard extends StatelessWidget {
-  final Map<String, dynamic> review;
+  final Review review;
+  final VoidCallback onTap;
 
   const MyReviewCard({
     super.key,
     required this.review,
+    required this.onTap,
   });
 
   void _editReview(BuildContext context) {
@@ -26,14 +29,14 @@ class MyReviewCard extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Delete Review'),
-        content: Text('Are you sure you want to delete this review?'),
+        title: const Text('Delete Review'),
+        content: const Text('Are you sure you want to delete this review?'),
         actions: [
           TextButton(
             child: const Text("Delete"),
             onPressed: () async {
               await request.postJson(
-                "http://localhost:8000/reviews/json/reviews/me/${review['id']}/delete/",
+                "http://localhost:8000/reviews/json/reviews/me/${review.id}/delete/",
                 "",
               );
 
@@ -62,57 +65,100 @@ class MyReviewCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
-
     return Card(
+      color: TailwindColors.whiteDefault,
       margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-      elevation: 4,
+      elevation: 8,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Product Info
-            Text(
-              review['product_name'],
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            SizedBox(
+              width: double.infinity,
+              child: InkWell(
+                onTap: onTap,
+                borderRadius: BorderRadius.circular(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      review.product.fields.productName,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: TailwindColors.mossGreenDefault,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      review.product.fields.restaurant,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: TailwindColors.peachDefault,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Rp${review.product.fields.price.toStringAsFixed(2)}',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: TailwindColors.peachDefault,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const Divider(
+              height: 24,
+              thickness: 1,
+              color: TailwindColors.sageLight,
             ),
             Text(
-              review['restaurant'],
-              style: TextStyle(color: Colors.grey),
+              review.comment,
+              style: const TextStyle(
+                fontSize: 14,
+                color: TailwindColors.sageDark,
+                height: 1.5,
+              ),
             ),
-            Text(
-              'Price: Rp${review['price'].toStringAsFixed(2)}',
-              style: TextStyle(color: Colors.green),
-            ),
-            SizedBox(height: 10),
-            // Review Comment
-            Text(review['comment']),
-            SizedBox(height: 10),
-            // Rating
+            const SizedBox(height: 12),
+            
             Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(5, (index) {
                 return Icon(
-                  index < review['rating'] ? Icons.star : Icons.star_border,
-                  color: index < review['rating'] ? Colors.amber : Colors.grey,
+                  index < review.rating ? Icons.star : Icons.star_border,
+                  color: index < review.rating ? TailwindColors.yellowDefault : TailwindColors.whiteDark,
                 );
               }),
             ),
-            SizedBox(height: 10),
-            // User Info
+            const SizedBox(height: 12),
+  
             Text(
-              '- by ${review['username']} | ${review['created_at'].toLocal().toString().split(' ')[0]}',
-              style: TextStyle(fontSize: 12, color: Colors.grey),
+              '- ${review.user.username} | ${review.createdAt.toLocal().toString().split(' ')[0]}',
+              style: const TextStyle(
+                fontSize: 12,
+                color: TailwindColors.whiteDarkHover,
+                fontStyle: FontStyle.italic,
+              ),
             ),
-            // Edit and Delete Icons
+      
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 IconButton(
-                  icon: Icon(Icons.edit),
+                  icon: const Icon(Icons.edit),
+                  color: TailwindColors.mossGreenDefault,
                   onPressed: () => _editReview(context),
                 ),
                 IconButton(
-                  icon: Icon(Icons.delete),
+                  icon: const Icon(Icons.delete),
+                  color: TailwindColors.redDefault,
                   onPressed: () => _deleteReview(context, request),
                 ),
               ],

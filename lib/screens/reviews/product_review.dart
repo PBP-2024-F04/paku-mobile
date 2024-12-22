@@ -22,25 +22,22 @@ class ProductReviewPage extends StatefulWidget {
 class _ProductReviewPageState extends State<ProductReviewPage> {
   String? selectedRating = 'all';
 
-  Future<List<Review>> _fetchReviews(CookieRequest request) async {
+  Future<List<Review>> _fetchReviews(BuildContext context, CookieRequest request) async {
     try {
       final response = await request.get(
         'http://localhost:8000/reviews/json/product/${widget.productId}/reviews/',
       );
 
-      print('Raw response: $response'); // Debug print
-
       if (response is List) {
-        // Konversi setiap item menggunakan fromJson
         return response.map((item) => Review.fromJson(item)).toList();
       }
       return [];
-    } catch (e, stackTrace) {
-      print('Error: $e');
-      print('Stack trace: $stackTrace');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error fetching reviews: $e')),
-      );
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error fetching reviews: $e')),
+        );
+      }
       return [];
     }
   }
@@ -51,14 +48,24 @@ class _ProductReviewPageState extends State<ProductReviewPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Product Reviews"),
+        backgroundColor: TailwindColors.mossGreenActive,
+        elevation: 4,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: const Text(
+          'Product Reviews',
+          style: TextStyle(color: Colors.white),
+        ),
       ),
       drawer: const LeftDrawer(),
-      body: Padding(
+      body: Container(
+        color: TailwindColors.yellowLight, 
         padding: const EdgeInsets.all(16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Rating filter
             DropdownButton<String>(
               value: selectedRating,
               isExpanded: true,
@@ -75,14 +82,15 @@ class _ProductReviewPageState extends State<ProductReviewPage> {
                   child: Text(value == 'all' ? 'All Ratings' : '$value Stars'),
                 );
               }).toList(),
+              style: const TextStyle(color: TailwindColors.mossGreenDarker),
+              dropdownColor: Colors.white, 
             ),
             const SizedBox(height: 16),
 
             Expanded(
               child: FutureBuilder<List<Review>>(
-                future: _fetchReviews(request),
-                builder: (context,
-                    AsyncSnapshot<List<Review>> snapshot) {
+                future: _fetchReviews(context, request),
+                builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
                   }
@@ -97,7 +105,6 @@ class _ProductReviewPageState extends State<ProductReviewPage> {
 
                   var reviews = snapshot.data!;
 
-                  // Filter reviews based on selected rating
                   if (selectedRating != 'all') {
                     reviews = reviews
                         .where((review) =>
@@ -136,13 +143,17 @@ class _ProductReviewPageState extends State<ProductReviewPage> {
                     ),
                   );
                   if (result == true) {
-                    setState(() {});
+                    setState(() {}); 
                   }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: TailwindColors.mossGreenActive,
                   foregroundColor: Colors.white,
                   minimumSize: const Size(double.infinity, 50),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  elevation: 4,
                 ),
                 child: const Text(
                   "Write a Review",

@@ -19,7 +19,6 @@ class ProductReviewCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Rating Stars
             Row(
               children: List.generate(
                 5,
@@ -33,7 +32,6 @@ class ProductReviewCard extends StatelessWidget {
             
             const SizedBox(height: 12),
             
-            // Review Comment
             Text(
               '${review['comment']}',
               style: const TextStyle(
@@ -44,7 +42,6 @@ class ProductReviewCard extends StatelessWidget {
             
             const SizedBox(height: 12),
             
-            // User Info and Date
             Row(
               children: [
                 const Icon(
@@ -69,7 +66,7 @@ class ProductReviewCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  '${review['created_at'].toLocal().toString().split(' ')[0]}',
+                  review['created_at'].toLocal().toString().split(' ')[0],
                   style: const TextStyle(
                     fontSize: 12,
                     color: Colors.grey,
