@@ -1,24 +1,26 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:paku/colors.dart';
 import 'package:paku/widgets/left_drawer.dart';
-import 'package:pbp_django_auth/pbp_django_auth.dart'; // Import CookieRequest
-import 'package:provider/provider.dart';
-import 'package:intl/intl.dart'; // Import intl package
 import 'package:paku/screens/promos/models/promo.dart';
-import 'dart:convert'; // Import for jsonEncode
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
 
 class EditPromoPage extends StatefulWidget {
   final Promo promo;
 
-  EditPromoPage({required this.promo});
+  const EditPromoPage({required this.promo, super.key});
 
   @override
-  _EditPromoPageState createState() => _EditPromoPageState();
+  State<EditPromoPage> createState() => _EditPromoPageState();
 }
 
 class _EditPromoPageState extends State<EditPromoPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  TextEditingController _tanggalController = TextEditingController();
+  final TextEditingController _tanggalController = TextEditingController();
+
   late String _judulPromo;
   late String _deskripsiPromo;
   DateTime? _tanggalBatas;
@@ -61,11 +63,11 @@ class _EditPromoPageState extends State<EditPromoPage> {
       _tanggalController.text = '';
     });
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Tanggal batas penggunaan telah dihapus.')),
+      const SnackBar(content: Text('Tanggal batas penggunaan telah dihapus.')),
     );
   }
 
-  Future<void> _submitEditPromo() async {
+  Future<void> _submitEditPromo(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       final request = context.read<CookieRequest>();
@@ -83,38 +85,32 @@ class _EditPromoPageState extends State<EditPromoPage> {
           'batas_penggunaan': formattedDate, // Send as string or null
         };
 
-        // Convert the data to JSON
-        String jsonData = jsonEncode(data);
-
-        // Print the JSON being sent for debugging
-        print('JSON Payload: $jsonData');
-
         // Send the POST request with the correct headers
         final response = await request.postJson(
           'http://localhost:8000/promos/edit_promo_json/${widget.promo.id}/',
           jsonEncode(data),
         );
 
-        // Debug statement
-        print('Edit Promo Response: $response');
-
-        if (response['success']) {
-          // Successfully updated, navigate back
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(response['message'])),
-          );
-          Navigator.pop(context);
-        } else {
-          // Show error from response
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(response['message'] ?? 'Gagal mengubah promo')),
-          );
+        if (context.mounted) {
+          if (response['success']) {
+            // Successfully updated, navigate back
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(response['message'])),
+            );
+            Navigator.pop(context);
+          } else {
+            // Show error from response
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(response['message'] ?? 'Gagal mengubah promo')),
+            );
+          }
         }
       } catch (e) {
-        print('Error editing promo: $e');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error editing promo')),
-        );
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Error editing promo')),
+          );
+        }
       }
     }
   }
@@ -154,7 +150,7 @@ class _EditPromoPageState extends State<EditPromoPage> {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
+                  boxShadow: const [
                     BoxShadow(
                       color: Colors.black12,
                       blurRadius: 8,
@@ -225,12 +221,12 @@ class _EditPromoPageState extends State<EditPromoPage> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   IconButton(
-                                    icon: Icon(Icons.calendar_today),
+                                    icon: const Icon(Icons.calendar_today),
                                     onPressed: () => _selectDate(context),
                                   ),
                                   if (_tanggalBatas != null)
                                     IconButton(
-                                      icon: Icon(Icons.clear),
+                                      icon: const Icon(Icons.clear),
                                       onPressed: _clearDate,
                                       tooltip: 'Hapus Tanggal',
                                     ),
@@ -260,17 +256,17 @@ class _EditPromoPageState extends State<EditPromoPage> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: TailwindColors.yellowDefault,
                           ),
-                          child: Text(
+                          child: const Text(
                             "Batal",
                             style: TextStyle(color: Colors.white),
                           ),
                         ),
                         ElevatedButton(
-                          onPressed: _submitEditPromo, // Submit to Django
+                          onPressed: () => _submitEditPromo(context),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: TailwindColors.sageDefault,
                           ),
-                          child: Text(
+                          child: const Text(
                             "Simpan Perubahan",
                             style: TextStyle(color: Colors.white),
                           ),

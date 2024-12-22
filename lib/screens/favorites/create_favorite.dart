@@ -22,8 +22,21 @@ class _CreateFavoritePageState extends State<CreateFavoritePage> {
 
   // Method to handle adding to favorites
   void _addFavorite(CookieRequest request) async {
+    // Cek apakah user sudah login dan cookie sudah ada
+    final cookie = request.cookies; 
+    if (cookie.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("You need to log in first.")),
+      );
+      return;
+    }
+
+    final productId = widget.product.pk;
+    print("Sending category: $_category");
+
+    // Kirim request ke Django API
     final response = await request.postJson(
-      "http://127.0.0.1:8000/favorites/create_favorite_json/",
+      "http://127.0.0.1:8000/favorites/create_favorite_json/$productId/",
       jsonEncode(<String, dynamic>{
         'category': fCategoryValues.reverse[_category], // Convert enum to string
         'product_id': widget.product.pk,
@@ -34,9 +47,7 @@ class _CreateFavoritePageState extends State<CreateFavoritePage> {
       if (context.mounted) {
         if (response['status'] == 'success') {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Favorite successfully added!"),
-            ),
+            const SnackBar(content: Text("Favorite successfully added!")),
           );
           Navigator.pushReplacement(
             context,
@@ -44,17 +55,13 @@ class _CreateFavoritePageState extends State<CreateFavoritePage> {
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("An error occurred. Please try again."),
-            ),
+            const SnackBar(content: Text("An error occurred. Please try again.")),
           );
         }
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("No response from server."),
-        ),
+        const SnackBar(content: Text("No response from server.")),
       );
     }
   }
@@ -65,9 +72,7 @@ class _CreateFavoritePageState extends State<CreateFavoritePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-            'Add to Favorites',
-          ),
+        title: const Text('Add to Favorites'),
         backgroundColor: TailwindColors.mossGreenDefault,
         foregroundColor: TailwindColors.whiteLight,
         leading: IconButton(
@@ -80,75 +85,79 @@ class _CreateFavoritePageState extends State<CreateFavoritePage> {
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Product Info Section
-              Container(
-                padding: const EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  color: TailwindColors.mossGreenLight,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: TailwindColors.mossGreenDark),
+          child: Form(
+            key: _formKey, // Menghubungkan Form dengan GlobalKey
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Product Info Section
+                Container(
+                  padding: const EdgeInsets.all(16.0),
+                  decoration: BoxDecoration(
+                    color: TailwindColors.mossGreenLight,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: TailwindColors.mossGreenDark),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Add "${widget.product.fields.productName}" to Your Favorites',
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: TailwindColors.yellowDark,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      _buildProductDetails('Name', widget.product.fields.productName),
+                      _buildProductDetails('Restaurant', widget.product.fields.restaurant),
+                      _buildProductDetails('Price', 'Rp ${widget.product.fields.price}'),
+                      _buildProductDetails('Description', widget.product.fields.description),
+                      _buildProductDetails('Category', widget.product.fields.category),
+                    ],
+                  ),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Add "${widget.product.fields.productName}" to Your Favorites',
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: TailwindColors.yellowDark,
+                const SizedBox(height: 20),
+
+                // Category Selection Section
+                const Text(
+                  'Select Category',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: TailwindColors.yellowActive,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                _buildCategoryOption('Want to Try', FCategory.wantToTry),
+                _buildCategoryOption('Loving It', FCategory.lovingIt),
+                _buildCategoryOption('All Time Favorite', FCategory.allTimeFavorites),
+                const SizedBox(height: 20),
+
+                // Submit Button
+                Center(
+                  child: ElevatedButton(
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(TailwindColors.redDefault),
+                      padding: MaterialStateProperty.all(
+                        const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
                       ),
                     ),
-                    const SizedBox(height: 10),
-                    _buildProductDetails('Name', widget.product.fields.productName),
-                    _buildProductDetails('Restaurant', widget.product.fields.restaurant),
-                    _buildProductDetails('Price', 'Rp ${widget.product.fields.price}'),
-                    _buildProductDetails('Description', widget.product.fields.description),
-                    _buildProductDetails('Category', widget.product.fields.category),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              // Category Selection Section
-              const Text(
-                'Select Category',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: TailwindColors.yellowActive,
-                ),
-              ),
-              const SizedBox(height: 10),
-              _buildCategoryOption('Want to Try', FCategory.wantToTry),
-              _buildCategoryOption('Loving It', FCategory.lovingIt),
-              _buildCategoryOption('All Time Favorite', FCategory.allTimeFavorites),
-              const SizedBox(height: 20),
-
-              // Submit Button
-              Center(
-                child: ElevatedButton(
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(TailwindColors.redDefault),
-                    padding: MaterialStateProperty.all(
-                      const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                    onPressed: () async {
+                      print("Category selected: $_category");
+                      if (_formKey.currentState!.validate()) {
+                        _addFavorite(request); // Call the separate function to add to favorites
+                      }
+                    },
+                    child: const Text(
+                      'Add to Favorites',
+                      style: TextStyle(color: TailwindColors.whiteLight),
                     ),
                   ),
-                  onPressed: () async {
-                    if (_formKey.currentState!.validate()) {
-                      _addFavorite(request); // Call the separate function to add to favorites
-                    }
-                  },
-                  child: const Text(
-                    'Add to Favorites',
-                    style: TextStyle(color: TailwindColors.whiteLight),
-                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -207,8 +216,10 @@ class _CreateFavoritePageState extends State<CreateFavoritePage> {
               value: category,
               groupValue: _category,
               onChanged: (value) {
+                print("Radio onChanged called with value: $value");
                 setState(() {
                   _category = value!;
+                  print("Selected category: $_category");
                 });
               },
             ),
