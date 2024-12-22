@@ -72,7 +72,7 @@ Bagi merchant, PaKu memberikan peluang untuk **menambahkan produk makanan** baru
 [Deployment PaKu](https://install.appcenter.ms/orgs/pbp-f04/apps/paku/distribution_groups/public/releases/3)
 
 ## :rocket: Tautan Video
-[Video Promosi PaKu]()
+[Video Promosi PaKu](https://youtu.be/m0JIzna7IsQ?si=tUCgHwhBvFlbrqEd)
 
 ## :rocket: Sheets Tracker Pengerjaan
 [Sheets Tracker Pengerjaan PaKu](https://docs.google.com/spreadsheets/d/1xTAlUjnHdHML4rV8QLKRsMHG14CR71f_xnXhZ5GjmDs/edit?usp=sharing)
