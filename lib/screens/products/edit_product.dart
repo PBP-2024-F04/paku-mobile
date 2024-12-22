@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:paku/screens/products/models/product.dart';
 import 'package:provider/provider.dart';
 import 'package:paku/colors.dart';
 import 'package:paku/widgets/left_drawer.dart';
@@ -7,7 +8,7 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 
 class EditProductPage extends StatefulWidget {
   final String productId;
-  final Map<String, dynamic> initialData;
+  final Product initialData;
 
   const EditProductPage({super.key, required this.productId, required this.initialData});
 
@@ -26,10 +27,10 @@ class _EditProductPageState extends State<EditProductPage> {
   void initState() {
     super.initState();
     // Initialize fields with data passed from previous page
-    _productName = widget.initialData['product_name'] ?? "";
-    _price = widget.initialData['price'] ?? 0;
-    _description = widget.initialData['description'] ?? "";
-    _category = widget.initialData['category'] ?? "";
+    _productName = widget.initialData.fields.productName ?? "";
+    _price = widget.initialData.fields.price ?? 0;
+    _description = widget.initialData.fields.description ?? "";
+    _category = widget.initialData.fields.category ?? "";
   }
 
   void _editProduct(BuildContext context, CookieRequest request) async {

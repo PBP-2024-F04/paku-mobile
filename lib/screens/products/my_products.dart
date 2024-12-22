@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:paku/colors.dart'; 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -6,6 +7,7 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:paku/screens/products/add_product.dart';
 import 'package:paku/screens/products/edit_product.dart';
 import 'package:paku/screens/reviews/product_review.dart';
+import 'package:paku/screens/products/models/product.dart';
 
 class MyProductsPage extends StatefulWidget {
   const MyProductsPage({super.key});
@@ -15,12 +17,20 @@ class MyProductsPage extends StatefulWidget {
 }
 
 class _MyProductsPageState extends State<MyProductsPage> {
-  late Future<List<dynamic>> _products;
+  late Future<List<Product>> _products;
 
-  Future<List<dynamic>> fetchProducts(CookieRequest request) async {
-    final response = await request.get("http://localhost:8000/products/my-products-flutter/");
+  Future<List<Product>> fetchProducts(CookieRequest request) async {
+    // final request = context.watch<CookieRequest>();
+    String username = request.jsonData['username'] ?? "Tidak dikenal";
+
+    // Cetak nama pengguna di console
+    print("Pengguna yang sedang login: $username");
+    final response = await request.get("http://localhost:8000/products/my-products-api/${username}");
+    print(response.toString());
     if (response['success']) {
-      return response['products'];
+      print("======");
+      print(response['products']);
+      return productFromJson(jsonEncode(response['products']));
     } else {
       throw Exception(response['message'] ?? "Failed to fetch products.");
     }
@@ -96,7 +106,7 @@ class _MyProductsPageState extends State<MyProductsPage> {
             ),
             const SizedBox(height: 25),
             Expanded(
-              child: FutureBuilder<List<dynamic>>(
+              child: FutureBuilder<List<Product>>(
                 future: _products,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -114,6 +124,7 @@ class _MyProductsPageState extends State<MyProductsPage> {
                     );
                   } else {
                     final products = snapshot.data!;
+                    print( products);
                     return SingleChildScrollView(
                       child: Column(
                         children: <Widget>[
@@ -165,11 +176,14 @@ class _MyProductsPageState extends State<MyProductsPage> {
                                                 child: SizedBox(
                                                   height: 120,
                                                   width: MediaQuery.of(context).size.width,
+                                                  child: product.fields.productImage != null
+                                                      ? Image.network(product.fields.productImage!, fit: BoxFit.cover)
+                                                      : const Placeholder(),
                                                 ),
                                               ),
                                               const SizedBox(height: 10),
                                               Text(
-                                                product['product_name'],
+                                                product.fields.productName,
                                                 style: const TextStyle(
                                                   fontSize: 15,
                                                   fontWeight: FontWeight.w600,
@@ -178,7 +192,7 @@ class _MyProductsPageState extends State<MyProductsPage> {
                                               Padding(
                                                 padding: const EdgeInsets.symmetric(vertical: 5),
                                                 child: Text(
-                                                  product['description'],
+                                                  product.fields.description,
                                                   style: const TextStyle(
                                                     fontSize: 11,
                                                     color: TailwindColors.whiteDark,
@@ -190,7 +204,7 @@ class _MyProductsPageState extends State<MyProductsPage> {
                                                 mainAxisAlignment: MainAxisAlignment.center,
                                                 children: <Widget>[
                                                   Text(
-                                                    product['category'],
+                                                    product.fields.category,
                                                     style: const TextStyle(
                                                       color: TailwindColors.peachDefault,
                                                       fontSize: 11,
@@ -200,7 +214,7 @@ class _MyProductsPageState extends State<MyProductsPage> {
                                               ),
                                               const SizedBox(height: 5),
                                               Text(
-                                                "Rp ${product['price']}",
+                                                "Rp ${product.fields.price}",
                                                 style: const TextStyle(
                                                   fontSize: 20,
                                                   fontWeight: FontWeight.bold,
@@ -221,11 +235,10 @@ class _MyProductsPageState extends State<MyProductsPage> {
                                                 Navigator.push(
                                                   context,
                                                   MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        EditProductPage(
-                                                          productId: product['id'],
-                                                          initialData: product,
-                                                        )
+                                                    builder: (context) => EditProductPage(
+                                                      productId: product.pk,
+                                                      initialData: product,
+                                                    ),
                                                   ),
                                                 ).then((_) => refreshProducts());
                                               },
@@ -235,7 +248,7 @@ class _MyProductsPageState extends State<MyProductsPage> {
                                               onPressed: () async {
                                                 try {
                                                   final request = context.read<CookieRequest>();
-                                                  await deleteProduct(request, product['id']);
+                                                  await deleteProduct(request, product.pk);
                                                   if (context.mounted) {
                                                     ScaffoldMessenger.of(context).showSnackBar(
                                                       const SnackBar(
@@ -276,16 +289,10 @@ class _MyProductsPageState extends State<MyProductsPage> {
   }
 }
 
-class ProductDetailPage extends StatefulWidget {
-  final Map<String, dynamic> product;
+class ProductDetailPage extends StatelessWidget {
+  final Product product;
 
   const ProductDetailPage({super.key, required this.product});
-
-  @override
-  State<ProductDetailPage> createState() => _ProductDetailPageState();
-}
-
-class _ProductDetailPageState extends State<ProductDetailPage> {
 
   @override
   Widget build(BuildContext context) {
@@ -323,12 +330,12 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   children: <Widget>[
                     Expanded(
                       child: Text(
-                        widget.product['product_name'],
+                        product.fields.productName,
                         style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
                       ),
                     ),
                     Text(
-                      "Rp ${widget.product['price']}",
+                      "Rp ${product.fields.price}",
                       style: const TextStyle(fontSize: 25, fontWeight: FontWeight.w500),
                     ),
                   ],
@@ -343,7 +350,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     ),
                     const SizedBox(width: 5),
                     Text(
-                      widget.product['category'] ?? 'No Category',
+                      product.fields.category,
                       style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                     ),
                   ],
@@ -355,10 +362,30 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 ),
                 const SizedBox(height: 5),
                 Text(
-                  widget.product['description'] ?? 'No Description',
+                  product.fields.description,
                   style: _grayText(),
                 ),
                 const SizedBox(height: 15),
+                const Text(
+                  "Restaurant",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  product.fields.restaurant,
+                  style: _grayText(),
+                ),
+                const SizedBox(height: 20),
+                if (product.fields.productImage != null)
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.network(
+                      product.fields.productImage!,
+                      height: 200,
+                      width: MediaQuery.of(context).size.width,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
               ],
             ),
           ),
@@ -370,7 +397,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => ProductReviewPage(productId: widget.product['id']),
+              builder: (context) => ProductReviewPage(productId: product.pk),
             ),
           );
         },
