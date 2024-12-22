@@ -7,12 +7,22 @@ import 'package:paku/widgets/left_drawer.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 
-class Promos extends StatelessWidget {
+class Promos extends StatefulWidget {
   const Promos({super.key});
 
-  Future<List<Promo>> _fetchPromos(CookieRequest request) async {
+  @override
+  State<Promos> createState() => _PromosState();
+}
+
+class _PromosState extends State<Promos> {
+  Future<List<Promo>>? _future;
+  String _query = "";
+
+  Future<List<Promo>> _fetchPromos(CookieRequest request, {String query = ""}) async {
     final response = await request.get(
-      '$apiURL/promos/promo_list_json/',
+      Uri.parse('$apiURL/promos/promo_list_json/')
+          .replace(queryParameters: {"query": query})
+          .toString(),
     );
 
     if (response is List<dynamic>) {
@@ -23,6 +33,13 @@ class Promos extends StatelessWidget {
   }
 
   @override
+  void initState() {
+    super.initState();
+    final request = context.read<CookieRequest>();
+    _future = _fetchPromos(request);
+  }
+
+  @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
 
@@ -30,12 +47,11 @@ class Promos extends StatelessWidget {
       appBar: AppBar(title: const Text("PaKu")),
       drawer: const LeftDrawer(),
       body: Padding(
-        padding: const EdgeInsets.all(32.0),
+        padding: const EdgeInsets.all(8.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Title text "Promos"
             Text(
               "Promos",
               textAlign: TextAlign.center,
@@ -51,23 +67,57 @@ class Promos extends StatelessWidget {
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: 16),
+            SearchBar(
+              hintText: 'Cari Promos...',
+              elevation: WidgetStatePropertyAll(0),
+              shape: WidgetStatePropertyAll(
+                RoundedRectangleBorder(
+                  borderRadius: BorderRadius.zero,
+                  side: const BorderSide(
+                    color: TailwindColors.mossGreenDark,
+                    width: 2,
+                  ),
+                ),
+              ),
+              onChanged: (value) {
+                setState(() {
+                  _query = value;
+                });
+              },
+              onSubmitted: (value) {
+                setState(() {
+                  _query = value;
+                  _future = _fetchPromos(request, query: _query);
+                });
+              },
+              trailing: [
+                IconButton(
+                  onPressed: () {
+                    setState(() {
+                      _future = _fetchPromos(request, query: _query);
+                    });
+                  },
+                  icon: const Icon(Icons.search),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 32.0), // Padding around the container
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 48.0, vertical: 16.0),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
                   decoration: BoxDecoration(
-                    color: TailwindColors.peachDarker, // Background color
-                    borderRadius: BorderRadius.zero, // No rounded corners
+                    color: TailwindColors.peachDarker,
+                    borderRadius: BorderRadius.zero,
                     border: Border.all(
-                      color: TailwindColors.peachDarkActive, // Border color
-                      width: 16, // Adjust border width
+                      color: TailwindColors.peachDarkActive,
+                      width: 16,
                     ),
                   ),
                   child: FutureBuilder(
-                    future: _fetchPromos(request),
+                    future: _future,
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(child: CircularProgressIndicator());
@@ -92,7 +142,7 @@ class Promos extends StatelessWidget {
                         itemBuilder: (context, index) {
                           var promo = snapshot.data![index];
                           return Container(
-                            width: double.infinity, // Make card responsive
+                            width: double.infinity,
                             padding: const EdgeInsets.symmetric(vertical: 8),
                             child: Card(
                               elevation: 4,
@@ -127,8 +177,7 @@ class Promos extends StatelessWidget {
                                           ?.copyWith(
                                             fontSize: 20,
                                             fontWeight: FontWeight.bold,
-                                            color:
-                                                TailwindColors.mossGreenDarker,
+                                            color: TailwindColors.mossGreenDarker,
                                           ),
                                     ),
                                     const SizedBox(height: 8),
@@ -139,8 +188,7 @@ class Promos extends StatelessWidget {
                                           .bodySmall
                                           ?.copyWith(
                                             fontWeight: FontWeight.bold,
-                                            color:
-                                                TailwindColors.mossGreenDarker,
+                                            color: TailwindColors.mossGreenDarker,
                                           ),
                                     ),
                                     const SizedBox(height: 12),
@@ -151,8 +199,7 @@ class Promos extends StatelessWidget {
                                           .textTheme
                                           .bodyMedium
                                           ?.copyWith(
-                                            color:
-                                                TailwindColors.mossGreenDarker,
+                                            color: TailwindColors.mossGreenDarker,
                                           ),
                                     ),
                                     const SizedBox(height: 8),

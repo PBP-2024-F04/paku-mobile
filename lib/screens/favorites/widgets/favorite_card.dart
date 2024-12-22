@@ -107,6 +107,7 @@ class FavoriteCard extends StatelessWidget {
                             content: Text("Favorit berhasil dihapus."),
                           ),
                         );
+                        Navigator.pop(context);
                       }
                     },
                     style: TextButton.styleFrom(
