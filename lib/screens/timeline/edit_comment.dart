@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:paku/screens/timeline/models/comment.dart';
+import 'package:paku/settings.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 
@@ -27,7 +28,7 @@ class _EditCommentPageState extends State<EditCommentPage> {
 
   void _editComment(BuildContext context, CookieRequest request) async {
     final response = await request.postJson(
-      "http://localhost:8000/timeline/json/comments/${widget.comment.id}/edit",
+      "$apiURL/timeline/json/comments/${widget.comment.id}/edit",
       jsonEncode({ 'text': _text }),
     );
 

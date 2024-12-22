@@ -3,6 +3,7 @@ import 'package:paku/colors.dart';
 import 'package:paku/screens/favorites/edit_favorites.dart';
 import 'package:paku/screens/favorites/models/favorites.dart';
 import 'package:paku/screens/products/models/product.dart';
+import 'package:paku/settings.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 
@@ -13,7 +14,7 @@ class FavoriteCard extends StatelessWidget {
 
   Future<Product> fetchProductDetails(CookieRequest request, String productId) async {
     try {
-      final response = await request.get('http://127.0.0.1:8000/products/json/$productId/');
+      final response = await request.get('$apiURL/products/json/$productId/');
       return Product.fromJson(response[0]);
     } catch (e) {
       throw Exception('Error fetching product details: $e');
@@ -22,7 +23,7 @@ class FavoriteCard extends StatelessWidget {
 
   Future<void> deleteFavorite(CookieRequest request, String favoriteId) async {
     final response = await request.postJson(
-      "http://127.0.0.1:8000/favorites/$favoriteId/delete_favorite_json",
+      "$apiURL/favorites/$favoriteId/delete_favorite_json",
       "",
     );
 

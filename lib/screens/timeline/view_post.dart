@@ -6,6 +6,7 @@ import 'package:paku/screens/timeline/models/comment.dart';
 import 'package:paku/screens/timeline/models/post.dart';
 import 'package:paku/screens/timeline/widgets/comment_card.dart';
 import 'package:paku/screens/timeline/widgets/post_card.dart';
+import 'package:paku/settings.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 
@@ -26,7 +27,7 @@ class _ViewPostPageState extends State<ViewPostPage> {
 
   void _createComment(BuildContext context, CookieRequest request) async {
     final response = await request.postJson(
-      "http://localhost:8000/timeline/json/posts/${widget.post.id}/comments/create",
+      "$apiURL/timeline/json/posts/${widget.post.id}/comments/create",
       jsonEncode({ 'text': _comment }),
     );
 
@@ -53,7 +54,7 @@ class _ViewPostPageState extends State<ViewPostPage> {
 
   Future<List<Comment>> _fetchComments(CookieRequest request) async {
     final response = await request.get(
-      'http://localhost:8000/timeline/json/posts/${widget.post.id}/comments',
+      '$apiURL/timeline/json/posts/${widget.post.id}/comments',
     );
 
     if (response is List<dynamic>) {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:paku/colors.dart';
+import 'package:paku/settings.dart';
 import 'package:paku/widgets/left_drawer.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
@@ -25,7 +26,7 @@ class _ProductReviewPageState extends State<ProductReviewPage> {
   Future<List<Review>> _fetchReviews(BuildContext context, CookieRequest request) async {
     try {
       final response = await request.get(
-        'http://localhost:8000/reviews/json/product/${widget.productId}/reviews/',
+        '$apiURL/reviews/json/product/${widget.productId}/reviews/',
       );
 
       if (response is List) {

@@ -1,5 +1,6 @@
 import 'package:paku/colors.dart'; 
 import 'package:flutter/material.dart';
+import 'package:paku/settings.dart';
 import 'package:provider/provider.dart';
 import 'package:paku/widgets/left_drawer.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
@@ -19,7 +20,7 @@ class _MyProductsPageState extends State<MyProductsPage> {
   late Future<List<Product>> _products;
 
   Future<List<Product>> fetchProducts(CookieRequest request) async {
-    final response = await request.get("http://localhost:8000/products/my-products-flutter");
+    final response = await request.get("$apiURL/products/my-products-flutter");
 
     List<Product> listProduct = [];
     for (var d in response) {
@@ -33,7 +34,7 @@ class _MyProductsPageState extends State<MyProductsPage> {
 
   Future<void> deleteProduct(CookieRequest request, String productId) async {
     final response = await request.post(
-      "http://localhost:8000/products/me/$productId/delete-product/",
+      "$apiURL/products/me/$productId/delete-product/",
       {},
     );
 

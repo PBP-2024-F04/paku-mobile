@@ -1,7 +1,7 @@
 import 'package:paku/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:paku/settings.dart';
 import 'package:provider/provider.dart';
-import 'package:paku/colors.dart';
 import 'package:paku/widgets/left_drawer.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:paku/screens/products/models/product.dart';
@@ -17,7 +17,7 @@ class ProductsPage extends StatefulWidget {
 
 class _ProductsPageState extends State<ProductsPage> {
   Future<List<Product>> fetchProduct(CookieRequest request) async {
-    final response = await request.get('http://127.0.0.1:8000/products/json/');
+    final response = await request.get('$apiURL/products/json/');
     var data = response;
     List<Product> listProduct = [];
     for (var d in data) {
@@ -224,7 +224,6 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    final request = context.watch<CookieRequest>();
     return Scaffold(
       appBar: AppBar(
         title: const Text("PaKu"),

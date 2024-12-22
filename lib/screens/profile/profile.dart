@@ -4,6 +4,7 @@ import 'package:paku/screens/profile/widgets/profile_favorites.dart';
 import 'package:paku/screens/profile/widgets/profile_posts.dart';
 import 'package:paku/screens/profile/widgets/profile_products.dart';
 import 'package:paku/screens/profile/widgets/profile_reviews.dart';
+import 'package:paku/settings.dart';
 import 'package:paku/widgets/left_drawer.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
@@ -20,7 +21,7 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   Future<Profile> _future(BuildContext context, CookieRequest request) async {
     final result = await request.get(
-      "http://localhost:8000/profile/json/${widget.username ?? ""}",
+      "$apiURL/profile/json/${widget.username ?? ""}",
     );
     return Profile.fromJson(result);
   }

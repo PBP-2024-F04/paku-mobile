@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:paku/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:paku/settings.dart';
 import 'package:provider/provider.dart';
 import 'package:paku/widgets/left_drawer.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
@@ -23,7 +24,7 @@ class _AddProductPageState extends State<AddProductPage> {
 
   void _addProduct(BuildContext context, CookieRequest request) async {
     final response = await request.postJson(
-      "http://localhost:8000/products/create-product-flutter/",
+      "$apiURL/products/create-product-flutter/",
       jsonEncode({
         "productName": _productName,
         "price": _price,

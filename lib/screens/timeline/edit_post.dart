@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:paku/screens/timeline/models/post.dart';
 import 'package:paku/screens/timeline/timeline_main.dart';
+import 'package:paku/settings.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 
@@ -28,7 +29,7 @@ class _EditPostPageState extends State<EditPostPage> {
 
   void _editPost(BuildContext context, CookieRequest request) async {
     final response = await request.postJson(
-      "http://localhost:8000/timeline/json/posts/${widget.post.id}/edit",
+      "$apiURL/timeline/json/posts/${widget.post.id}/edit",
       jsonEncode({ 'text': _text }),
     );
 

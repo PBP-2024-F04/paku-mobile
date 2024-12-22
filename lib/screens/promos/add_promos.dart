@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:paku/colors.dart';
+import 'package:paku/settings.dart';
 import 'package:paku/widgets/left_drawer.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
@@ -73,7 +74,7 @@ class _AddPromoPageState extends State<AddPromoPage> {
 
         // Send the POST request
         final response = await request.postJson(
-          'http://localhost:8000/promos/create_promo_json/',
+          '$apiURL/promos/create_promo_json/',
           jsonEncode(data),
         );
 

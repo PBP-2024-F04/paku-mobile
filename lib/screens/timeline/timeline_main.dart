@@ -3,6 +3,7 @@ import 'package:paku/colors.dart';
 import 'package:paku/screens/timeline/create_post.dart';
 import 'package:paku/screens/timeline/models/post.dart';
 import 'package:paku/screens/timeline/widgets/post_card.dart';
+import 'package:paku/settings.dart';
 import 'package:paku/widgets/left_drawer.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
@@ -23,7 +24,7 @@ class _TimelineMainPageState extends State<TimelineMainPage> {
     String query = "",
   }) async {
     final response = await request.get(
-      Uri.parse('http://localhost:8000/timeline/json/posts')
+      Uri.parse('$apiURL/timeline/json/posts')
           .replace(queryParameters: {"query": query}).toString(),
     );
 

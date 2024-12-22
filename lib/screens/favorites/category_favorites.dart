@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:paku/screens/favorites/models/favorites.dart';
 import 'package:paku/screens/favorites/widgets/favorite_card.dart';
+import 'package:paku/settings.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 
@@ -12,7 +13,7 @@ class FavoritesByCategoryScreen extends StatelessWidget {
   Future<List<Favorites>> fetchFavoritesByCategory(CookieRequest request, FCategory category) async {
     try {
       final response = await request.get(
-        'http://127.0.0.1:8000/favorites/category/${category.apiName}/json/',
+        '$apiURL/favorites/category/${category.apiName}/json/',
       );
 
       final data = response;

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:paku/screens/reviews/reviews.dart';
+import 'package:paku/settings.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:paku/screens/reviews/models/review.dart';
@@ -29,7 +30,7 @@ class _EditReviewPageState extends State<EditReviewPage> {
 
   void _editReview(BuildContext context, CookieRequest request) async {
     final response = await request.postJson(
-      "http://localhost:8000/reviews/json/reviews/me/${widget.review.id}/edit/",
+      "$apiURL/reviews/json/reviews/me/${widget.review.id}/edit/",
       jsonEncode({
         'rating': _rating,
         'comment': _commentController.text,

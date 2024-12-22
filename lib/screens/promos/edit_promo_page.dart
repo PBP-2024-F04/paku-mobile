@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:paku/colors.dart';
+import 'package:paku/settings.dart';
 import 'package:paku/widgets/left_drawer.dart';
 import 'package:paku/screens/promos/models/promo.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
@@ -87,7 +88,7 @@ class _EditPromoPageState extends State<EditPromoPage> {
 
         // Send the POST request with the correct headers
         final response = await request.postJson(
-          'http://localhost:8000/promos/edit_promo_json/${widget.promo.id}/',
+          '$apiURL/promos/edit_promo_json/${widget.promo.id}/',
           jsonEncode(data),
         );
 

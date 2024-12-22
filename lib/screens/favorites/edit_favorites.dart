@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:paku/settings.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:paku/screens/accounts/home.dart';
@@ -29,7 +30,7 @@ class _EditFavoritePageState extends State<EditFavoritePage> {
 
   void _updateFavorite(BuildContext context, CookieRequest request) async {
     final response = await request.postJson(
-      "http://127.0.0.1:8000/favorites/${widget.favorite.favorite}/edit_favorite_json",
+      "$apiURL/favorites/${widget.favorite.favorite}/edit_favorite_json",
       jsonEncode(<String, dynamic>{
         'category': fCategoryValues.reverse[_category], // Convert enum to string
         'product_id': widget.product.pk,
