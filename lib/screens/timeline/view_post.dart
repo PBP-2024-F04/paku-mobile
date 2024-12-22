@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:paku/colors.dart';
 import 'package:paku/screens/timeline/models/comment.dart';
 import 'package:paku/screens/timeline/models/post.dart';
 import 'package:paku/screens/timeline/widgets/comment_card.dart';
@@ -20,6 +21,7 @@ class ViewPostPage extends StatefulWidget {
 class _ViewPostPageState extends State<ViewPostPage> {
   final _formKey = GlobalKey<FormState>();
 
+  Future<List<Comment>>? _future;
   String _comment = "";
 
   void _createComment(BuildContext context, CookieRequest request) async {
@@ -67,7 +69,15 @@ class _ViewPostPageState extends State<ViewPostPage> {
   ) {
     if (snapshot.hasData && snapshot.data is List) {
       if (snapshot.data!.isEmpty) {
-        return const Text("Belum ada komentar.");
+        return Padding(
+          padding: const EdgeInsets.only(left: 10.0),
+          child: ListView.builder(
+            scrollDirection: Axis.vertical,
+            shrinkWrap: true,
+            itemCount: 1,
+            itemBuilder: (context, index) => const Center(child: Text("Belum ada komentar.")),
+          ),
+        );
       }
       return Padding(
         padding: const EdgeInsets.only(left: 10.0),
@@ -86,49 +96,86 @@ class _ViewPostPageState extends State<ViewPostPage> {
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
+    _future ??= _fetchComments(request);
 
     return Scaffold(
       appBar: AppBar(title: const Text("Post")),
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            padding: const EdgeInsets.all(30),
-            child: Column(
-              children: [
-                PostCard(widget.post),
-                FutureBuilder(
-                  future: _fetchComments(request),
-                  builder: _commentsBuilder,
+      body: Center(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 800),
+          child: Stack(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 16.0,
+                  horizontal: 24.0,
                 ),
-                const SizedBox(height: 50),
-              ],
-            ),
-          ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Form(
-              key: _formKey,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextFormField(
-                      decoration: const InputDecoration(
-                        hintText: "Berikan komentarmu!",
-                        filled: true,
-                        fillColor: Colors.white,
+                child: RefreshIndicator(
+                  onRefresh: () async {
+                    setState(() {
+                      _future = _fetchComments(request);
+                    });
+                  },
+                  child: Column(
+                    children: [
+                      PostCard(widget.post),
+                      Expanded(
+                        child: FutureBuilder(
+                          future: _future,
+                          builder: _commentsBuilder,
+                        ),
                       ),
-                      onChanged: (value) => setState(() => _comment = value),
+                      const SizedBox(height: 50),
+                    ],
+                  ),
+                ),
+              ),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: Form(
+                  key: _formKey,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Table(
+                      columnWidths: const {
+                        0: FlexColumnWidth(5),
+                        1: FlexColumnWidth(1),
+                      },
+                      children: [
+                        TableRow(
+                          children: [
+                            TableCell(
+                              verticalAlignment: TableCellVerticalAlignment.fill,
+                              child: TextFormField(
+                                decoration: const InputDecoration(
+                                  hintText: "Berikan komentarmu!",
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                ),
+                                onChanged: (value) => setState(() => _comment = value),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 8.0),
+                              child: IconButton(
+                                style: const ButtonStyle(
+                                  backgroundColor: WidgetStatePropertyAll(TailwindColors.sageDark),
+                                  shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.zero))),
+                                ),
+                                onPressed: () => _createComment(context, request),
+                                icon: const Icon(Icons.send, color: Colors.white),
+                              ),
+                            )
+                          ],
+                        ),
+                      ],
                     ),
                   ),
-                  IconButton(
-                    onPressed: () => _createComment(context, request),
-                    icon: const Icon(Icons.send),
-                  )
-                ],
+                ),
               ),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

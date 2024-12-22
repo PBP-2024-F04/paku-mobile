@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:paku/colors.dart';
 import 'package:paku/screens/profile/profile.dart';
 import 'package:paku/screens/timeline/edit_post.dart';
@@ -91,17 +92,56 @@ class PostCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        post.user.displayName,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                      ),
-                      Text(
-                        "@${post.user.username}",
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
+                      Row(
+                        children: [
+                          if (post.user.role == "Merchant")
+                            const Icon(LucideIcons.chefHat, size: 14, color: TailwindColors.peachDefault,)
+                          else 
+                            const Icon(LucideIcons.utensilsCrossed, size: 14, color: TailwindColors.peachDefault,),
+                          const SizedBox(width: 2),
+                          Flexible(
+                            fit: FlexFit.loose,
+                            child: Text(
+                              post.user.displayName,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium!
+                                  .copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                          ),
+                          const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 2.0),
+                            child: Text("—"),
+                          ),
+                          Flexible(
+                            fit: FlexFit.tight,
+                            child: Text(
+                              "@${post.user.username}",
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall!
+                                  .copyWith(
+                                    color: TailwindColors.peachDefault,
+                                  ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                          ),
+                        ],
                       ),
                       Text(post.text),
+                      if (post.isEdited)
+                        Text(
+                          "edited",
+                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                            fontStyle: FontStyle.italic,
+                            color: TailwindColors.peachDefault,
+                          ),
+                        )
                     ],
                   ),
                 ),
@@ -128,7 +168,7 @@ class PostCard extends StatelessWidget {
                             ListTile(
                               title: const Text('Profile'),
                               leading: const Icon(Icons.person_outlined),
-                              onTap: () => Navigator.pushReplacement(
+                              onTap: () => Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) =>
