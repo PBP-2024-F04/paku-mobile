@@ -365,6 +365,22 @@ class ProductDetailPage extends StatelessWidget {
                 Row(
                   children: [
                     const Icon(
+                      Icons.restaurant,
+                      color: TailwindColors.yellowDefault,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 5),
+                    Text(
+                      product.fields.restaurant,
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.w500),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    const Icon(
                       Icons.category,
                       color: TailwindColors.whiteDarkActive,
                       size: 20,
@@ -384,16 +400,6 @@ class ProductDetailPage extends StatelessWidget {
                 const SizedBox(height: 5),
                 Text(
                   product.fields.description,
-                  style: _grayText(),
-                ),
-                const SizedBox(height: 15),
-                const Text(
-                  "Restaurant",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  product.fields.restaurant,
                   style: _grayText(),
                 ),
               ],
