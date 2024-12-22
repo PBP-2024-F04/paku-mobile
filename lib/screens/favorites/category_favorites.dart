@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
-import 'package:http/http.dart' as http;
 import 'package:paku/screens/favorites/models/favorites.dart';
 import 'package:paku/screens/products/models/product.dart';
 import 'package:paku/screens/favorites/edit_favorites.dart';
@@ -13,13 +12,9 @@ class FavoritesByCategoryScreen extends StatelessWidget {
   const FavoritesByCategoryScreen({Key? key, required this.category})
       : super(key: key);
 
-  Future<List<Favorites>> fetchFavoritesByCategory(
-      CookieRequest request, FCategory category) async {
-    final url =
-        'http://127.0.0.1:8000/favorites/category/${category.apiName}/json/';
-
+  Future<List<Favorites>> fetchFavoritesByCategory(CookieRequest request, FCategory category) async {
     try {
-      final response = await request.get(url);
+      final response = await request.get('http://127.0.0.1:8000/favorites/category/${category.apiName}/json/');
       var data = response;
 
       List<Favorites> favoritesList = [];
@@ -36,10 +31,8 @@ class FavoritesByCategoryScreen extends StatelessWidget {
   }
 
   Future<Product> fetchProductDetails(CookieRequest request, String productId) async {
-    final url = 'http://127.0.0.1:8000/products/json/$productId/';
-
     try {
-      final response = await request.get(url);
+      final response = await request.get('http://127.0.0.1:8000/products/json/$productId/');
       var data = response;
       return Product.fromJson(data);
     } catch (e) {
@@ -49,6 +42,7 @@ class FavoritesByCategoryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
     return Scaffold(
       appBar: AppBar(
         title: Text(category.displayName),
@@ -58,12 +52,10 @@ class FavoritesByCategoryScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Daftar Favorite per Kategori
             Expanded(
               child: FutureBuilder<List<Favorites>>(
-                future: fetchFavoritesByCategory(
-                    context.watch<CookieRequest>(), category),
-                builder: (context, snapshot) {
+                future: fetchFavoritesByCategory(request, category),
+                builder: (context, AsyncSnapshot snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
                   } else if (snapshot.hasError) {
@@ -101,6 +93,7 @@ class FavoritesByCategoryScreen extends StatelessWidget {
   }
 
   Widget _buildFavoriteCard(BuildContext context, Favorites favorite) {
+    final request = context.watch<CookieRequest>();
     return GestureDetector(
       child: Card(
         elevation: 4,
@@ -138,13 +131,11 @@ class FavoritesByCategoryScreen extends StatelessWidget {
                 Expanded(
                   child: TextButton(
                     onPressed: () async {
-                      // Ambil detail produk berdasarkan ID produk
                       final product = await fetchProductDetails(
-                        context.watch<CookieRequest>(),
+                        request,
                         favorite.fields.product,
                       );
 
-                      // Arahkan pengguna ke halaman EditFavoritePage
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -165,28 +156,34 @@ class FavoritesByCategoryScreen extends StatelessWidget {
                 Expanded(
                   child: TextButton(
                     onPressed: () async {
-                      final response = await http.delete(
-                        Uri.parse(
-                            'http://127.0.0.1:8000/favorites/${favorite.pk}/delete'),
-                      );
-
-                      if (response.statusCode == 204) {
-                        // Berhasil menghapus
-                        print(
-                            "Product ${favorite.fields.product} deleted successfully");
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                              content: Text(
-                                  "${favorite.fields.product} has been deleted.")),
+                      final request = context.read<CookieRequest>();
+                      try {
+                        final response = await request.post(
+                          'http://127.0.0.1:8000/favorites/${favorite.pk}/delete_favorite_json/',
+                          {},
                         );
-                      } else {
-                        // Jika gagal menghapus
-                        print(
-                            "Failed to delete ${favorite.fields.product}");
+
+                        if (response['success']) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('${favorite.fields.product} has been deleted successfully.'),
+                              backgroundColor: TailwindColors.mossGreenDefault,
+                            ),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Failed to delete ${favorite.fields.product}.'),
+                              backgroundColor: TailwindColors.redDefault,
+                            ),
+                          );
+                        }
+                      } catch (e) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                              content: Text(
-                                  "Failed to delete ${favorite.fields.product}")),
+                            content: Text('Error deleting product: $e'),
+                            backgroundColor: TailwindColors.redDefault,
+                          ),
                         );
                       }
                     },

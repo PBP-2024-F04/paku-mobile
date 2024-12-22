@@ -24,14 +24,12 @@ class _EditFavoritePageState extends State<EditFavoritePage> {
   @override
   void initState() {
     super.initState();
-    // Set initial category from favorite's category
     _category = FCategory.values.firstWhere(
       (e) => e.toString().split('.').last == widget.favorite.fields.category,
-      orElse: () => FCategory.wantToTry, // Default if no match
+      orElse: () => FCategory.wantToTry,
     );
   }
 
-  // Method to handle updating the favorite
   void _updateFavorite(CookieRequest request) async {
     final response = await request.postJson(
       "http://127.0.0.1:8000/favorites/edit_favorite_json/${widget.favorite.pk}/",
@@ -94,7 +92,6 @@ class _EditFavoritePageState extends State<EditFavoritePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Product Info Section
               Container(
                 padding: const EdgeInsets.all(16.0),
                 decoration: BoxDecoration(
@@ -124,7 +121,6 @@ class _EditFavoritePageState extends State<EditFavoritePage> {
               ),
               const SizedBox(height: 20),
 
-              // Category Selection Section
               const Text(
                 'Select Category',
                 style: TextStyle(
@@ -139,7 +135,6 @@ class _EditFavoritePageState extends State<EditFavoritePage> {
               _buildCategoryOption('All Time Favorite', FCategory.allTimeFavorites),
               const SizedBox(height: 20),
 
-              // Submit Button
               Center(
                 child: ElevatedButton(
                   style: ButtonStyle(
@@ -150,7 +145,7 @@ class _EditFavoritePageState extends State<EditFavoritePage> {
                   ),
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      _updateFavorite(request); // Call the separate function to update the favorite
+                      _updateFavorite(request); 
                     }
                   },
                   child: const Text(
@@ -173,7 +168,7 @@ class _EditFavoritePageState extends State<EditFavoritePage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 100, // Set a fixed width for the label
+            width: 100,
             child: Text(
               '$label:',
               style: const TextStyle(fontWeight: FontWeight.bold),

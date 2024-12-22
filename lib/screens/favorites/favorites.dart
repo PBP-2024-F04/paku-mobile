@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:paku/screens/favorites/category_favorites.dart';
 import 'package:paku/widgets/left_drawer.dart';
-import 'package:paku/screens/favorites/search_result.dart';
 import 'package:paku/screens/accounts/login.dart';
 import 'package:paku/screens/favorites/models/favorites.dart';
 import 'package:paku/colors.dart';  
@@ -16,44 +15,20 @@ class FavoritesPage extends StatefulWidget {
 }
 
 class _FavoritesPageState extends State<FavoritesPage> {
-  final TextEditingController _searchController = TextEditingController();
-
   final List<FCategory> categories = [
     FCategory.wantToTry,
     FCategory.lovingIt,
     FCategory.allTimeFavorites,
   ];
 
-  // Fungsi untuk menangani pencarian
-  void _searchProducts() {
-    final query = _searchController.text.trim();
-    if (query.isNotEmpty) {
-      final request = context.read<CookieRequest>();
-      if (!request.loggedIn) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => LoginPage()), 
-        );
-      } else {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => SearchResultsScreen(query: query),
-          ),
-        );
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
-    print(request.cookies);
 
     if (!request.loggedIn) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => LoginPage()), // Ganti dengan halaman login Anda
+        MaterialPageRoute(builder: (context) => LoginPage()), 
       );
       return const SizedBox(); 
     }
@@ -74,51 +49,16 @@ class _FavoritesPageState extends State<FavoritesPage> {
             ),
             const SizedBox(height: 20),
 
-            // Pencarian Kuliner Baru dengan Button di sebelah kanan
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _searchController,
-                    decoration: InputDecoration(
-                      hintText: "Tambah Kuliner Baru...",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      prefixIcon: const Icon(Icons.search),
-                      filled: true,
-                      fillColor: TailwindColors.sageLight,  // Menggunakan warna dari colors.dart
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8), // Memberi jarak antara TextField dan Button
-                ElevatedButton(
-                  onPressed: _searchProducts,  // Menekan tombol untuk melakukan pencarian
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: TailwindColors.mossGreenDefault,  // Menggunakan backgroundColor, bukan primary
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                  ),
-                  child: const Text("Search"),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-
-            // Kategori Favorit
             const Text(
               "Categories",
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
 
-            // Menampilkan Kategori Favorit
             Expanded(
               child: GridView.builder(
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: MediaQuery.of(context).size.width > 600 ? 3 : 2,  // Mengatur jumlah kolom berdasarkan lebar layar
+                  crossAxisCount: MediaQuery.of(context).size.width > 600 ? 3 : 2,  
                   crossAxisSpacing: 16,
                   mainAxisSpacing: 16,
                 ),
@@ -127,7 +67,6 @@ class _FavoritesPageState extends State<FavoritesPage> {
                   final category = categories[index];
                   return GestureDetector(
                     onTap: () {
-                      // Arahkan ke halaman category favorites sesuai kategori yang dipilih
                       Navigator.push(
                         context,
                         MaterialPageRoute(

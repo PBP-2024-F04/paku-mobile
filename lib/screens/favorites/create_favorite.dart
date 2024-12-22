@@ -21,20 +21,19 @@ class _CreateFavoritePageState extends State<CreateFavoritePage> {
   FCategory _category = FCategory.wantToTry; // Default category
 
   // Method to handle adding to favorites
-  void _addFavorite(CookieRequest request) async {
+  void _addFavorite(BuildContext context, CookieRequest request) async {
     // Cek apakah user sudah login dan cookie sudah ada
-    final cookie = request.cookies; 
-    if (cookie.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("You need to log in first.")),
-      );
-      return;
-    }
+    // final cookie = request.cookies; 
+    // if (cookie.isEmpty) {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     const SnackBar(content: Text("You need to log in first.")),
+    //   );
+    //   return;
+    // }
 
     final productId = widget.product.pk;
     print("Sending category: $_category");
 
-    // Kirim request ke Django API
     final response = await request.postJson(
       "http://127.0.0.1:8000/favorites/create_favorite_json/$productId/",
       jsonEncode(<String, dynamic>{
@@ -43,26 +42,20 @@ class _CreateFavoritePageState extends State<CreateFavoritePage> {
       }),
     );
 
-    if (response != null) {
-      if (context.mounted) {
-        if (response['status'] == 'success') {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Favorite successfully added!")),
-          );
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => HomePage()),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("An error occurred. Please try again.")),
-          );
-        }
+    if (context.mounted) {
+      if (response['status'] == 'success') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Favorite successfully added!")),
+        );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomePage()),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("An error occurred. Please try again.")),
+        );
       }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("No response from server.")),
-      );
     }
   }
 
@@ -86,11 +79,10 @@ class _CreateFavoritePageState extends State<CreateFavoritePage> {
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Form(
-            key: _formKey, // Menghubungkan Form dengan GlobalKey
+            key: _formKey, 
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Product Info Section
                 Container(
                   padding: const EdgeInsets.all(16.0),
                   decoration: BoxDecoration(
@@ -120,7 +112,6 @@ class _CreateFavoritePageState extends State<CreateFavoritePage> {
                 ),
                 const SizedBox(height: 20),
 
-                // Category Selection Section
                 const Text(
                   'Select Category',
                   style: TextStyle(
@@ -135,7 +126,6 @@ class _CreateFavoritePageState extends State<CreateFavoritePage> {
                 _buildCategoryOption('All Time Favorite', FCategory.allTimeFavorites),
                 const SizedBox(height: 20),
 
-                // Submit Button
                 Center(
                   child: ElevatedButton(
                     style: ButtonStyle(
@@ -147,7 +137,7 @@ class _CreateFavoritePageState extends State<CreateFavoritePage> {
                     onPressed: () async {
                       print("Category selected: $_category");
                       if (_formKey.currentState!.validate()) {
-                        _addFavorite(request); // Call the separate function to add to favorites
+                        _addFavorite(context, request); 
                       }
                     },
                     child: const Text(
@@ -171,7 +161,7 @@ class _CreateFavoritePageState extends State<CreateFavoritePage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 100, // Set a fixed width for the label
+            width: 100, 
             child: Text(
               '$label:',
               style: const TextStyle(fontWeight: FontWeight.bold),
