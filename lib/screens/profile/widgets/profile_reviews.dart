@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:paku/screens/products/product_detail_page.dart';
 import 'package:paku/screens/profile/models/profile.dart';
 import 'package:paku/screens/reviews/models/review.dart';
 import 'package:paku/screens/reviews/widgets/my_review_card.dart';
 import 'package:paku/settings.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
-import 'package:paku/screens/products/products.dart';
 
 class ProfileReviewsPage extends StatefulWidget {
   final Profile profile;
