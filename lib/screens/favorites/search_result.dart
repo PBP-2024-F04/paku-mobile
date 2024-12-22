@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:paku/screens/products/models/product.dart';
+import 'package:paku/screens/favorites/create_favorite.dart'; 
+import 'package:paku/colors.dart';  
 
 class SearchResultsScreen extends StatefulWidget {
   final String query;
@@ -14,6 +16,7 @@ class SearchResultsScreen extends StatefulWidget {
 
 class _SearchResultsScreenState extends State<SearchResultsScreen> {
   late Future<List<Product>> products;
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -23,7 +26,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
 
   // Fetch data products berdasarkan query
   Future<List<Product>> fetchSearchResults(String query) async {
-    final response = await http.get(Uri.parse('http://localhost:8000/favorites/search_flutter/?q=$query'));
+    final response = await http.get(Uri.parse('http://localhost:8000/favorites/favorites/search_flutter/?q=$query'));
 
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body)['products'];
@@ -33,64 +36,100 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
     }
   }
 
-  // Fungsi untuk menambahkan ke favorit
-  Future<void> addToFavorites(String productId) async {
-    final response = await http.post(
-      Uri.parse('http://<your-server-ip>:8000/favorites/favorites/create-ajax/$productId'),
-      body: {'category': 'want_to_try'}, // Kategori favorit
-    );
-
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      if (data['success']) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Added to Favorites')));
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to add to favorites')));
-      }
-    } else {
-      throw Exception('Failed to add to favorites');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Search Results: "${widget.query}"'),
       ),
-      body: FutureBuilder<List<Product>>(
-        future: products,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('No products found.'));
-          } else {
-            final productList = snapshot.data!;
-            return ListView.builder(
-              itemCount: productList.length,
-              itemBuilder: (context, index) {
-                final product = productList[index];
-                return Card(
-                  margin: const EdgeInsets.all(8.0),
-                  child: ListTile(
-                    title: Text(product.fields.productName),
-                    subtitle: Text('Rp ${product.fields.price}'),
-                    leading: product.fields.user != null
-                        ? CircleAvatar(child: Text(product.fields.user![0]))
-                        : null,  // Menambahkan avatar jika ada user
-                    trailing: IconButton(
-                      icon: const Icon(Icons.favorite_border),
-                      onPressed: () => addToFavorites(product.pk),
+      body: Column(
+        children: [
+          // Search bar di bagian atas dengan tombol search
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      hintText: "Search again...",
+                      prefixIcon: const Icon(Icons.search),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      filled: true,
+                      fillColor: TailwindColors.sageLight,
                     ),
                   ),
-                );
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      // Memperbarui hasil pencarian berdasarkan query baru
+                      products = fetchSearchResults(_searchController.text.trim());
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: TailwindColors.mossGreenDefault,  // Menggunakan backgroundColor, bukan primary
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                  ),
+                  child: const Text("Search"),
+                ),
+              ],
+            ),
+          ),
+
+          // Menampilkan hasil pencarian produk
+          Expanded(
+            child: FutureBuilder<List<Product>>(
+              future: products,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text('No products found.'));
+                } else {
+                  final productList = snapshot.data!;
+                  return ListView.builder(
+                    itemCount: productList.length,
+                    itemBuilder: (context, index) {
+                      final product = productList[index];
+                      return Card(
+                        margin: const EdgeInsets.all(8.0),
+                        child: ListTile(
+                          title: Text(product.fields.productName),
+                          subtitle: Text('Rp ${product.fields.price}'),
+                          leading: product.fields.user != null
+                              ? CircleAvatar(child: Text(product.fields.user![0]))
+                              : null,  // Menambahkan avatar jika ada user
+                          trailing: IconButton(
+                            icon: const Icon(Icons.favorite_border),
+                            onPressed: () {
+                              // Menggunakan Navigator untuk pergi ke CreateFavoritePage
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => CreateFavoritePage(product: product),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                }
               },
-            );
-          }
-        },
+            ),
+          ),
+        ],
       ),
     );
   }

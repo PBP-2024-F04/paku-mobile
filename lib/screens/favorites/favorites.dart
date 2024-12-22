@@ -5,6 +5,8 @@ import 'package:paku/screens/favorites/category_favorites.dart';
 import 'package:paku/widgets/left_drawer.dart';
 import 'package:paku/screens/favorites/search_result.dart';
 import 'package:paku/screens/accounts/login.dart';
+import 'package:paku/screens/favorites/models/favorites.dart';
+import 'package:paku/colors.dart';  
 
 class FavoritesPage extends StatefulWidget {
   const FavoritesPage({super.key});
@@ -16,17 +18,17 @@ class FavoritesPage extends StatefulWidget {
 class _FavoritesPageState extends State<FavoritesPage> {
   final TextEditingController _searchController = TextEditingController();
 
-  final List<Map<String, String>> categories = [
-    {'title': 'Want to Try', 'category': 'want_to_try'},
-    {'title': 'Loving It', 'category': 'loving_it'},
-    {'title': 'All Time Favorite', 'category': 'all_time_favorites'},
+  final List<FCategory> categories = [
+    FCategory.wantToTry,
+    FCategory.lovingIt,
+    FCategory.allTimeFavorites,
   ];
 
   // Fungsi untuk menangani pencarian
   void _searchProducts() {
     final query = _searchController.text.trim();
     if (query.isNotEmpty) {
-      final request = context.watch<CookieRequest>();
+      final request = context.read<CookieRequest>();
       if (!request.loggedIn) {
         Navigator.pushReplacement(
           context,
@@ -72,27 +74,37 @@ class _FavoritesPageState extends State<FavoritesPage> {
             ),
             const SizedBox(height: 20),
 
-            // Pencarian Kuliner Baru
-            TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: "Tambah Kuliner Baru...",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
+            // Pencarian Kuliner Baru dengan Button di sebelah kanan
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      hintText: "Tambah Kuliner Baru...",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      prefixIcon: const Icon(Icons.search),
+                      filled: true,
+                      fillColor: TailwindColors.sageLight,  // Menggunakan warna dari colors.dart
+                    ),
+                  ),
                 ),
-                prefixIcon: const Icon(Icons.search),
-                filled: true,
-                fillColor: Colors.green[50],
-              ),
+                const SizedBox(width: 8), // Memberi jarak antara TextField dan Button
+                ElevatedButton(
+                  onPressed: _searchProducts,  // Menekan tombol untuk melakukan pencarian
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: TailwindColors.mossGreenDefault,  // Menggunakan backgroundColor, bukan primary
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                  ),
+                  child: const Text("Search"),
+                ),
+              ],
             ),
-            const SizedBox(height: 20),
-
-            // Tombol Pencarian
-            ElevatedButton(
-              onPressed: _searchProducts,  // Menekan tombol untuk melakukan pencarian
-              child: const Text("Search"),
-            ),
-
             const SizedBox(height: 20),
 
             // Kategori Favorit
@@ -105,8 +117,8 @@ class _FavoritesPageState extends State<FavoritesPage> {
             // Menampilkan Kategori Favorit
             Expanded(
               child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: MediaQuery.of(context).size.width > 600 ? 3 : 2,  // Mengatur jumlah kolom berdasarkan lebar layar
                   crossAxisSpacing: 16,
                   mainAxisSpacing: 16,
                 ),
@@ -120,14 +132,14 @@ class _FavoritesPageState extends State<FavoritesPage> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => FavoritesByCategoryScreen(
-                            categoryName: category['category']!,
+                            category: category,
                           ),
                         ),
                       );
                     },
                     child: CategoryCard(
-                      title: category['title']!,
-                      category: category['category']!,
+                      title: category.displayName,
+                      category: category.apiName,
                     ),
                   );
                 },
@@ -149,18 +161,19 @@ class CategoryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Colors.yellow[50],
+      color: TailwindColors.yellowLightActive,  
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(8.0),  
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
               title,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),  // Ukuran font lebih kecil
+              textAlign: TextAlign.center,  // Agar teks tidak meluber
             ),
             const SizedBox(height: 10),
           ],

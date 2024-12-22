@@ -35,7 +35,7 @@ class Favorites {
 class Fields {
     String foodie;
     String product;
-    String category;
+    FCategory category;
 
     Fields({
         required this.foodie,
@@ -46,12 +46,61 @@ class Fields {
     factory Fields.fromJson(Map<String, dynamic> json) => Fields(
         foodie: json["foodie"],
         product: json["product"],
-        category: json["category"],
+        category: fCategoryValues.map[json["category"]] ?? FCategory.wantToTry, // Default jika null
     );
 
     Map<String, dynamic> toJson() => {
         "foodie": foodie,
         "product": product,
-        "category": category,
+        "category": fCategoryValues.reverse[category],
     };
+}
+
+enum FCategory {
+  wantToTry,
+  lovingIt,
+  allTimeFavorites,
+}
+
+final fCategoryValues = EnumValues({
+  "want_to_try": FCategory.wantToTry,
+  "loving_it": FCategory.lovingIt,
+  "all_time_favorites": FCategory.allTimeFavorites,
+});
+
+
+class EnumValues<T> {
+  Map<String, T> map;
+  late Map<T, String> reverseMap;
+
+  EnumValues(this.map);
+
+  Map<T, String> get reverse {
+    reverseMap = map.map((k, v) => MapEntry(v, k));
+    return reverseMap;
+  }
+}
+
+extension FCategoryExtension on FCategory {
+  String get displayName {
+    switch (this) {
+      case FCategory.wantToTry:
+        return "Want to Try";
+      case FCategory.lovingIt:
+        return "Loving It";
+      case FCategory.allTimeFavorites:
+        return "All Time Favorites";
+    }
+  }
+
+  String get apiName {
+    switch (this) {
+      case FCategory.wantToTry:
+        return "wtt";
+      case FCategory.lovingIt:
+        return "li";
+      case FCategory.allTimeFavorites:
+        return "atf";
+    }
+  }
 }

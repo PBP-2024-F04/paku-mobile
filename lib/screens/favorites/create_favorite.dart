@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:paku/screens/accounts/home.dart';
-import 'package:paku/widgets/left_drawer.dart';
 import 'package:paku/screens/products/models/product.dart';
+import 'package:paku/screens/favorites/models/favorites.dart';
+import 'package:paku/colors.dart'; 
 
 class CreateFavoritePage extends StatefulWidget {
   final Product product;
@@ -17,7 +18,46 @@ class CreateFavoritePage extends StatefulWidget {
 
 class _CreateFavoritePageState extends State<CreateFavoritePage> {
   final _formKey = GlobalKey<FormState>();
-  String _category = "want_to_try";  // Default category
+  FCategory _category = FCategory.wantToTry; // Default category
+
+  // Method to handle adding to favorites
+  void _addFavorite(CookieRequest request) async {
+    final response = await request.postJson(
+      "http://127.0.0.1:8000/favorites/create_favorite_json/",
+      jsonEncode(<String, dynamic>{
+        'category': fCategoryValues.reverse[_category], // Convert enum to string
+        'product_id': widget.product.pk,
+      }),
+    );
+
+    if (response != null) {
+      if (context.mounted) {
+        if (response['status'] == 'success') {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Favorite successfully added!"),
+            ),
+          );
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => HomePage()),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("An error occurred. Please try again."),
+            ),
+          );
+        }
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("No response from server."),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,111 +65,91 @@ class _CreateFavoritePageState extends State<CreateFavoritePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Center(
-          child: Text(
+        title: const Text(
             'Add to Favorites',
           ),
+        backgroundColor: TailwindColors.mossGreenDefault,
+        foregroundColor: TailwindColors.whiteLight,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Colors.white,
       ),
-      drawer: const LeftDrawer(),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Product Info Section
-            Container(
-              padding: const EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                color: Colors.green[200], // Moss Green
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.green[800]!),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Product Info Section
+              Container(
+                padding: const EdgeInsets.all(16.0),
+                decoration: BoxDecoration(
+                  color: TailwindColors.mossGreenLight,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: TailwindColors.mossGreenDark),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Add "${widget.product.fields.productName}" to Your Favorites',
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: TailwindColors.yellowDark,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    _buildProductDetails('Name', widget.product.fields.productName),
+                    _buildProductDetails('Restaurant', widget.product.fields.restaurant),
+                    _buildProductDetails('Price', 'Rp ${widget.product.fields.price}'),
+                    _buildProductDetails('Description', widget.product.fields.description),
+                    _buildProductDetails('Category', widget.product.fields.category),
+                  ],
+                ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Add "${widget.product.fields.productName}" to Your Favorites',
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.yellow,
+              const SizedBox(height: 20),
+
+              // Category Selection Section
+              const Text(
+                'Select Category',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: TailwindColors.yellowActive,
+                ),
+              ),
+              const SizedBox(height: 10),
+              _buildCategoryOption('Want to Try', FCategory.wantToTry),
+              _buildCategoryOption('Loving It', FCategory.lovingIt),
+              _buildCategoryOption('All Time Favorite', FCategory.allTimeFavorites),
+              const SizedBox(height: 20),
+
+              // Submit Button
+              Center(
+                child: ElevatedButton(
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(TailwindColors.redDefault),
+                    padding: MaterialStateProperty.all(
+                      const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  _buildProductDetails('Name', widget.product.fields.productName),
-                  _buildProductDetails('Restaurant', widget.product.fields.restaurant),
-                  _buildProductDetails('Price', 'Rp ${widget.product.fields.price}'),
-                  _buildProductDetails('Description', widget.product.fields.description),
-                  _buildProductDetails('Category', widget.product.fields.category),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // Category Selection Section
-            const Text(
-              'Select Category',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.yellow,
-              ),
-            ),
-            const SizedBox(height: 10),
-            _buildCategoryOption('Want to Try', 'want_to_try'),
-            _buildCategoryOption('Loving It', 'loving_it'),
-            _buildCategoryOption('All Time Favorite', 'all_time_favorites'),
-            const SizedBox(height: 20),
-
-            // Submit Button
-            Center(
-              child: ElevatedButton(
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(Colors.red),
-                  padding: MaterialStateProperty.all(
-                    const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                  onPressed: () async {
+                    if (_formKey.currentState!.validate()) {
+                      _addFavorite(request); // Call the separate function to add to favorites
+                    }
+                  },
+                  child: const Text(
+                    'Add to Favorites',
+                    style: TextStyle(color: TailwindColors.whiteLight),
                   ),
                 ),
-                onPressed: () async {
-                  if (_formKey.currentState!.validate()) {
-                    // Send data to Django
-                    final response = await request.postJson(
-                      "http://127.0.0.1:8000/create_favorite_flutter/",
-                      jsonEncode(<String, String>{
-                        'category': _category,
-                      }),
-                    );
-                    if (context.mounted) {
-                      if (response['status'] == 'success') {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text("Favorite successfully added!"),
-                          ),
-                        );
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (context) => HomePage()),
-                        );
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text("An error occurred. Please try again."),
-                          ),
-                        );
-                      }
-                    }
-                  }
-                },
-                child: const Text(
-                  'Add to Favorites',
-                  style: TextStyle(color: Colors.white),
-                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -139,19 +159,29 @@ class _CreateFavoritePageState extends State<CreateFavoritePage> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            '$label:',
-            style: const TextStyle(fontWeight: FontWeight.bold),
+          SizedBox(
+            width: 100, // Set a fixed width for the label
+            child: Text(
+              '$label:',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
-          Text(value),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              value,
+              softWrap: true,
+              overflow: TextOverflow.visible,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildCategoryOption(String title, String category) {
+  Widget _buildCategoryOption(String title, FCategory category) {
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -162,9 +192,9 @@ class _CreateFavoritePageState extends State<CreateFavoritePage> {
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         margin: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
-          color: Colors.yellow[200],
+          color: TailwindColors.yellowLight,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: Colors.yellow[700]!),
+          border: Border.all(color: TailwindColors.yellowDark),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -173,7 +203,7 @@ class _CreateFavoritePageState extends State<CreateFavoritePage> {
               title,
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            Radio<String>(
+            Radio<FCategory>(
               value: category,
               groupValue: _category,
               onChanged: (value) {

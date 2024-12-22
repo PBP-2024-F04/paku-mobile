@@ -1,56 +1,72 @@
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:pbp_django_auth/pbp_django_auth.dart';
-import 'package:http/http.dart' as http;
-import 'package:paku/screens/products/models/product.dart';
 import 'dart:convert';
-import 'package:paku/colors.dart';
+import 'package:flutter/material.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
+import 'package:paku/screens/accounts/home.dart';
+import 'package:paku/screens/products/models/product.dart';
+import 'package:paku/screens/favorites/models/favorites.dart';
+import 'package:paku/colors.dart'; 
 
-class EditFavoriteScreen extends StatefulWidget {
-  final String favoriteId;  // Menambahkan ID favorit
-  final String currentCategory;
+class EditFavoritePage extends StatefulWidget {
+  final Favorites favorite;
+  final Product product;
 
-  const EditFavoriteScreen({
-    Key? key,
-    required this.favoriteId,
-    required this.currentCategory,
-  }) : super(key: key);
+  const EditFavoritePage({super.key, required this.favorite, required this.product});
 
   @override
-  State<EditFavoriteScreen> createState() => _EditFavoriteScreenState();
+  State<EditFavoritePage> createState() => _EditFavoritePageState();
 }
 
-class _EditFavoriteScreenState extends State<EditFavoriteScreen> {
-  String? selectedCategory;
+class _EditFavoritePageState extends State<EditFavoritePage> {
+  final _formKey = GlobalKey<FormState>();
+  FCategory _category = FCategory.wantToTry; // Default category
 
   @override
   void initState() {
     super.initState();
-    selectedCategory = widget.currentCategory;
+    // Set initial category from favorite's category
+    _category = FCategory.values.firstWhere(
+      (e) => e.toString().split('.').last == widget.favorite.fields.category,
+      orElse: () => FCategory.wantToTry, // Default if no match
+    );
   }
 
-  // Fungsi untuk mengupdate kategori favorit
-  Future<void> _updateFavorite(CookieRequest request) async {
-    if (selectedCategory != null) {
-      final response = await http.patch(
-        Uri.parse('http://127.0.0.1:8000/favorites/${widget.favoriteId}/edit'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'category': selectedCategory}),
-      );
+  // Method to handle updating the favorite
+  void _updateFavorite(CookieRequest request) async {
+    final response = await request.postJson(
+      "http://127.0.0.1:8000/favorites/edit_favorite_json/${widget.favorite.pk}/",
+      jsonEncode(<String, dynamic>{
+        'category': fCategoryValues.reverse[_category], // Convert enum to string
+        'product_id': widget.product.pk,
+      }),
+    );
 
-      if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Product updated in favorites'),
-        ));
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Failed to update favorite'),
-        ));
+    if (response != null) {
+      if (context.mounted) {
+        if (response['status'] == 'success') {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Favorite successfully updated!"),
+            ),
+          );
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => HomePage()),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("An error occurred. Please try again."),
+            ),
+          );
+        }
       }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Please select a category to update the product'),
-      ));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("No response from server."),
+        ),
+      );
     }
   }
 
@@ -60,77 +76,154 @@ class _EditFavoriteScreenState extends State<EditFavoriteScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit Favorite'),
-        centerTitle: true,
+        title: const Text(
+          'Edit Favorite',
+        ),
+        backgroundColor: TailwindColors.mossGreenDefault,
+        foregroundColor: TailwindColors.whiteLight,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            // Menampilkan detail favorit
-            Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Product Info Section
+              Container(
+                padding: const EdgeInsets.all(16.0),
+                decoration: BoxDecoration(
+                  color: TailwindColors.mossGreenLight,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: TailwindColors.mossGreenDark),
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Current Category: ${widget.currentCategory}',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      'Edit "${widget.product.fields.productName}" in Your Favorites',
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: TailwindColors.yellowDark,
+                      ),
                     ),
+                    const SizedBox(height: 10),
+                    _buildProductDetails('Name', widget.product.fields.productName),
+                    _buildProductDetails('Restaurant', widget.product.fields.restaurant),
+                    _buildProductDetails('Price', 'Rp ${widget.product.fields.price}'),
+                    _buildProductDetails('Description', widget.product.fields.description),
+                    _buildProductDetails('Category', widget.product.fields.category),
                   ],
                 ),
               ),
-            ),
-            SizedBox(height: 16),
+              const SizedBox(height: 20),
 
-            // Pilih kategori favorit baru
-            Text(
-              'Select New Category',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 10),
-            _buildCategoryOption('Want to Try', 'want_to_try'),
-            _buildCategoryOption('Loving It', 'loving_it'),
-            _buildCategoryOption('All Time Favorite', 'all_time_favorites'),
-            SizedBox(height: 20),
-
-            // Tombol untuk memperbarui kategori favorit
-            ElevatedButton(
-              onPressed: () => _updateFavorite(request),
-              child: Text('Update Favorite'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: TailwindColors.redDefault,
-                foregroundColor: Colors.white,
-                padding: EdgeInsets.symmetric(horizontal: 50, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+              // Category Selection Section
+              const Text(
+                'Select Category',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: TailwindColors.yellowActive,
                 ),
               ),
-            )
-          ],
+              const SizedBox(height: 10),
+              _buildCategoryOption('Want to Try', FCategory.wantToTry),
+              _buildCategoryOption('Loving It', FCategory.lovingIt),
+              _buildCategoryOption('All Time Favorite', FCategory.allTimeFavorites),
+              const SizedBox(height: 20),
+
+              // Submit Button
+              Center(
+                child: ElevatedButton(
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(TailwindColors.redDefault),
+                    padding: MaterialStateProperty.all(
+                      const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                    ),
+                  ),
+                  onPressed: () async {
+                    if (_formKey.currentState!.validate()) {
+                      _updateFavorite(request); // Call the separate function to update the favorite
+                    }
+                  },
+                  child: const Text(
+                    'Update Favorite',
+                    style: TextStyle(color: TailwindColors.whiteLight),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildCategoryOption(String label, String value) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      child: ListTile(
-        title: Text(label),
-        subtitle: Text('$value Products'),
-        trailing: Radio<String>(
-          value: value,
-          groupValue: selectedCategory,
-          onChanged: (value) {
-            setState(() {
-              selectedCategory = value;
-            });
-          },
+  Widget _buildProductDetails(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 100, // Set a fixed width for the label
+            child: Text(
+              '$label:',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              value,
+              softWrap: true,
+              overflow: TextOverflow.visible,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCategoryOption(String title, FCategory category) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _category = category;
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        decoration: BoxDecoration(
+          color: TailwindColors.yellowLight,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: TailwindColors.yellowDark),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            Radio<FCategory>(
+              value: category,
+              groupValue: _category,
+              onChanged: (value) {
+                setState(() {
+                  _category = value!;
+                });
+              },
+            ),
+          ],
         ),
       ),
     );

@@ -1,42 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
 import 'package:paku/screens/favorites/models/favorites.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;  // Pastikan ini ada
+import 'package:paku/screens/products/models/product.dart';
+import 'package:paku/screens/favorites/edit_favorites.dart';
+import 'package:paku/colors.dart';
 
 class FavoritesByCategoryScreen extends StatelessWidget {
-  final String categoryName;
+  final FCategory category;
 
-  const FavoritesByCategoryScreen({Key? key, required this.categoryName}) : super(key: key);
+  const FavoritesByCategoryScreen({Key? key, required this.category})
+      : super(key: key);
 
-  Future<List<Favorites>> fetchFavoritesByCategory(CookieRequest request, String categoryName) async {
-    String url;
-
-    if (categoryName == 'want_to_try') {
-      url = 'http://127.0.0.1:8000/favorites/category/wtt/json/';
-    } else if (categoryName == 'loving_it') {
-      url = 'http://127.0.0.1:8000/favorites/category/li/json/';
-    } else if (categoryName == 'all_time_favorites') {
-      url = 'http://127.0.0.1:8000/favorites/category/atf/json/';
-    } else {
-      throw Exception('Invalid category name');
-    }
-
-    print("yo");
+  Future<List<Favorites>> fetchFavoritesByCategory(
+      CookieRequest request, FCategory category) async {
+    final url =
+        'http://127.0.0.1:8000/favorites/category/${category.apiName}/json/';
 
     try {
-      print("hai");
       final response = await request.get(url);
-
-      print("object");
-
       var data = response;
 
       List<Favorites> favoritesList = [];
       for (var d in data['favorites']) {
         if (d != null) {
-          favoritesList.add(Favorites.fromJson(d)); 
+          favoritesList.add(Favorites.fromJson(d));
         }
       }
 
@@ -46,35 +35,34 @@ class FavoritesByCategoryScreen extends StatelessWidget {
     }
   }
 
+  Future<Product> fetchProductDetails(CookieRequest request, String productId) async {
+    final url = 'http://127.0.0.1:8000/products/json/$productId/';
+
+    try {
+      final response = await request.get(url);
+      var data = response;
+      return Product.fromJson(data);
+    } catch (e) {
+      throw Exception('Error fetching product details: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(categoryName),  
+        title: Text(category.displayName),
         centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Search Bar
-            TextField(
-              decoration: InputDecoration(
-                hintText: "Tambah Kuliner Baru...",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                prefixIcon: Icon(Icons.search),
-                filled: true,
-                fillColor: Colors.green[50],
-              ),
-            ),
-            SizedBox(height: 16),
-
             // Daftar Favorite per Kategori
             Expanded(
               child: FutureBuilder<List<Favorites>>(
-                future: fetchFavoritesByCategory(context.watch<CookieRequest>(), categoryName),
+                future: fetchFavoritesByCategory(
+                    context.watch<CookieRequest>(), category),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
@@ -90,7 +78,8 @@ class FavoritesByCategoryScreen extends StatelessWidget {
                     );
                   } else {
                     return GridView.builder(
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
                         crossAxisSpacing: 16,
                         mainAxisSpacing: 16,
@@ -115,7 +104,8 @@ class FavoritesByCategoryScreen extends StatelessWidget {
     return GestureDetector(
       child: Card(
         elevation: 4,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -127,13 +117,17 @@ class FavoritesByCategoryScreen extends StatelessWidget {
                   children: [
                     Text(
                       favorite.fields.product,
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold),
                     ),
-                    Text(favorite.fields.category, style: TextStyle(color: Colors.grey)),
-                    Spacer(),
                     Text(
-                      favorite.fields.category, 
-                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green),
+                      favorite.fields.category.displayName,
+                      style: const TextStyle(color: Colors.grey),
+                    ),
+                    const Spacer(),
+                    Text(
+                      favorite.fields.category.displayName,
+                      style: const TextStyle(fontWeight: FontWeight.bold, color: TailwindColors.mossGreenDefault),
                     ),
                   ],
                 ),
@@ -143,42 +137,64 @@ class FavoritesByCategoryScreen extends StatelessWidget {
               children: [
                 Expanded(
                   child: TextButton(
-                    onPressed: () {
-                      print("Navigate to Edit screen for ${favorite.fields.product}");
+                    onPressed: () async {
+                      // Ambil detail produk berdasarkan ID produk
+                      final product = await fetchProductDetails(
+                        context.watch<CookieRequest>(),
+                        favorite.fields.product,
+                      );
+
+                      // Arahkan pengguna ke halaman EditFavoritePage
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => EditFavoritePage(
+                            favorite: favorite,
+                            product: product,
+                          ),
+                        ),
+                      );
                     },
                     style: TextButton.styleFrom(
-                      backgroundColor: Colors.yellow[200],
+                      backgroundColor: TailwindColors.yellowLight,
                       foregroundColor: Colors.black,
                     ),
-                    child: Text("Edit"),
+                    child: const Text("Edit"),
                   ),
                 ),
                 Expanded(
                   child: TextButton(
                     onPressed: () async {
                       final response = await http.delete(
-                        Uri.parse('http://127.0.0.1:8000/favorites/${favorite.pk}/delete'),
+                        Uri.parse(
+                            'http://127.0.0.1:8000/favorites/${favorite.pk}/delete'),
                       );
 
                       if (response.statusCode == 204) {
                         // Berhasil menghapus
-                        print("Product ${favorite.fields.product} deleted successfully");
+                        print(
+                            "Product ${favorite.fields.product} deleted successfully");
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("${favorite.fields.product} has been deleted.")),
+                          SnackBar(
+                              content: Text(
+                                  "${favorite.fields.product} has been deleted.")),
                         );
                       } else {
                         // Jika gagal menghapus
-                        print("Failed to delete ${favorite.fields.product}");
+                        print(
+                            "Failed to delete ${favorite.fields.product}");
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Failed to delete ${favorite.fields.product}")),
+                          SnackBar(
+                              content: Text(
+                                  "Failed to delete ${favorite.fields.product}")),
                         );
                       }
                     },
                     style: TextButton.styleFrom(
-                      backgroundColor: Colors.red[300],
+                      backgroundColor: TailwindColors.redDefault,
                       foregroundColor: Colors.white,
                     ),
-                    child: Text("Delete"),
+                    child: const Text("Delete"),
                   ),
                 ),
               ],
