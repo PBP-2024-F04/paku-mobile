@@ -20,10 +20,9 @@ class _PromosState extends State<Promos> {
 
   Future<List<Promo>> _fetchPromos(CookieRequest request, {String query = ""}) async {
     final response = await request.get(
-      Uri.parse('http://localhost:8000/promos/promo_list_json/')
+      Uri.parse('$apiURL/promos/promo_list_json/')
           .replace(queryParameters: {"query": query})
           .toString(),
-      // '$apiURL/promos/promo_list_json/',
     );
 
     if (response is List<dynamic>) {
