@@ -40,7 +40,15 @@ class _TimelineMainPageState extends State<TimelineMainPage> {
   ) {
     if (snapshot.hasData && snapshot.data is List) {
       if (snapshot.data!.isEmpty) {
-        return const Text("Belum ada post.");
+        return Padding(
+          padding: const EdgeInsets.only(left: 10.0),
+          child: ListView.builder(
+            scrollDirection: Axis.vertical,
+            shrinkWrap: true,
+            itemCount: 1,
+            itemBuilder: (context, index) => const Center(child: Text("Belum ada post.")),
+          ),
+        );
       }
       return ListView.builder(
         scrollDirection: Axis.vertical,
@@ -61,38 +69,53 @@ class _TimelineMainPageState extends State<TimelineMainPage> {
     return Scaffold(
       appBar: AppBar(title: const Text("Timeline")),
       drawer: const LeftDrawer(),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(30),
-        child: Center(
-          child: Column(
-            children: [
-              SearchBar(
-                hintText: 'Search...',
-                elevation: const WidgetStatePropertyAll(0),
-                shape: const WidgetStatePropertyAll(
-                  RoundedRectangleBorder(
-                    borderRadius: BorderRadius.zero,
-                    side: BorderSide(
-                      color: TailwindColors.mossGreenDark,
-                      width: 2,
+      body: Center(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 800),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              vertical: 16.0,
+              horizontal: 24.0,
+            ),
+            child: RefreshIndicator(
+              onRefresh: () async {
+                setState(() {
+                  _future = _fetchPosts(request);
+                });
+              },
+              child: Column(
+                children: [
+                  SearchBar(
+                    hintText: 'Cari kata kunci',
+                    elevation: const WidgetStatePropertyAll(0),
+                    shape: const WidgetStatePropertyAll(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.zero,
+                        side: BorderSide(
+                          color: TailwindColors.mossGreenDark,
+                          width: 1,
+                        ),
+                      ),
+                    ),
+                    onChanged: (value) => setState(() => _query = value),
+                    trailing: [
+                      IconButton(
+                        onPressed: () => setState(() {
+                          _future = _fetchPosts(request, query: _query);
+                        }),
+                        icon: const Icon(Icons.search),
+                      )
+                    ],
+                  ),
+                  Expanded(
+                    child: FutureBuilder(
+                      future: _future,
+                      builder: _postsBuilder,
                     ),
                   ),
-                ),
-                onChanged: (value) => setState(() => _query = value),
-                trailing: [
-                  IconButton(
-                    onPressed: () => setState(() {
-                      _future = _fetchPosts(request, query: _query);
-                    }),
-                    icon: const Icon(Icons.search),
-                  )
                 ],
               ),
-              FutureBuilder(
-                future: _future,
-                builder: _postsBuilder,
-              )
-            ],
+            ),
           ),
         ),
       ),
