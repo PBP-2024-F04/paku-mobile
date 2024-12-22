@@ -9,8 +9,7 @@ import 'package:paku/colors.dart';
 class FavoritesByCategoryScreen extends StatelessWidget {
   final FCategory category;
 
-  const FavoritesByCategoryScreen({Key? key, required this.category})
-      : super(key: key);
+  const FavoritesByCategoryScreen({super.key, required this.category});
 
   Future<List<Favorites>> fetchFavoritesByCategory(CookieRequest request, FCategory category) async {
     try {
@@ -37,6 +36,20 @@ class FavoritesByCategoryScreen extends StatelessWidget {
       return Product.fromJson(data);
     } catch (e) {
       throw Exception('Error fetching product details: $e');
+    }
+  }
+
+  // Fungsi untuk menghapus favorit
+  Future<void> deleteFavorite(CookieRequest request, String favoriteId) async {
+    final response = await request.post(
+      "http://127.0.0.1:8000/favorites/$favoriteId/delete_favorite_json/",
+      {},
+    );
+
+    if (response['success']) {
+      return;
+    } else {
+      throw Exception(response['message'] ?? "Failed to delete favorite.");
     }
   }
 
@@ -156,35 +169,22 @@ class FavoritesByCategoryScreen extends StatelessWidget {
                 Expanded(
                   child: TextButton(
                     onPressed: () async {
-                      final request = context.read<CookieRequest>();
                       try {
-                        final response = await request.post(
-                          'http://127.0.0.1:8000/favorites/${favorite.pk}/delete_favorite_json/',
-                          {},
-                        );
-
-                        if (response['success']) {
+                        final request = context.read<CookieRequest>();
+                        await deleteFavorite(request, favorite.pk.toString());  // Memanggil deleteFavorite
+                        if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('${favorite.fields.product} has been deleted successfully.'),
-                              backgroundColor: TailwindColors.mossGreenDefault,
-                            ),
-                          );
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Failed to delete ${favorite.fields.product}.'),
-                              backgroundColor: TailwindColors.redDefault,
+                            const SnackBar(
+                              content: Text("Favorit berhasil dihapus."),
                             ),
                           );
                         }
                       } catch (e) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Error deleting product: $e'),
-                            backgroundColor: TailwindColors.redDefault,
-                          ),
-                        );
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text("Error: $e")),
+                          );
+                        }
                       }
                     },
                     style: TextButton.styleFrom(
