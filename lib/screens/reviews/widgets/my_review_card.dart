@@ -76,7 +76,7 @@ class MyReviewCard extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            Container(
+            SizedBox(
               width: double.infinity,
               child: InkWell(
                 onTap: onTap,
@@ -86,7 +86,7 @@ class MyReviewCard extends StatelessWidget {
                   children: [
                     Text(
                       review.product.fields.productName,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: TailwindColors.mossGreenDefault,
@@ -95,7 +95,7 @@ class MyReviewCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       review.product.fields.restaurant,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 14,
                         color: TailwindColors.peachDefault,
                       ),
@@ -103,7 +103,7 @@ class MyReviewCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       'Rp${review.product.fields.price.toStringAsFixed(2)}',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 14,
                         color: TailwindColors.peachDefault,
                         fontWeight: FontWeight.w400,
@@ -120,7 +120,7 @@ class MyReviewCard extends StatelessWidget {
             ),
             Text(
               review.comment,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 14,
                 color: TailwindColors.sageDark,
                 height: 1.5,
@@ -141,7 +141,7 @@ class MyReviewCard extends StatelessWidget {
   
             Text(
               '- ${review.user.username} | ${review.createdAt.toLocal().toString().split(' ')[0]}',
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 12,
                 color: TailwindColors.whiteDarkHover,
                 fontStyle: FontStyle.italic,
@@ -152,12 +152,12 @@ class MyReviewCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 IconButton(
-                  icon: Icon(Icons.edit),
+                  icon: const Icon(Icons.edit),
                   color: TailwindColors.mossGreenDefault,
                   onPressed: () => _editReview(context),
                 ),
                 IconButton(
-                  icon: Icon(Icons.delete),
+                  icon: const Icon(Icons.delete),
                   color: TailwindColors.redDefault,
                   onPressed: () => _deleteReview(context, request),
                 ),
