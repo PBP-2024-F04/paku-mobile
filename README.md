@@ -69,7 +69,7 @@ Bagi merchant, PaKu memberikan peluang untuk **menambahkan produk makanan** baru
    - Parsing data JSON menggunakan model berupa class di Dart.
 
 ## :rocket: Tautan APK
-[Deployment PaKu](https://install.appcenter.ms/orgs/pbp-f04/apps/paku/distribution_groups/public/releases/3)
+[Deployment PaKu](https://install.appcenter.ms/orgs/pbp-f04/apps/paku/distribution_groups/public/releases)
 
 ## :rocket: Tautan Video
 [Video Promosi PaKu](https://youtu.be/m0JIzna7IsQ?si=tUCgHwhBvFlbrqEd)
