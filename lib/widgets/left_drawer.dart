@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:paku/screens/products/my_products.dart';
+import 'package:paku/screens/profile/profile.dart';
 import 'package:provider/provider.dart';
 import 'package:paku/screens/accounts/login.dart';
 import 'package:paku/screens/accounts/home.dart';
@@ -105,6 +106,17 @@ class _LeftDrawerState extends State<LeftDrawer> {
             else
               const Center(child: CircularProgressIndicator()),
             const Divider(),
+            ListTile(
+              leading: const Icon(Icons.person_outline),
+              title: const Text('Profile'),
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const ProfilePage(),
+                  ),
+                );
+              },
+            ),
             ListTile(
               leading: const Icon(Icons.logout),
               title: const Text('Logout'),

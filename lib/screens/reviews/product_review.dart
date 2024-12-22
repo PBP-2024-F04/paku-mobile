@@ -31,7 +31,6 @@ class _ProductReviewPageState extends State<ProductReviewPage> {
       if (response is List) {
         return response.map((item) => Review.fromJson(item)).toList();
       }
-
       return [];
     } catch (e) {
       if (context.mounted) {
@@ -49,14 +48,38 @@ class _ProductReviewPageState extends State<ProductReviewPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Product Reviews"),
+        backgroundColor: TailwindColors.mossGreenActive,
+        elevation: 4,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: const Text(
+          'Product Reviews',
+          style: TextStyle(color: Colors.white),
+        ),
       ),
       drawer: const LeftDrawer(),
-      body: Padding(
+      body: Container(
+        color: TailwindColors.yellowLight, 
         padding: const EdgeInsets.all(16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Rating filter
+    
+            const Align(
+              alignment: Alignment.topCenter,
+              child: Text(
+                "Review Product",
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: TailwindColors.peachDarkActive,
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+
             DropdownButton<String>(
               value: selectedRating,
               isExpanded: true,
@@ -73,14 +96,16 @@ class _ProductReviewPageState extends State<ProductReviewPage> {
                   child: Text(value == 'all' ? 'All Ratings' : '$value Stars'),
                 );
               }).toList(),
+              style: const TextStyle(color: TailwindColors.mossGreenDarker),
+              dropdownColor: Colors.white, 
             ),
             const SizedBox(height: 16),
+
 
             Expanded(
               child: FutureBuilder<List<Review>>(
                 future: _fetchReviews(context, request),
-                builder: (context,
-                    AsyncSnapshot<List<Review>> snapshot) {
+                builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
                   }
@@ -95,7 +120,6 @@ class _ProductReviewPageState extends State<ProductReviewPage> {
 
                   var reviews = snapshot.data!;
 
-                  // Filter reviews based on selected rating
                   if (selectedRating != 'all') {
                     reviews = reviews
                         .where((review) =>
@@ -134,13 +158,17 @@ class _ProductReviewPageState extends State<ProductReviewPage> {
                     ),
                   );
                   if (result == true) {
-                    setState(() {});
+                    setState(() {}); 
                   }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: TailwindColors.mossGreenActive,
                   foregroundColor: Colors.white,
                   minimumSize: const Size(double.infinity, 50),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  elevation: 4,
                 ),
                 child: const Text(
                   "Write a Review",
