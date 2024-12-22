@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
+import 'package:paku/colors.dart'; 
 
 class CreateReviewPage extends StatefulWidget {
   final String productId;
@@ -95,6 +96,7 @@ class _CreateReviewPageState extends State<CreateReviewPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Write a Review'),
+        backgroundColor: TailwindColors.mossGreenDefault,
         leading: IconButton(
           icon: const Icon(Icons.close),
           onPressed: () => Navigator.pop(context),
@@ -108,50 +110,35 @@ class _CreateReviewPageState extends State<CreateReviewPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Rating',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                Row(
-                  children: List.generate(5, (index) {
-                    return IconButton(
-                      icon: Icon(
-                        _rating > index ? Icons.star : Icons.star_border,
-                        color: Colors.amber,
-                        size: 32,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _rating = index + 1;
-                        });
-                      },
-                    );
-                  }),
+                const SectionTitle(title: 'Rating'),
+                RatingStars(
+                  rating: _rating,
+                  onRatingSelected: (rating) {
+                    setState(() {
+                      _rating = rating;
+                    });
+                  },
                 ),
                 if (_rating == 0)
                   const Padding(
                     padding: EdgeInsets.only(top: 4),
                     child: Text(
                       'Please select a rating',
-                      style: TextStyle(
-                        color: Colors.red,
-                        fontSize: 12,
-                      ),
+                      style: TextStyle(color: Colors.red, fontSize: 12),
                     ),
                   ),
                 const SizedBox(height: 20),
-
-                const Text(
-                  'Your Review',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
+                const SectionTitle(title: 'Your Review'),
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _commentController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: 'Share your thoughts about this product...',
-                    border: OutlineInputBorder(),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                     filled: true,
+                    fillColor: TailwindColors.whiteLight,
                   ),
                   maxLines: 5,
                   validator: (value) {
@@ -162,7 +149,6 @@ class _CreateReviewPageState extends State<CreateReviewPage> {
                   },
                 ),
                 const SizedBox(height: 24),
-
                 SizedBox(
                   width: double.infinity,
                   height: 48,
@@ -170,20 +156,19 @@ class _CreateReviewPageState extends State<CreateReviewPage> {
                     onPressed: _isSubmitting ? null : () => _submitReview(context, request),
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
-                      backgroundColor: Theme.of(context).primaryColor,
+                      backgroundColor: TailwindColors.mossGreenDefault,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
                     child: _isSubmitting
-                        ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                            ),
+                        ? const CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                           )
                         : const Text(
                             'Submit Review',
-                            style: TextStyle(fontSize: 16),
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                   ),
                 ),
@@ -192,6 +177,43 @@ class _CreateReviewPageState extends State<CreateReviewPage> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class SectionTitle extends StatelessWidget {
+  final String title;
+
+  const SectionTitle({super.key, required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      title,
+      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+    );
+  }
+}
+
+class RatingStars extends StatelessWidget {
+  final int rating;
+  final ValueChanged<int> onRatingSelected;
+
+  const RatingStars({super.key, required this.rating, required this.onRatingSelected});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: List.generate(5, (index) {
+        return IconButton(
+          icon: Icon(
+            rating > index ? Icons.star : Icons.star_border,
+            color: TailwindColors.yellowDefault,
+            size: 32,
+          ),
+          onPressed: () => onRatingSelected(index + 1),
+        );
+      }),
     );
   }
 }
