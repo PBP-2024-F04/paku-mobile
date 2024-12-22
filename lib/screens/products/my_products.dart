@@ -68,7 +68,9 @@ class _MyProductsPageState extends State<MyProductsPage> {
         title: const Text("PaKu"),
       ),
       drawer: const LeftDrawer(),
-      body: Padding(
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
           children: <Widget>[
@@ -123,12 +125,14 @@ class _MyProductsPageState extends State<MyProductsPage> {
                     );
                   } else {
                     final products = snapshot.data!;
+                    int crossAxisCount =
+                            constraints.maxWidth < 600 ? 1 : 2;
                     return GridView.builder(
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: crossAxisCount,
                         mainAxisSpacing: 15,
                         crossAxisSpacing: 15,
-                        childAspectRatio: 0.8,
+                        childAspectRatio: 1.2,
                       ),
                       itemCount: products.length,
                       itemBuilder: (context, index) {
@@ -246,7 +250,7 @@ class _MyProductsPageState extends State<MyProductsPage> {
                                 child: Row(
                                   children: [
                                     IconButton(
-                                      icon: const Icon(Icons.edit, color: TailwindColors.yellowDefault),
+                                      icon: const Icon(Icons.edit),
                                       onPressed: () {
                                         Navigator.push(
                                           context,
@@ -260,7 +264,7 @@ class _MyProductsPageState extends State<MyProductsPage> {
                                       },
                                     ),
                                     IconButton(
-                                      icon: const Icon(Icons.delete, color: TailwindColors.redDefault),
+                                      icon: const Icon(Icons.delete),
                                       onPressed: () async {
                                         try {
                                           final request = context.read<CookieRequest>();
@@ -296,7 +300,9 @@ class _MyProductsPageState extends State<MyProductsPage> {
             ),
           ],
         ),
-      ),
+      );
+        }
+      )
     );
   }
 }
