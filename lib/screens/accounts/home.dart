@@ -44,59 +44,65 @@ class _HomePageState extends State<HomePage> {
         title: const Text("PaKu"),
       ),
       drawer: const LeftDrawer(),
-      body: Column(
-        children: [
-          const SizedBox(height: 36),
-          Text(
-            "Palu Kuliner",
-            textAlign: TextAlign.center,
-            style: Theme.of(context)
-                .textTheme
-                .displayLarge
-                ?.copyWith(color: TailwindColors.sageDarker, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            "Nikmati berbagai kuliner terbaik di Palu dan jelajahi menu favoritmu",
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: TailwindColors.sageDark,
-                ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 20),
-          Expanded(
-            child: FutureBuilder<String?>(
-              future: _fetchUserRole(request),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError || snapshot.data == null) {
-                  return Center(
-                    child: Text(
-                      'Terjadi kesalahan saat memuat data. Coba lagi nanti.',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            color: Colors.red,
-                            fontWeight: FontWeight.bold,
-                          ),
-                      textAlign: TextAlign.center,
+      body: Center(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 480),
+          padding: const EdgeInsets.all(10.0),
+          child: Column(
+            children: [
+              const SizedBox(height: 36),
+              Text(
+                "Palu Kuliner",
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                    color: TailwindColors.sageDarker,
+                    fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                "Nikmati berbagai kuliner terbaik di Palu dan jelajahi menu favoritmu",
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: TailwindColors.sageDark,
                     ),
-                  );
-                } else {
-                  String userRole = snapshot.data!;
-                  return GridView.count(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 3,
-                    padding: const EdgeInsets.all(32.0),
-                    children: userRole == 'Merchant'
-                        ? _buildMerchantContent(context)
-                        : _buildFoodieContent(context),
-                  );
-                }
-              },
-            ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              Expanded(
+                child: FutureBuilder<String?>(
+                  future: _fetchUserRole(request),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError || snapshot.data == null) {
+                      return Center(
+                        child: Text(
+                          'Terjadi kesalahan saat memuat data. Coba lagi nanti.',
+                          style:
+                              Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                    color: Colors.red,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                          textAlign: TextAlign.center,
+                        ),
+                      );
+                    } else {
+                      String userRole = snapshot.data!;
+                      return GridView.count(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 3,
+                        padding: const EdgeInsets.all(32.0),
+                        children: userRole == 'Merchant'
+                            ? _buildMerchantContent(context)
+                            : _buildFoodieContent(context),
+                      );
+                    }
+                  },
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -105,7 +111,8 @@ class _HomePageState extends State<HomePage> {
     return [
       _buildCard(
         context,
-        icon: const Icon(Icons.food_bank_outlined, size: 30, color: Colors.white),
+        icon:
+            const Icon(Icons.food_bank_outlined, size: 30, color: Colors.white),
         title: "My Products",
         description:
             "Tambahkan produk baru ke database Paku Kuliner dan biarkan pelanggan menjelajahi menu istimewa Anda!",
@@ -133,7 +140,8 @@ class _HomePageState extends State<HomePage> {
       ),
       _buildCard(
         context,
-        icon: const Icon(Icons.discount_outlined, size: 30, color: Colors.white),
+        icon:
+            const Icon(Icons.discount_outlined, size: 30, color: Colors.white),
         title: "Reviews",
         description:
             "Tingkatkan produkmu dengan mendengar ulasan pelanggan tentang kuliner yang ada di Palu!",
@@ -166,7 +174,8 @@ class _HomePageState extends State<HomePage> {
     return [
       _buildCard(
         context,
-        icon: const Icon(Icons.food_bank_outlined, size: 30, color: Colors.white),
+        icon:
+            const Icon(Icons.food_bank_outlined, size: 30, color: Colors.white),
         title: "Products",
         description:
             "Jelajahi beragam produk kuliner khas Palu yang menggugah selera—temukan makanan favorit Anda hari ini!",
@@ -194,7 +203,8 @@ class _HomePageState extends State<HomePage> {
       ),
       _buildCard(
         context,
-        icon: const Icon(Icons.discount_outlined, size: 30, color: Colors.white),
+        icon:
+            const Icon(Icons.discount_outlined, size: 30, color: Colors.white),
         title: "Reviews",
         description:
             "Bagikan pengalaman Anda! Berikan ulasan dan rating pada produk yang Anda coba, bantu orang lain menemukan kuliner terbaik.",
@@ -212,7 +222,7 @@ class _HomePageState extends State<HomePage> {
         title: "Favorites",
         description:
             "Tandai produk favorit Anda! Gunakan label untuk menyimpan memori dan memudahkan pencarian kuliner berikutnya.",
-        cardColor: TailwindColors.yellowDark, 
+        cardColor: TailwindColors.yellowDark,
         onPressed: () {
           Navigator.pushReplacement(
             context,
@@ -237,50 +247,46 @@ class _HomePageState extends State<HomePage> {
     ];
   }
 
-  Widget _buildCard(BuildContext context,
-      {required Widget icon,
-      required String title,
-      required String description,
-      required Color cardColor,
-      required VoidCallback onPressed}) {
-    return Card(
-      color: cardColor,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.zero, 
-      ),
-      margin: const EdgeInsets.symmetric(vertical: 2.0),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          children: [
-            icon,
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    description,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Colors.white,
-                        ),
-                  ),
-                ],
-              ),
+  Widget _buildCard(
+    BuildContext context, {
+    required Widget icon,
+    required String title,
+    required String description,
+    required Color cardColor,
+    required VoidCallback onPressed,
+  }) {
+    return InkWell(
+      onTap: onPressed,
+      child: Card(
+        color: cardColor,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.zero,
+        ),
+        margin: const EdgeInsets.symmetric(vertical: 2.0),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                icon,
+                Text(
+                  title,
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Colors.white,
+                      ),
+                ),
+              ],
             ),
-            IconButton(
-              icon: const Icon(Icons.arrow_forward_ios_outlined, color: Colors.white),
-              onPressed: onPressed,
-            ),
-          ],
+          ),
         ),
       ),
     );
