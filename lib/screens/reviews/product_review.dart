@@ -22,7 +22,7 @@ class ProductReviewPage extends StatefulWidget {
 class _ProductReviewPageState extends State<ProductReviewPage> {
   String? selectedRating = 'all';
 
-  Future<List<Review>> _fetchReviews(CookieRequest request) async {
+  Future<List<Review>> _fetchReviews(BuildContext context, CookieRequest request) async {
     try {
       final response = await request.get(
         'http://localhost:8000/reviews/json/product/${widget.productId}/reviews/',
@@ -33,9 +33,11 @@ class _ProductReviewPageState extends State<ProductReviewPage> {
       }
       return [];
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error fetching reviews: $e')),
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error fetching reviews: $e')),
+        );
+      }
       return [];
     }
   }
@@ -67,7 +69,7 @@ class _ProductReviewPageState extends State<ProductReviewPage> {
     
             const Align(
               alignment: Alignment.topCenter,
-              child: const Text(
+              child: Text(
                 "Review Product",
                 style: TextStyle(
                   fontSize: 24,
@@ -94,7 +96,7 @@ class _ProductReviewPageState extends State<ProductReviewPage> {
                   child: Text(value == 'all' ? 'All Ratings' : '$value Stars'),
                 );
               }).toList(),
-              style: TextStyle(color: TailwindColors.mossGreenDarker),
+              style: const TextStyle(color: TailwindColors.mossGreenDarker),
               dropdownColor: Colors.white, 
             ),
             const SizedBox(height: 16),
@@ -102,7 +104,7 @@ class _ProductReviewPageState extends State<ProductReviewPage> {
 
             Expanded(
               child: FutureBuilder<List<Review>>(
-                future: _fetchReviews(request),
+                future: _fetchReviews(context, request),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());

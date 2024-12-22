@@ -25,7 +25,7 @@ class ReviewCard extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            Container(
+            SizedBox(
               width: double.infinity,
               child: InkWell(
                 onTap: onTap,
@@ -35,7 +35,7 @@ class ReviewCard extends StatelessWidget {
                   children: [
                     Text(
                       review.product.fields.productName,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: TailwindColors.mossGreenDefault,
@@ -44,7 +44,7 @@ class ReviewCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       review.product.fields.restaurant,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 14,
                         color: TailwindColors.peachDefault,
                       ),
@@ -52,7 +52,7 @@ class ReviewCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       'Rp${review.product.fields.price.toStringAsFixed(2)}',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 14,
                         color: TailwindColors.peachDefault,
                         fontWeight: FontWeight.w400,
@@ -69,7 +69,7 @@ class ReviewCard extends StatelessWidget {
             ),
             Text(
               review.comment,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 14,
                 color: TailwindColors.sageDark,
                 height: 1.5,
@@ -88,7 +88,7 @@ class ReviewCard extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               '- ${review.user.username} | ${review.createdAt.toLocal().toString().split(' ')[0]}',
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 12,
                 color: TailwindColors.whiteDarkHover,
                 fontStyle: FontStyle.italic,

@@ -52,7 +52,7 @@ class _ReviewPageState extends State<ReviewPage>
       return [];
     } catch (e) {
       print('Error fetching reviews: $e');
-      rethrow; 
+      rethrow;
     }
   }
 
@@ -76,7 +76,7 @@ class _ReviewPageState extends State<ReviewPage>
       return [];
     } catch (e) {
       print('Error fetching my reviews: $e');
-      rethrow; 
+      rethrow;
     }
   }
 
@@ -102,15 +102,15 @@ class _ReviewPageState extends State<ReviewPage>
               ),
             ],
             indicatorColor: TailwindColors.whiteActive,
-            indicatorWeight: 3.0, 
+            indicatorWeight: 3.0,
             labelColor: TailwindColors.whiteActive,
             unselectedLabelColor: TailwindColors.whiteDarker,
             labelStyle: const TextStyle(
               fontWeight: FontWeight.w600,
-              fontSize: 16, 
+              fontSize: 16,
             ),
             unselectedLabelStyle: const TextStyle(
-              fontSize: 14, 
+              fontSize: 14,
             ),
           ),
         ),
@@ -140,7 +140,6 @@ class _ReviewPageState extends State<ReviewPage>
             child: TabBarView(
               controller: _tabController,
               children: [
-                
                 FutureBuilder(
                   future: _fetchAllReviews(request),
                   builder: (context, AsyncSnapshot<List<Review>> snapshot) {
@@ -163,23 +162,20 @@ class _ReviewPageState extends State<ReviewPage>
                         return ReviewCard(
                           review: review,
                           onTap: () {
-                            if (review.product != null) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ProductDetailPage(
-                                    product: review.product,
-                                  ),
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ProductDetailPage(
+                                  product: review.product,
                                 ),
-                              );
-                            }
+                              ),
+                            );
                           },
                         );
                       },
                     );
                   },
                 ),
-           
                 FutureBuilder(
                   future: _fetchMyReviews(request),
                   builder: (context, AsyncSnapshot<List<Review>> snapshot) {
@@ -202,16 +198,14 @@ class _ReviewPageState extends State<ReviewPage>
                         return MyReviewCard(
                           review: review,
                           onTap: () {
-                            if (review.product != null) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ProductDetailPage(
-                                    product: review.product,
-                                  ),
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ProductDetailPage(
+                                  product: review.product,
                                 ),
-                              );
-                            }
+                              ),
+                            );
                           },
                         );
                       },
