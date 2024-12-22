@@ -55,59 +55,44 @@ class _ProductsPageState extends State<ProductsPage> {
                 builder: (context, AsyncSnapshot snapshot) {
                   if (snapshot.data == null) {
                     return const Center(child: CircularProgressIndicator());
+                  } else if (!snapshot.hasData) {
+                    return const Column(
+                      children: [
+                        Text(
+                          'Belum ada data produk pada PaKu.',
+                          style: TextStyle(fontSize: 20, color: TailwindColors.sageDarker),
+                        ),
+                        SizedBox(height: 8),
+                      ],
+                    );
                   } else {
-                    if (!snapshot.hasData) {
-                      return const Column(
-                        children: [
-                          Text(
-                            'Belum ada data produk pada PaKu.',
-                            style: TextStyle(fontSize: 20, color: TailwindColors.sageDarker),
-                          ),
-                          SizedBox(height: 8),
-                        ],
-                      );
-                    } else {
-                      return SingleChildScrollView(
-                        child: Column(
-                          children: <Widget>[
-                            const SizedBox(
-                              height: 25,
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 20),
-                              child: GridView.builder(
-                                physics: const NeverScrollableScrollPhysics(),
-                                shrinkWrap: true,
-                                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2,
-                                  mainAxisSpacing: 15,
-                                  crossAxisSpacing: 15,
-                                  childAspectRatio: 0.8,
-                                ),
-                                itemCount: snapshot.data!.length,
-                                itemBuilder: (context, index) {
-                                  return InkWell(
-                                    onTap: () => Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => ProductDetailPage(
-                                          product: snapshot.data[index],
-                                        ),
-                                      ),
-                                    ),
-                                    child: ProductCard(product: snapshot.data[index]),
-                                  );
-                                },
+                    return GridView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 15,
+                        crossAxisSpacing: 15,
+                        childAspectRatio: 0.8,
+                      ),
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (context, index) {
+                        return InkWell(
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ProductDetailPage(
+                                product: snapshot.data[index],
                               ),
                             ),
-                          ],
-                        ),
-                      );
-                    }
+                          ),
+                          child: ProductCard(product: snapshot.data[index]),
+                        );
+                      },
+                    );
                   }
                 },
               ),
-            )
+            ),
           ]
         )
       )
@@ -119,69 +104,113 @@ class ProductCard extends StatelessWidget {
   final Product product;
 
   const ProductCard({super.key, required this.product});
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        borderRadius: BorderRadius.all(Radius.circular(12)),
-        color: TailwindColors.whiteLight,
-        
-        boxShadow: [
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        color: TailwindColors.whiteLightActive,
+        boxShadow: const [
           BoxShadow(
             color: TailwindColors.whiteActive,
             blurRadius: 15.0,
             spreadRadius: 0.5,
             offset: Offset(3.0, 3.0),
-          )
+          ),
         ],
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          children: <Widget>[
-            ClipRRect(
-              borderRadius: const BorderRadius.all(Radius.circular(12)),
-              child: SizedBox(
-                height: 120,
-                width: MediaQuery.of(context).size.width,
-              ),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Text(
-              product.fields.productName,
-              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 5),
-              child: Text(
-                product.fields.restaurant,
-                style: const TextStyle(fontSize: 11, color: TailwindColors.whiteDark),
-              ),
-            ),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text(
-                  product.fields.category,
-                  style: const TextStyle(
-                    color: TailwindColors.peachDefault,
-                    fontSize: 11,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+            child: Stack(
+              children: [
+                SizedBox(
+                  height: 180,
+                  width: double.infinity,
+                  child: product.fields.productImage != null
+                      ? Image.network(
+                          product.fields.productImage!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            // print("Error loading image: $error");
+                            return const Center(child: Icon(Icons.broken_image));
+                          },
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return const Center(child: CircularProgressIndicator());
+                          },
+                        )
+                      : const Center(child: Icon(Icons.image_not_supported)),
+                ),
+                Container(
+                  height: 180,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.black.withOpacity(0.6),
+                        Colors.transparent,
+                      ],
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                    ),
                   ),
-                )
+                ),
               ],
             ),
-            const SizedBox(
-              height: 5
+          ),
+          Container(
+            padding: const EdgeInsets.all(12.0),
+            color: TailwindColors.whiteLightActive,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  product.fields.productName,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color:Colors.black,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  product.fields.restaurant,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: TailwindColors.whiteDarker,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Text(
+                      product.fields.category,
+                      style: const TextStyle(
+                        color: TailwindColors.peachDefault,
+                        fontSize: 12,
+                      ),
+                    ),
+                    Text(
+                      "Rp ${product.fields.price}",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: TailwindColors.peachDarker,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-            Text(
-              "Rp ${product.fields.price}",
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -233,6 +262,64 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                       color: TailwindColors.redDefault,
                     ),
                   ],
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
+                Center(
+                  child: Container(
+                    height: 300,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(15),
+                      child: widget.product.fields.productImage != null
+                          ? Image.network(
+                              widget.product.fields.productImage!,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  color: Colors.grey[200],
+                                  child: const Center(
+                                    child: Icon(
+                                      Icons.broken_image,
+                                      size: 50,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                );
+                              },
+                              loadingBuilder: (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return Container(
+                                  color: Colors.grey[200],
+                                  child: const Center(
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                );
+                              },
+                            )
+                          : Container(
+                              color: Colors.grey[200],
+                              child: const Center(
+                                child: Icon(
+                                  Icons.image_not_supported,
+                                  size: 50,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ),
+                    ),
+                  ),
                 ),
                 const SizedBox(
                   height: 15,
