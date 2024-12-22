@@ -68,14 +68,9 @@ class _ProfileReviewsPageState extends State<ProfileReviewsPage> {
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('My Reviews'),
-      ),
-      body: FutureBuilder(
-        future: _fetchMyReviews(context, request),
-        builder: _myReviewsBuilder,
-      ),
+    return FutureBuilder(
+      future: _fetchMyReviews(context, request),
+      builder: _myReviewsBuilder,
     );
   }
 }
