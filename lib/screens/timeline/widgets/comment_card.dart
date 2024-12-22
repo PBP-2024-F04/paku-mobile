@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:paku/colors.dart';
 import 'package:paku/screens/profile/profile.dart';
 import 'package:paku/screens/timeline/edit_comment.dart';
@@ -92,10 +93,13 @@ class CommentCard extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        const Icon(
-                          Icons.south_east,
-                          size: 13,
-                        ),
+                        const Icon(LucideIcons.cornerDownRight, size: 13),
+                        const SizedBox(width: 4),
+                        if (comment.userRole == "Merchant")
+                          const Icon(LucideIcons.chefHat, size: 14, color: TailwindColors.peachDefault,)
+                        else
+                          const Icon(LucideIcons.utensilsCrossed, size: 14, color: TailwindColors.peachDefault,),
+                        const SizedBox(width: 2),
                         Flexible(
                           fit: FlexFit.loose,
                           child: Text(

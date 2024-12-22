@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:paku/colors.dart';
 import 'package:paku/screens/profile/profile.dart';
 import 'package:paku/screens/timeline/edit_post.dart';
@@ -93,6 +94,11 @@ class PostCard extends StatelessWidget {
                     children: [
                       Row(
                         children: [
+                          if (post.user.role == "Merchant")
+                            const Icon(LucideIcons.chefHat, size: 14, color: TailwindColors.peachDefault,)
+                          else 
+                            const Icon(LucideIcons.utensilsCrossed, size: 14, color: TailwindColors.peachDefault,),
+                          const SizedBox(width: 2),
                           Flexible(
                             fit: FlexFit.loose,
                             child: Text(
