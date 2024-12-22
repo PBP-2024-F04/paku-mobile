@@ -221,7 +221,7 @@ class _MyPromosState extends State<MyPromos> {
       appBar: AppBar(title: const Text("PaKu")),
       drawer: const LeftDrawer(),
       body: Padding(
-        padding: const EdgeInsets.all(32.0),
+        padding: const EdgeInsets.all(8.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -264,11 +264,11 @@ class _MyPromosState extends State<MyPromos> {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 32.0,
+                  horizontal: 16.0,
                 ),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 48.0,
+                    horizontal: 16.0,
                     vertical: 16.0,
                   ),
                   decoration: BoxDecoration(

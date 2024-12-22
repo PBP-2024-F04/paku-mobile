@@ -23,7 +23,7 @@ class _PromosState extends State<Promos> {
       Uri.parse('http://localhost:8000/promos/promo_list_json/')
           .replace(queryParameters: {"query": query})
           .toString(),
-      '$apiURL/promos/promo_list_json/',
+      // '$apiURL/promos/promo_list_json/',
     );
 
     if (response is List<dynamic>) {
@@ -48,7 +48,7 @@ class _PromosState extends State<Promos> {
       appBar: AppBar(title: const Text("PaKu")),
       drawer: const LeftDrawer(),
       body: Padding(
-        padding: const EdgeInsets.all(32.0),
+        padding: const EdgeInsets.all(8.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -105,10 +105,10 @@ class _PromosState extends State<Promos> {
             const SizedBox(height: 16),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 48.0, vertical: 16.0),
+                      const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
                   decoration: BoxDecoration(
                     color: TailwindColors.peachDarker,
                     borderRadius: BorderRadius.zero,
