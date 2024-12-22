@@ -78,7 +78,6 @@ class _EditReviewPageState extends State<EditReviewPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-            
               const Text(
                 'Rating',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -90,6 +89,7 @@ class _EditReviewPageState extends State<EditReviewPage> {
                     icon: Icon(
                       _rating > index ? Icons.star : Icons.star_border,
                       color: TailwindColors.yellowDefault,
+                      size: 32,
                     ),
                     onPressed: () {
                       setState(() {
@@ -100,7 +100,6 @@ class _EditReviewPageState extends State<EditReviewPage> {
                 }),
               ),
               const SizedBox(height: 20),
-
               const Text(
                 'Your Review',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
