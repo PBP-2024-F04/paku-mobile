@@ -6,6 +6,7 @@ import 'package:paku/screens/timeline/edit_comment.dart';
 import 'package:paku/screens/timeline/models/comment.dart';
 import 'package:paku/screens/timeline/models/post.dart';
 import 'package:paku/screens/timeline/view_post.dart';
+import 'package:paku/settings.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 
@@ -41,7 +42,7 @@ class CommentCard extends StatelessWidget {
             child: const Text("Yes"),
             onPressed: () async {
               await request.postJson(
-                "http://localhost:8000/timeline/json/comments/${comment.id}/delete",
+                "$apiURL/timeline/json/comments/${comment.id}/delete",
                 "",
               );
 

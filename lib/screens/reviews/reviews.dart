@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:paku/colors.dart';
+import 'package:paku/screens/products/product_detail_page.dart';
+import 'package:paku/settings.dart';
 import 'package:paku/widgets/left_drawer.dart';
 import 'package:paku/screens/reviews/widgets/review_card.dart';
 import 'package:paku/screens/reviews/widgets/my_review_card.dart';
 import 'package:paku/screens/reviews/models/review.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
-import 'package:paku/screens/products/products.dart';
 
 class ReviewPage extends StatefulWidget {
   const ReviewPage({super.key});
@@ -35,7 +36,7 @@ class _ReviewPageState extends State<ReviewPage>
   Future<List<Review>> _fetchAllReviews(CookieRequest request) async {
     try {
       final response = await request.get(
-        'http://localhost:8000/reviews/json-reviews',
+        '$apiURL/reviews/json-reviews',
       );
 
       if (response is List<dynamic>) {
@@ -58,7 +59,7 @@ class _ReviewPageState extends State<ReviewPage>
   Future<List<Review>> _fetchMyReviews(CookieRequest request) async {
     try {
       final response = await request.get(
-        'http://localhost:8000/reviews/json-reviews-me/',
+        '$apiURL/reviews/json-reviews-me/',
       );
 
       if (response is List<dynamic>) {

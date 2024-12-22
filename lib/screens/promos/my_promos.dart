@@ -4,6 +4,7 @@ import 'package:paku/colors.dart';
 import 'package:paku/screens/promos/add_promos.dart';
 import 'package:paku/screens/promos/models/promo.dart';
 import 'package:paku/screens/promos/edit_promo_page.dart';
+import 'package:paku/settings.dart';
 import 'package:paku/widgets/left_drawer.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
@@ -20,7 +21,7 @@ class _MyPromosState extends State<MyPromos> {
 
   Future<List<Promo>> _fetchPromos(CookieRequest request) async {
     final response = await request.get(
-      'http://localhost:8000/promos/my_promo_list_json/',
+      '$apiURL/promos/my_promo_list_json/',
     );
 
     if (response is List<dynamic>) {
@@ -37,7 +38,7 @@ class _MyPromosState extends State<MyPromos> {
   ) async {
     try {
       final response = await request.post(
-        'http://localhost:8000/promos/delete_promo_json/$promoId/',
+        '$apiURL/promos/delete_promo_json/$promoId/',
         {},
       );
 

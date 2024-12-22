@@ -1,11 +1,12 @@
 import 'package:paku/colors.dart'; 
 import 'package:flutter/material.dart';
+import 'package:paku/screens/products/my_product_detail.dart';
+import 'package:paku/settings.dart';
 import 'package:provider/provider.dart';
 import 'package:paku/widgets/left_drawer.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:paku/screens/products/add_product.dart';
 import 'package:paku/screens/products/edit_product.dart';
-import 'package:paku/screens/reviews/product_review.dart';
 import 'package:paku/screens/products/models/product.dart';
 
 class MyProductsPage extends StatefulWidget {
@@ -19,7 +20,7 @@ class _MyProductsPageState extends State<MyProductsPage> {
   late Future<List<Product>> _products;
 
   Future<List<Product>> fetchProducts(CookieRequest request) async {
-    final response = await request.get("http://localhost:8000/products/my-products-flutter");
+    final response = await request.get("$apiURL/products/my-products-flutter");
 
     List<Product> listProduct = [];
     for (var d in response) {
@@ -33,7 +34,7 @@ class _MyProductsPageState extends State<MyProductsPage> {
 
   Future<void> deleteProduct(CookieRequest request, String productId) async {
     final response = await request.post(
-      "http://localhost:8000/products/me/$productId/delete-product/",
+      "$apiURL/products/me/$productId/delete-product/",
       {},
     );
 
@@ -136,7 +137,7 @@ class _MyProductsPageState extends State<MyProductsPage> {
                           onTap: () => Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => ProductDetailPage(
+                              builder: (context) => MyProductDetailPage(
                                 product: product,
                               ),
                             ),
@@ -164,7 +165,7 @@ class _MyProductsPageState extends State<MyProductsPage> {
                                       child: SizedBox(
                                         height: 180,
                                         width: double.infinity,
-                                        child: product.fields.productImage != null
+                                        child: product.fields.productImage != null && product.fields.productImage!.isNotEmpty
                                             ? Image.network(
                                                 product.fields.productImage!,
                                                 fit: BoxFit.cover,
@@ -300,132 +301,3 @@ class _MyProductsPageState extends State<MyProductsPage> {
   }
 }
 
-class ProductDetailPage extends StatelessWidget {
-  final Product product;
-
-  const ProductDetailPage({super.key, required this.product});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("PaKu"),
-      ),
-      drawer: const LeftDrawer(),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                const SizedBox(height: 3),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Icon(
-                        Icons.arrow_back_ios,
-                        size: 22,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                if (product.fields.productImage != null)
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(15),
-                    child: Image.network(
-                      product.fields.productImage!,
-                      height: 300,
-                      width: MediaQuery.of(context).size.width,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: <Widget>[
-                    Expanded(
-                      child: Text(
-                        product.fields.productName,
-                        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
-                      ),
-                    ),
-                    Text(
-                      "Rp ${product.fields.price}",
-                      style: const TextStyle(fontSize: 25, fontWeight: FontWeight.w500),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.restaurant,
-                      color: TailwindColors.yellowDefault,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 5),
-                    Text(
-                      product.fields.restaurant,
-                      style: const TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w500),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.category,
-                      color: TailwindColors.whiteDarkActive,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 5),
-                    Text(
-                      product.fields.category,
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 15),
-                const Text(
-                  "Details",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  product.fields.description,
-                  style: _grayText(),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ProductReviewPage(productId: product.pk),
-            ),
-          );
-        },
-        backgroundColor: TailwindColors.yellowDefault,
-        label: const Text(
-          'Lihat Review',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-        ),
-        icon: const Icon(Icons.visibility),
-      ),
-    );
-  }
-
-  TextStyle _grayText() => const TextStyle(color: TailwindColors.whiteDark, fontSize: 15);
-}

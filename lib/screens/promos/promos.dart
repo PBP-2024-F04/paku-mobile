@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:paku/colors.dart';
 import 'package:paku/screens/promos/models/promo.dart';
+import 'package:paku/settings.dart';
 import 'package:paku/widgets/left_drawer.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
@@ -22,6 +23,7 @@ class _PromosState extends State<Promos> {
       Uri.parse('http://localhost:8000/promos/promo_list_json/')
           .replace(queryParameters: {"query": query})
           .toString(),
+      '$apiURL/promos/promo_list_json/',
     );
 
     if (response is List<dynamic>) {

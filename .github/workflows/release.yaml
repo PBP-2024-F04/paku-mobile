@@ -38,7 +38,7 @@ jobs:
       - name: Build APK
         env:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: flutter build apk --split-per-abi
+        run: flutter build apk --split-per-abi --dart-define=API_URL=https://muhammad-vito31-paku.pbp.cs.ui.ac.id
 
       - name: Get current date
         id: date

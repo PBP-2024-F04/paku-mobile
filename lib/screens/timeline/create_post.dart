@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:paku/screens/timeline/timeline_main.dart';
+import 'package:paku/settings.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 
@@ -19,7 +20,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
   void _createPost(BuildContext context, CookieRequest request) async {
     final response = await request.postJson(
-      "http://localhost:8000/timeline/json/posts/create",
+      "$apiURL/timeline/json/posts/create",
       jsonEncode({ 'text': _text }),
     );
 

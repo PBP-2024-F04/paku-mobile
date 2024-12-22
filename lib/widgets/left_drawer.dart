@@ -3,6 +3,7 @@ import 'package:paku/screens/promos/my_promos.dart';
 import 'package:paku/screens/reviews/merchant_reviews.dart';
 import 'package:paku/screens/products/my_products.dart';
 import 'package:paku/screens/profile/profile.dart';
+import 'package:paku/settings.dart';
 import 'package:provider/provider.dart';
 import 'package:paku/screens/accounts/login.dart';
 import 'package:paku/screens/accounts/home.dart';
@@ -23,13 +24,13 @@ class LeftDrawer extends StatefulWidget {
 class _LeftDrawerState extends State<LeftDrawer> {
   Future<String?> _fetchUserRole(CookieRequest request) async {
     final response = await request.get(
-      'http://localhost:8000/profile/json/',
+      '$apiURL/profile/json/',
     );
     return response["role"];
   }
 
   void _logout(BuildContext context, CookieRequest request) async {
-    final response = await request.logout("http://localhost:8000/accounts/auth/logout/");
+    final response = await request.logout("$apiURL/accounts/auth/logout/");
     String message = response["message"];
 
     if (context.mounted) {

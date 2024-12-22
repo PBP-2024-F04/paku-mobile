@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:paku/screens/favorites/models/favorites.dart';
 import 'package:paku/screens/favorites/widgets/favorite_card.dart';
 import 'package:paku/screens/profile/models/profile.dart';
+import 'package:paku/settings.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 
@@ -17,7 +18,7 @@ class ProfileFavoritesPage extends StatefulWidget {
 class _ProfileFavoritesPageState extends State<ProfileFavoritesPage> {
   Future<List<Favorites>> _fetchFavorites(BuildContext context, CookieRequest request) async {
     final response = await request.get(
-      'http://localhost:8000/profile/json/${widget.profile.username}/favorites',
+      '$apiURL/profile/json/${widget.profile.username}/favorites',
     );
 
     if (response is List<dynamic>) {

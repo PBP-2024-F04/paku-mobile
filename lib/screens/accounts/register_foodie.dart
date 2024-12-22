@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:paku/screens/accounts/login.dart';
+import 'package:paku/settings.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 
@@ -25,7 +26,7 @@ class _RegisterFoodiePageState extends State<RegisterFoodiePage> {
 
   void _registerFoodie(BuildContext context, CookieRequest request) async {
     final response = await request.postJson(
-      "http://localhost:8000/accounts/auth/register/foodie/",
+      "$apiURL/accounts/auth/register/foodie/",
       jsonEncode({
         "username": _username,
         "password1": _password1,

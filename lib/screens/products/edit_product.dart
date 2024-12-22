@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:paku/screens/products/models/product.dart';
+import 'package:paku/settings.dart';
 import 'package:provider/provider.dart';
 import 'package:paku/colors.dart';
 import 'package:paku/widgets/left_drawer.dart';
@@ -38,7 +39,7 @@ class _EditProductPageState extends State<EditProductPage> {
   void _editProduct(BuildContext context, CookieRequest request) async {
     try {
       final response = await request.post(
-        "http://localhost:8000/products/me/${widget.productId}/edit-product-flutter/",
+        "$apiURL/products/me/${widget.productId}/edit-product-flutter/",
         jsonEncode({
           "productName": _productName,
           "price": _price,

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:paku/settings.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:paku/colors.dart'; 
@@ -50,7 +51,7 @@ class _CreateReviewPageState extends State<CreateReviewPage> {
       };
 
       final response = await request.postJson(
-        'http://localhost:8000/reviews/json/product/${widget.productId}/reviews/create/',
+        '$apiURL/reviews/json/product/${widget.productId}/reviews/create/',
         jsonEncode(reviewData),
       );
 

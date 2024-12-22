@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:paku/settings.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:paku/screens/accounts/home.dart';
@@ -25,7 +26,7 @@ class _CreateFavoritePageState extends State<CreateFavoritePage> {
 
     print(request.getJsonData());
     final response = await request.postJson(
-      "http://127.0.0.1:8000/favorites/create_favorite_json/$productId/",
+      "$apiURL/favorites/create_favorite_json/$productId/",
       jsonEncode(<String, dynamic>{
         'category': fCategoryValues.reverse[_category],
         'product_id': widget.product.pk,

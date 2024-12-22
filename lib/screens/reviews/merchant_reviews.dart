@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:paku/settings.dart';
 import 'package:paku/widgets/left_drawer.dart';
 import 'package:paku/screens/reviews/models/review.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
@@ -18,7 +19,7 @@ class _MerchantReviewPageState extends State<MerchantReviewPage> {
   Future<List<Review>> _fetchMerchantReviews(CookieRequest request) async {
     try {
       final response = await request.get(
-        'http://localhost:8000/reviews/json-merchant-reviews/',
+        '$apiURL/reviews/json-merchant-reviews/',
       );
 
       if (response is List<dynamic>) {

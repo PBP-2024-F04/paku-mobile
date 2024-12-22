@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:paku/screens/accounts/home.dart';
 import 'package:paku/screens/accounts/register.dart';
+import 'package:paku/settings.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 
@@ -19,7 +20,7 @@ class _LoginPageState extends State<LoginPage> {
   String _password = "";
 
   void _login(BuildContext context, CookieRequest request) async {
-    final response = await request.login("http://localhost:8000/accounts/auth/login/", {
+    final response = await request.login("$apiURL/accounts/auth/login/", {
       'username': _username,
       'password': _password,
     });

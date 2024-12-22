@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:paku/screens/reviews/reviews.dart';
 import 'package:paku/screens/reviews/edit_review.dart';
+import 'package:paku/settings.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:paku/screens/reviews/models/review.dart';
@@ -36,7 +37,7 @@ class MyReviewCard extends StatelessWidget {
             child: const Text("Delete"),
             onPressed: () async {
               await request.postJson(
-                "http://localhost:8000/reviews/json/reviews/me/${review.id}/delete/",
+                "$apiURL/reviews/json/reviews/me/${review.id}/delete/",
                 "",
               );
 
