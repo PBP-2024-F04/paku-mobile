@@ -27,7 +27,7 @@ class _EditFavoritePageState extends State<EditFavoritePage> {
     _category = widget.favorite.category;
   }
 
-  void _updateFavorite(CookieRequest request) async {
+  void _updateFavorite(BuildContext context, CookieRequest request) async {
     final response = await request.postJson(
       "http://127.0.0.1:8000/favorites/${widget.favorite.favorite}/edit_favorite_json",
       jsonEncode(<String, dynamic>{
@@ -46,7 +46,7 @@ class _EditFavoritePageState extends State<EditFavoritePage> {
           );
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => HomePage()),
+            MaterialPageRoute(builder: (context) => const HomePage()),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -57,11 +57,13 @@ class _EditFavoritePageState extends State<EditFavoritePage> {
         }
       }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("No response from server."),
-        ),
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("No response from server."),
+          ),
+        );
+      }
     }
   }
 
@@ -137,14 +139,14 @@ class _EditFavoritePageState extends State<EditFavoritePage> {
                 Center(
                   child: ElevatedButton(
                     style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(TailwindColors.redDefault),
-                      padding: MaterialStateProperty.all(
+                      backgroundColor: WidgetStateProperty.all(TailwindColors.redDefault),
+                      padding: WidgetStateProperty.all(
                         const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
                       ),
                     ),
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        _updateFavorite(request); 
+                        _updateFavorite(context, request); 
                       }
                     },
                     child: const Text(

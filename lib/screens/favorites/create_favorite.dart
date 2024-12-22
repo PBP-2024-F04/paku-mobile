@@ -18,17 +18,15 @@ class CreateFavoritePage extends StatefulWidget {
 
 class _CreateFavoritePageState extends State<CreateFavoritePage> {
   final _formKey = GlobalKey<FormState>();
-  FCategory _category = FCategory.wantToTry; // Default category
+  FCategory _category = FCategory.wantToTry;
 
-  // Method to handle adding to favorites
   void _addFavorite(BuildContext context, CookieRequest request) async {
     final productId = widget.product.pk;
-    print("Sending category: $_category");
 
     final response = await request.postJson(
       "http://127.0.0.1:8000/favorites/create_favorite_json/$productId/",
       jsonEncode(<String, dynamic>{
-        'category': fCategoryValues.reverse[_category], // Convert enum to string
+        'category': fCategoryValues.reverse[_category],
         'product_id': widget.product.pk,
       }),
     );
@@ -40,7 +38,7 @@ class _CreateFavoritePageState extends State<CreateFavoritePage> {
         );
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => HomePage()),
+          MaterialPageRoute(builder: (context) => const HomePage()),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -120,13 +118,14 @@ class _CreateFavoritePageState extends State<CreateFavoritePage> {
                 Center(
                   child: ElevatedButton(
                     style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(TailwindColors.redDefault),
-                      padding: MaterialStateProperty.all(
+                      backgroundColor: WidgetStateProperty.all(
+                        TailwindColors.redDefault,
+                      ),
+                      padding: WidgetStateProperty.all(
                         const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
                       ),
                     ),
                     onPressed: () async {
-                      print("Category selected: $_category");
                       if (_formKey.currentState!.validate()) {
                         _addFavorite(context, request); 
                       }
@@ -197,10 +196,8 @@ class _CreateFavoritePageState extends State<CreateFavoritePage> {
               value: category,
               groupValue: _category,
               onChanged: (value) {
-                print("Radio onChanged called with value: $value");
                 setState(() {
                   _category = value!;
-                  print("Selected category: $_category");
                 });
               },
             ),
