@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:paku/colors.dart';
+import 'package:paku/screens/profile/profile.dart';
 import 'package:paku/screens/timeline/edit_comment.dart';
 import 'package:paku/screens/timeline/models/comment.dart';
 import 'package:paku/screens/timeline/models/post.dart';
@@ -76,7 +78,7 @@ class CommentCard extends StatelessWidget {
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.zero,
           side: BorderSide(
-            color: TailwindColors.mossGreenDark,
+            color: TailwindColors.whiteDark,
             width: 1,
           ),
         ),
@@ -89,38 +91,96 @@ class CommentCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Row(
+                      children: [
+                        const Icon(LucideIcons.cornerDownRight, size: 13),
+                        const SizedBox(width: 4),
+                        if (comment.userRole == "Merchant")
+                          const Icon(LucideIcons.chefHat, size: 14, color: TailwindColors.peachDefault,)
+                        else
+                          const Icon(LucideIcons.utensilsCrossed, size: 14, color: TailwindColors.peachDefault,),
+                        const SizedBox(width: 2),
+                        Flexible(
+                          fit: FlexFit.loose,
+                          child: Text(
+                            comment.displayname,
+                            style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 2.0),
+                          child: Text("—"),
+                        ),
+                        Flexible(
+                          fit: FlexFit.tight,
+                          child: Text(
+                            "@${comment.username}",
+                            style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                              color: TailwindColors.peachDefault,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                        ),
+                      ],
+                    ),
                     Text(comment.text),
+                    if (comment.isEdited)
+                      Text(
+                        "edited",
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          fontStyle: FontStyle.italic,
+                          color: TailwindColors.peachDefault,
+                        ),
+                      )
                   ],
                 ),
               ),
-              if (comment.isMine)
-                IconButton(
-                  onPressed: () => showModalBottomSheet(
-                    context: context,
-                    builder: (context) => Container(
-                      padding: const EdgeInsets.all(16.0),
-                      height: MediaQuery.of(context).size.height * 0.35,
-                      child: SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
+              IconButton(
+                onPressed: () => showModalBottomSheet(
+                  context: context,
+                  builder: (context) => Container(
+                    padding: const EdgeInsets.all(16.0),
+                    height: MediaQuery.of(context).size.height * 0.35,
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (comment.isMine)
                             ListTile(
                               title: const Text('Edit'),
                               leading: const Icon(Icons.edit_outlined),
                               onTap: () => _editComment(context),
                             ),
+                          if (comment.isMine)
                             ListTile(
                               title: const Text('Delete'),
                               leading: const Icon(Icons.delete_outlined),
                               onTap: () => _deleteComment(context, request),
                             ),
-                          ],
-                        ),
+                          if (!comment.isMine)
+                            ListTile(
+                              title: const Text('Profile'),
+                              leading: const Icon(Icons.person_outline),
+                              onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      ProfilePage(username: post.user.username),
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
                     ),
                   ),
-                  icon: const Icon(Icons.more_vert),
                 ),
+                icon: const Icon(Icons.more_vert),
+              ),
             ],
           ),
         ),

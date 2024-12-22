@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:paku/screens/accounts/login.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
@@ -64,63 +65,68 @@ class _RegisterMerchantPageState extends State<RegisterMerchantPage> {
         title: const Text("Register Merchant"),
       ),
       body: Center(
-        child: Form(
-          key: _formKey,
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(30.0),
-            child: Column(
-              children: [
-                Text(
-                  "Create Merchant Account",
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.displayMedium,
-                ),
-                const SizedBox(height: 30),
-                TextFormField(
-                  decoration: const InputDecoration(
-                    hintText: "Username",
-                    labelText: "Username",
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 500),
+          child: Form(
+            key: _formKey,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(30.0),
+              child: Column(
+                children: [
+                  const Icon(LucideIcons.chefHat, size: 50),
+                  Text(
+                    "Create Merchant Account",
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.displayMedium,
                   ),
-                  onChanged: (String? value) =>
-                      setState(() => _username = value!),
-                ),
-                const SizedBox(height: 10),
-                TextFormField(
-                  decoration: const InputDecoration(
-                    hintText: "Password",
-                    labelText: "Password",
+                  const SizedBox(height: 50),
+                  TextFormField(
+                    decoration: const InputDecoration(
+                      hintText: "Username",
+                      labelText: "Username",
+                    ),
+                    onChanged: (String? value) =>
+                        setState(() => _username = value!),
                   ),
-                  obscureText: true,
-                  onChanged: (String? value) =>
-                      setState(() => _password1 = value!),
-                ),
-                const SizedBox(height: 10),
-                TextFormField(
-                  decoration: const InputDecoration(
-                    hintText: "Password Confirmation",
-                    labelText: "Password Confirmation",
+                  const SizedBox(height: 10),
+                  TextFormField(
+                    decoration: const InputDecoration(
+                      hintText: "Password",
+                      labelText: "Password",
+                    ),
+                    obscureText: true,
+                    onChanged: (String? value) =>
+                        setState(() => _password1 = value!),
                   ),
-                  obscureText: true,
-                  onChanged: (String? value) =>
-                      setState(() => _password2 = value!),
-                ),
-                const SizedBox(height: 10),
-                TextFormField(
-                  decoration: const InputDecoration(
-                    hintText: "Restaurant Name",
-                    labelText: "Restaurant Name",
+                  const SizedBox(height: 10),
+                  TextFormField(
+                    decoration: const InputDecoration(
+                      hintText: "Password Confirmation",
+                      labelText: "Password Confirmation",
+                    ),
+                    obscureText: true,
+                    onChanged: (String? value) =>
+                        setState(() => _password2 = value!),
                   ),
-                  onChanged: (String? value) =>
-                      setState(() => _restaurantName = value!),
-                ),
-                const SizedBox(height: 10),
-                ElevatedButton(
-                  onPressed: () => _registerMerchant(context, request),
-                  style:
-                      ElevatedButton.styleFrom(fixedSize: const Size(200, 40)),
-                  child: const Text('Register Merchant'),
-                ),
-              ],
+                  const SizedBox(height: 10),
+                  TextFormField(
+                    decoration: const InputDecoration(
+                      hintText: "Restaurant Name",
+                      labelText: "Restaurant Name",
+                    ),
+                    onChanged: (String? value) =>
+                        setState(() => _restaurantName = value!),
+                  ),
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: () => _registerMerchant(context, request),
+                    style:
+                        ElevatedButton.styleFrom(fixedSize: const Size(200, 40)),
+                    child: const Text('Register Merchant'),
+                  ),
+                  const SizedBox(height: 50),
+                ],
+              ),
             ),
           ),
         ),

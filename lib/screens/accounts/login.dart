@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:paku/screens/accounts/home.dart';
 import 'package:paku/screens/accounts/register.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
@@ -62,50 +63,54 @@ class _LoginPageState extends State<LoginPage> {
         title: const Text("Login"),
       ),
       body: Center(
-        child: Form(
-          key: _formKey,
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(30.0),
-            child: Column(
-              children: [
-                Text(
-                  "Sign in to PaKu",
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.displayMedium,
-                ),
-                const SizedBox(height: 30),
-                TextFormField(
-                  decoration: const InputDecoration(
-                    hintText: "Name",
-                    labelText: "Name",
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 500),
+          child: Form(
+            key: _formKey,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(30.0),
+              child: Column(
+                children: [
+                  const Icon(LucideIcons.logIn, size: 50),
+                  Text(
+                    "Sign in to PaKu",
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.displayMedium,
                   ),
-                  onChanged: (String? value) =>
-                      setState(() => _username = value!),
-                ),
-                const SizedBox(height: 10),
-                TextFormField(
-                  decoration: const InputDecoration(
-                    hintText: "Password",
-                    labelText: "Password",
+                  const SizedBox(height: 50),
+                  TextFormField(
+                    decoration: const InputDecoration(
+                      hintText: "Name",
+                      labelText: "Name",
+                    ),
+                    onChanged: (String? value) =>
+                        setState(() => _username = value!),
                   ),
-                  obscureText: true,
-                  onChanged: (String? value) =>
-                      setState(() => _password = value!),
-                ),
-                const SizedBox(height: 10),
-                ElevatedButton(
-                  onPressed: () => _login(context, request),
-                  child: const Text('Login'),
-                ),
-                const SizedBox(height: 20),
-                TextButton(
-                  onPressed: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const RegisterPage())
+                  const SizedBox(height: 10),
+                  TextFormField(
+                    decoration: const InputDecoration(
+                      hintText: "Password",
+                      labelText: "Password",
+                    ),
+                    obscureText: true,
+                    onChanged: (String? value) =>
+                        setState(() => _password = value!),
                   ),
-                  child: const Text("Belum punya akun? Registrasi!"),
-                ),
-              ],
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: () => _login(context, request),
+                    child: const Text('Login'),
+                  ),
+                  const SizedBox(height: 20),
+                  TextButton(
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const RegisterPage())
+                    ),
+                    child: const Text("Belum punya akun? Registrasi!"),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

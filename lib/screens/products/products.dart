@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:paku/widgets/left_drawer.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:paku/screens/products/models/product.dart';
+import 'package:paku/screens/favorites/create_favorite.dart';
 import 'package:paku/screens/reviews/product_review.dart';
 
 class ProductsPage extends StatefulWidget {
@@ -200,6 +201,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
     return Scaffold(
       appBar: AppBar(
         title: const Text("PaKu"),
@@ -227,10 +229,20 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                         size: 22,
                       ),
                     ),
-                    const Icon(
-                      Icons.favorite,
-                      size: 28,
-                      color: TailwindColors.redDefault,
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => CreateFavoritePage(
+                            product: widget.product,
+                          )), 
+                        );
+                      },
+                      child: const Icon(
+                        Icons.favorite,
+                        size: 28,
+                        color: TailwindColors.redDefault,
+                      ),
                     ),
                   ],
                 ),
