@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:paku/screens/reviews/merchant_reviews.dart';
 import 'package:paku/screens/products/my_products.dart';
 import 'package:paku/screens/profile/profile.dart';
 import 'package:provider/provider.dart';
@@ -164,11 +165,11 @@ class _LeftDrawerState extends State<LeftDrawer> {
         ),
         ListTile(
           leading: const Icon(Icons.book_outlined),
-          title: const Text('Reviews'),
+          title: const Text('My Reviews'),
           onTap: () {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => const ReviewPage()),
+              MaterialPageRoute(builder: (context) => const MerchantReviewPage()),
             );
           },
         ),

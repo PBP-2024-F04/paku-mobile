@@ -78,12 +78,12 @@ class _ProfilePageState extends State<ProfilePage> {
               children: snapshot.data!.role == "Foodie"
                   ? ([
                       ProfilePostsPage(snapshot.data!),
-                      const ProfileReviewsPage(),
-                      const ProfileFavoritesPage(),
+                      ProfileReviewsPage(snapshot.data!),
+                      ProfileFavoritesPage(snapshot.data!),
                     ])
                   : ([
                       ProfilePostsPage(snapshot.data!),
-                      const ProfileProductsPage(),
+                      ProfileProductsPage(snapshot.data!),
                     ]),
             ),
           ),
