@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:paku/screens/favorites/favorites.dart';
 import 'package:provider/provider.dart';
 import 'package:paku/screens/promos/my_promos.dart';
 import 'package:paku/screens/promos/promos.dart';
@@ -226,7 +227,7 @@ class _HomePageState extends State<HomePage> {
         onPressed: () {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => const ReviewPage()),
+            MaterialPageRoute(builder: (context) => const FavoritesPage()),
           );
         },
       ),
