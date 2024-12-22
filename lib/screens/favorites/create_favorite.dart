@@ -23,6 +23,7 @@ class _CreateFavoritePageState extends State<CreateFavoritePage> {
   void _addFavorite(BuildContext context, CookieRequest request) async {
     final productId = widget.product.pk;
 
+    print(request.getJsonData());
     final response = await request.postJson(
       "http://127.0.0.1:8000/favorites/create_favorite_json/$productId/",
       jsonEncode(<String, dynamic>{
@@ -127,6 +128,7 @@ class _CreateFavoritePageState extends State<CreateFavoritePage> {
                     ),
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
+                        print(request.getJsonData());
                         _addFavorite(context, request); 
                       }
                     },
