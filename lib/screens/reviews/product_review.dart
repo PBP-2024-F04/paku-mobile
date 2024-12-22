@@ -66,20 +66,6 @@ class _ProductReviewPageState extends State<ProductReviewPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-    
-            const Align(
-              alignment: Alignment.topCenter,
-              child: Text(
-                "Review Product",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: TailwindColors.peachDarkActive,
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-
             DropdownButton<String>(
               value: selectedRating,
               isExpanded: true,
@@ -100,7 +86,6 @@ class _ProductReviewPageState extends State<ProductReviewPage> {
               dropdownColor: Colors.white, 
             ),
             const SizedBox(height: 16),
-
 
             Expanded(
               child: FutureBuilder<List<Review>>(

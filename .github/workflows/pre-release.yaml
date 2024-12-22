@@ -1,0 +1,43 @@
+name: Pre-Release
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  releases:
+    name: Build and Pre-Release APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: "zulu"
+          java-version: "17"
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+
+      - name: Get packages
+        run: flutter pub get
+
+      - name: Generate Java keystore
+        env:
+          KEY_JKS: ${{ secrets.KEY_JKS }}
+        run: echo "$KEY_JKS" | base64 --decode > release-keystore.jks
+
+      - name: Build APK
+        env:
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: flutter build apk --split-per-abi
+
+      - name: Pre-release APK by uploading it to Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: APKS
+          path: build/app/outputs/flutter-apk/*.apk

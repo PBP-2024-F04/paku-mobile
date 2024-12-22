@@ -51,8 +51,7 @@ class _ReviewPageState extends State<ReviewPage>
       }
       return [];
     } catch (e) {
-      print('Error fetching reviews: $e');
-      rethrow;
+      rethrow; 
     }
   }
 
@@ -75,8 +74,7 @@ class _ReviewPageState extends State<ReviewPage>
       }
       return [];
     } catch (e) {
-      print('Error fetching my reviews: $e');
-      rethrow;
+      rethrow; 
     }
   }
 
@@ -118,22 +116,40 @@ class _ReviewPageState extends State<ReviewPage>
       drawer: const LeftDrawer(),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: DropdownButton<String>(
-              value: selectedRating,
-              onChanged: (String? newValue) {
-                setState(() {
-                  selectedRating = newValue;
-                });
-              },
-              items: <String>['all', '5', '4', '3', '2', '1']
-                  .map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value == 'all' ? 'All Ratings' : '$value Stars'),
-                );
-              }).toList(),
+          Container(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              children: [
+                const Text(
+                  "Filter by rating: ",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: DropdownButton<String>(
+                    value: selectedRating,
+                    isExpanded: true,
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedRating = newValue;
+                      });
+                    },
+                    items: <String>['all', '5', '4', '3', '2', '1']
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(
+                          value == 'all' ? 'All Ratings' : '$value Stars',
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ],
             ),
           ),
           Expanded(
@@ -162,14 +178,14 @@ class _ReviewPageState extends State<ReviewPage>
                         return ReviewCard(
                           review: review,
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ProductDetailPage(
-                                  product: review.product,
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ProductDetailPage(
+                                    product: review.product,
+                                  ),
                                 ),
-                              ),
-                            );
+                              );
                           },
                         );
                       },
@@ -198,15 +214,15 @@ class _ReviewPageState extends State<ReviewPage>
                         return MyReviewCard(
                           review: review,
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ProductDetailPage(
-                                  product: review.product,
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ProductDetailPage(
+                                    product: review.product,
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
+                              );
+                            }
                         );
                       },
                     );

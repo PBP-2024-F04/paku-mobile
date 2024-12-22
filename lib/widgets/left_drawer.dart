@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:paku/screens/reviews/merchant_reviews.dart';
 import 'package:paku/screens/products/my_products.dart';
 import 'package:paku/screens/profile/profile.dart';
 import 'package:provider/provider.dart';
@@ -9,6 +10,7 @@ import 'package:paku/screens/promos/promos.dart';
 import 'package:paku/screens/reviews/reviews.dart';
 import 'package:paku/screens/products/products.dart';
 import 'package:paku/screens/timeline/timeline_main.dart';
+import 'package:paku/screens/favorites/favorites.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 
 class LeftDrawer extends StatefulWidget {
@@ -23,13 +25,11 @@ class _LeftDrawerState extends State<LeftDrawer> {
     final response = await request.get(
       'http://localhost:8000/profile/json/',
     );
-
     return response["role"];
   }
 
   void _logout(BuildContext context, CookieRequest request) async {
-    final response =
-        await request.logout("http://localhost:8000/accounts/auth/logout/");
+    final response = await request.logout("http://localhost:8000/accounts/auth/logout/");
     String message = response["message"];
 
     if (context.mounted) {
@@ -61,71 +61,73 @@ class _LeftDrawerState extends State<LeftDrawer> {
     return Drawer(
       child: FutureBuilder(
         future: _fetchUserRole(request),
-        builder: (context, AsyncSnapshot snapshot) => ListView(
-          children: [
-            DrawerHeader(
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                InkWell(
-                    onTap: () {
-                      Navigator.pop(context);
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => const HomePage()),
-                      );
-                    },
-                    child: Text(
-                      "PaKu",
+        builder: (context, AsyncSnapshot snapshot) {
+          return ListView(
+            children: [
+              DrawerHeader(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => const HomePage()),
+                        );
+                      },
+                      child: Text(
+                        "PaKu",
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context)
+                            .textTheme
+                            .displaySmall
+                            ?.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    Text(
+                      "Jelajahi kuliner Palu!",
                       textAlign: TextAlign.center,
                       style: Theme.of(context)
                           .textTheme
-                          .displaySmall
-                          ?.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+                          .labelLarge
+                          ?.copyWith(color: Colors.white),
                     ),
-                  ),
-                  Text(
-                    "Jelajahi kuliner Palu!",
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context)
-                        .textTheme
-                        .labelLarge
-                        ?.copyWith(color: Colors.white),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            if (snapshot.hasData)
-              if (snapshot.data == "Merchant")
-                ..._merchantButtons(context)
+              if (snapshot.hasData)
+                if (snapshot.data == "Merchant")
+                  ..._merchantButtons(context)
+                else
+                  ..._foodieButtons(context)
               else
-                ..._foodieButtons(context)
-            else
-              const Center(child: CircularProgressIndicator()),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.person_outline),
-              title: const Text('Profile'),
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const ProfilePage(),
-                  ),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.logout),
-              title: const Text('Logout'),
-              onTap: () {
-                _logout(context, request);
-              },
-            ),
-          ],
-        ),
+                const Center(child: CircularProgressIndicator()),
+              const Divider(),
+              ListTile(
+                leading: const Icon(Icons.person_outline),
+                title: const Text('Profile'),
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const ProfilePage(),
+                    ),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.logout),
+                title: const Text('Logout'),
+                onTap: () {
+                  _logout(context, request);
+                },
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -163,11 +165,11 @@ class _LeftDrawerState extends State<LeftDrawer> {
         ),
         ListTile(
           leading: const Icon(Icons.book_outlined),
-          title: const Text('Reviews'),
+          title: const Text('My Reviews'),
           onTap: () {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => const ReviewPage()),
+              MaterialPageRoute(builder: (context) => const MerchantReviewPage()),
             );
           },
         ),
@@ -198,7 +200,10 @@ class _LeftDrawerState extends State<LeftDrawer> {
           leading: const Icon(Icons.star_border),
           title: const Text('Favorites'),
           onTap: () {
-            // Navigasi ke halaman Favorites
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const FavoritesPage()),
+            );
           },
         ),
         ListTile(
