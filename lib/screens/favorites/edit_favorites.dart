@@ -19,20 +19,17 @@ class EditFavoritePage extends StatefulWidget {
 
 class _EditFavoritePageState extends State<EditFavoritePage> {
   final _formKey = GlobalKey<FormState>();
-  FCategory _category = FCategory.wantToTry; // Default category
+  late FCategory _category;
 
   @override
   void initState() {
     super.initState();
-    _category = FCategory.values.firstWhere(
-      (e) => e.toString().split('.').last == widget.favorite.fields.category,
-      orElse: () => FCategory.wantToTry,
-    );
+    _category = widget.favorite.category;
   }
 
   void _updateFavorite(CookieRequest request) async {
     final response = await request.postJson(
-      "http://127.0.0.1:8000/favorites/edit_favorite_json/${widget.favorite.pk}/",
+      "http://127.0.0.1:8000/favorites/${widget.favorite.favorite}/edit_favorite_json",
       jsonEncode(<String, dynamic>{
         'category': fCategoryValues.reverse[_category], // Convert enum to string
         'product_id': widget.product.pk,
@@ -86,75 +83,78 @@ class _EditFavoritePageState extends State<EditFavoritePage> {
           },
         ),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  color: TailwindColors.mossGreenLight,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: TailwindColors.mossGreenDark),
+      body: Form(
+        key: _formKey,
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16.0),
+                  decoration: BoxDecoration(
+                    color: TailwindColors.mossGreenLight,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: TailwindColors.mossGreenDark),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Edit "${widget.product.fields.productName}" in Your Favorites',
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: TailwindColors.yellowDark,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      _buildProductDetails('Name', widget.product.fields.productName),
+                      _buildProductDetails('Restaurant', widget.product.fields.restaurant),
+                      _buildProductDetails('Price', 'Rp ${widget.product.fields.price}'),
+                      _buildProductDetails('Description', widget.product.fields.description),
+                      _buildProductDetails('Category', widget.product.fields.category),
+                    ],
+                  ),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Edit "${widget.product.fields.productName}" in Your Favorites',
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: TailwindColors.yellowDark,
+                const SizedBox(height: 20),
+        
+                const Text(
+                  'Select Category',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: TailwindColors.yellowActive,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                _buildCategoryOption('Want to Try', FCategory.wantToTry),
+                _buildCategoryOption('Loving It', FCategory.lovingIt),
+                _buildCategoryOption('All Time Favorite', FCategory.allTimeFavorites),
+                const SizedBox(height: 20),
+        
+                Center(
+                  child: ElevatedButton(
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(TailwindColors.redDefault),
+                      padding: MaterialStateProperty.all(
+                        const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
                       ),
                     ),
-                    const SizedBox(height: 10),
-                    _buildProductDetails('Name', widget.product.fields.productName),
-                    _buildProductDetails('Restaurant', widget.product.fields.restaurant),
-                    _buildProductDetails('Price', 'Rp ${widget.product.fields.price}'),
-                    _buildProductDetails('Description', widget.product.fields.description),
-                    _buildProductDetails('Category', widget.product.fields.category),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              const Text(
-                'Select Category',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: TailwindColors.yellowActive,
-                ),
-              ),
-              const SizedBox(height: 10),
-              _buildCategoryOption('Want to Try', FCategory.wantToTry),
-              _buildCategoryOption('Loving It', FCategory.lovingIt),
-              _buildCategoryOption('All Time Favorite', FCategory.allTimeFavorites),
-              const SizedBox(height: 20),
-
-              Center(
-                child: ElevatedButton(
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(TailwindColors.redDefault),
-                    padding: MaterialStateProperty.all(
-                      const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                    onPressed: () async {
+                      if (_formKey.currentState!.validate()) {
+                        _updateFavorite(request); 
+                      }
+                    },
+                    child: const Text(
+                      'Update Favorite',
+                      style: TextStyle(color: TailwindColors.whiteLight),
                     ),
                   ),
-                  onPressed: () async {
-                    if (_formKey.currentState!.validate()) {
-                      _updateFavorite(request); 
-                    }
-                  },
-                  child: const Text(
-                    'Update Favorite',
-                    style: TextStyle(color: TailwindColors.whiteLight),
-                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

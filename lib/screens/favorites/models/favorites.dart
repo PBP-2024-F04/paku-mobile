@@ -1,59 +1,41 @@
-// To parse this JSON data, do
-//
-//     final favorites = favoritesFromJson(jsonString);
-
 import 'dart:convert';
 
-List<Favorites> favoritesFromJson(String str) => List<Favorites>.from(json.decode(str).map((x) => Favorites.fromJson(x)));
+List<Favorites> favoriteFromJson(String str) =>
+    List<Favorites>.from(json.decode(str).map((x) => Favorites.fromJson(x)));
 
-String favoritesToJson(List<Favorites> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+String favoriteToJson(List<Favorites> data) =>
+    json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
 class Favorites {
-    String model;
-    String pk;
-    Fields fields;
+  String favorite;
+  String foodie;
+  String product;
+  String productId;
+  FCategory category;
 
-    Favorites({
-        required this.model,
-        required this.pk,
-        required this.fields,
-    });
+  Favorites({
+    required this.favorite,
+    required this.foodie,
+    required this.product,
+    required this.productId,
+    required this.category,
+  });
 
-    factory Favorites.fromJson(Map<String, dynamic> json) => Favorites(
-        model: json["model"],
-        pk: json["pk"],
-        fields: Fields.fromJson(json["fields"]),
-    );
-
-    Map<String, dynamic> toJson() => {
-        "model": model,
-        "pk": pk,
-        "fields": fields.toJson(),
-    };
-}
-
-class Fields {
-    String foodie;
-    String product;
-    FCategory category;
-
-    Fields({
-        required this.foodie,
-        required this.product,
-        required this.category,
-    });
-
-    factory Fields.fromJson(Map<String, dynamic> json) => Fields(
+  factory Favorites.fromJson(Map<String, dynamic> json) => Favorites(
+        favorite: json["favorite"],
         foodie: json["foodie"],
         product: json["product"],
-        category: fCategoryValues.map[json["category"]] ?? FCategory.wantToTry, // Default jika null
-    );
+        productId: json["product_id"],
+        category: fCategoryValues.map[json["category"]]!,
+      );
 
-    Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toJson() => {
+        "favorite": favorite,
         "foodie": foodie,
         "product": product,
-        "category": fCategoryValues.reverse[category],
-    };
+        "product_id": productId,
+        "category": category,
+      };
 }
 
 enum FCategory {
@@ -67,7 +49,6 @@ final fCategoryValues = EnumValues({
   "loving_it": FCategory.lovingIt,
   "all_time_favorites": FCategory.allTimeFavorites,
 });
-
 
 class EnumValues<T> {
   Map<String, T> map;

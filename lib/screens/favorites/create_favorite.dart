@@ -22,15 +22,6 @@ class _CreateFavoritePageState extends State<CreateFavoritePage> {
 
   // Method to handle adding to favorites
   void _addFavorite(BuildContext context, CookieRequest request) async {
-    // Cek apakah user sudah login dan cookie sudah ada
-    // final cookie = request.cookies; 
-    // if (cookie.isEmpty) {
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     const SnackBar(content: Text("You need to log in first.")),
-    //   );
-    //   return;
-    // }
-
     final productId = widget.product.pk;
     print("Sending category: $_category");
 

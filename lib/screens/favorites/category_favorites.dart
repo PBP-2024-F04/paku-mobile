@@ -13,8 +13,11 @@ class FavoritesByCategoryScreen extends StatelessWidget {
 
   Future<List<Favorites>> fetchFavoritesByCategory(CookieRequest request, FCategory category) async {
     try {
-      final response = await request.get('http://127.0.0.1:8000/favorites/category/${category.apiName}/json/');
-      var data = response;
+      final response = await request.get(
+        'http://127.0.0.1:8000/favorites/category/${category.apiName}/json/',
+      );
+
+      final data = response;
 
       List<Favorites> favoritesList = [];
       for (var d in data['favorites']) {
@@ -32,23 +35,19 @@ class FavoritesByCategoryScreen extends StatelessWidget {
   Future<Product> fetchProductDetails(CookieRequest request, String productId) async {
     try {
       final response = await request.get('http://127.0.0.1:8000/products/json/$productId/');
-      var data = response;
-      return Product.fromJson(data);
+      return Product.fromJson(response[0]);
     } catch (e) {
       throw Exception('Error fetching product details: $e');
     }
   }
 
-  // Fungsi untuk menghapus favorit
   Future<void> deleteFavorite(CookieRequest request, String favoriteId) async {
-    final response = await request.post(
-      "http://127.0.0.1:8000/favorites/$favoriteId/delete_favorite_json/",
-      {},
+    final response = await request.postJson(
+      "http://127.0.0.1:8000/favorites/$favoriteId/delete_favorite_json",
+      "",
     );
 
-    if (response['success']) {
-      return;
-    } else {
+    if (!response['success']) {
       throw Exception(response['message'] ?? "Failed to delete favorite.");
     }
   }
@@ -122,17 +121,17 @@ class FavoritesByCategoryScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      favorite.fields.product,
+                      favorite.product,
                       style: const TextStyle(
                           fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     Text(
-                      favorite.fields.category.displayName,
+                      favorite.category.displayName,
                       style: const TextStyle(color: Colors.grey),
                     ),
                     const Spacer(),
                     Text(
-                      favorite.fields.category.displayName,
+                      favorite.category.displayName,
                       style: const TextStyle(fontWeight: FontWeight.bold, color: TailwindColors.mossGreenDefault),
                     ),
                   ],
@@ -146,7 +145,7 @@ class FavoritesByCategoryScreen extends StatelessWidget {
                     onPressed: () async {
                       final product = await fetchProductDetails(
                         request,
-                        favorite.fields.product,
+                        favorite.productId,
                       );
 
                       Navigator.push(
@@ -169,22 +168,14 @@ class FavoritesByCategoryScreen extends StatelessWidget {
                 Expanded(
                   child: TextButton(
                     onPressed: () async {
-                      try {
-                        final request = context.read<CookieRequest>();
-                        await deleteFavorite(request, favorite.pk.toString());  // Memanggil deleteFavorite
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("Favorit berhasil dihapus."),
-                            ),
-                          );
-                        }
-                      } catch (e) {
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text("Error: $e")),
-                          );
-                        }
+                      final request = context.read<CookieRequest>();
+                      await deleteFavorite(request, favorite.favorite);
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Favorit berhasil dihapus."),
+                          ),
+                        );
                       }
                     },
                     style: TextButton.styleFrom(

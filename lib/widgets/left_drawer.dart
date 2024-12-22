@@ -118,66 +118,6 @@ class _LeftDrawerState extends State<LeftDrawer> {
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.home_outlined),
-                title: const Text('Home'),
-                onTap: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => const HomePage()),
-                  );
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.discount_outlined),
-                title: const Text('Promos'),
-                onTap: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => MyPromos()),
-                  );
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.home_outlined),
-                title: const Text('Timeline'),
-                onTap: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => const TimelineMainPage()),
-                  );
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.book_outlined),
-                title: const Text('Reviews'),
-                onTap: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => ReviewPage()),
-                  );
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.food_bank_outlined),
-                title: const Text('Products'),
-                onTap: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => ProductsPage()),
-                  );
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.favorite_outline),
-                title: const Text('Favorites'),
-                onTap: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => FavoritesPage()),
-                  );
-                },
-              ),
-              ListTile(
                 leading: const Icon(Icons.logout),
                 title: const Text('Logout'),
                 onTap: () {
@@ -259,7 +199,10 @@ class _LeftDrawerState extends State<LeftDrawer> {
           leading: const Icon(Icons.star_border),
           title: const Text('Favorites'),
           onTap: () {
-            // Navigasi ke halaman Favorites
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const FavoritesPage()),
+            );
           },
         ),
         ListTile(
