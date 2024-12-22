@@ -166,24 +166,42 @@ class _MyProductsPageState extends State<MyProductsPage> {
                                           child: Column(
                                             children: <Widget>[
                                               ClipRRect(
-                                                borderRadius: const BorderRadius.all(Radius.circular(12)),
-                                                  child: SizedBox(
-                                                    height: 120,
-                                                    width: double.infinity,
-                                                    child: product.fields.productImage != null
-                                                        ? Image.network(
-                                                            product.fields.productImage!,
-                                                            fit: BoxFit.cover,
-                                                            errorBuilder: (context, error, stackTrace) {
-                                                              return const Center(child: Icon(Icons.image_not_supported));
-                                                            },
-                                                            loadingBuilder: (context, child, loadingProgress) {
-                                                              if (loadingProgress == null) return child;
-                                                              return const Center(child: CircularProgressIndicator());
-                                                            },
-                                                          )
-                                                        : const Center(child: Icon(Icons.image_not_supported)),
-                                                  ),
+                                                borderRadius: const BorderRadius.all(Radius.circular(16)),
+                                                child: Stack(
+                                                  children: [
+                                                    SizedBox(
+                                                      height: 180,
+                                                      width: double.infinity,
+                                                      child: product.fields.productImage != null && (product.fields.productImage?.isNotEmpty ?? false)
+                                                          ? Image.network(
+                                                              product.fields.productImage!,
+                                                              fit: BoxFit.cover,
+                                                              errorBuilder: (context, error, stackTrace) {
+                                                                return const Center(child: Icon(Icons.image_not_supported));
+                                                              },
+                                                              loadingBuilder: (context, child, loadingProgress) {
+                                                                if (loadingProgress == null) return child;
+                                                                return const Center(child: CircularProgressIndicator());
+                                                              },
+                                                            )
+                                                          : const Center(child: Icon(Icons.image_not_supported)),
+                                                    ),
+                                                    Container(
+                                                      height: 180,
+                                                      width: double.infinity,
+                                                      decoration: BoxDecoration(
+                                                        gradient: LinearGradient(
+                                                          colors: [
+                                                            Colors.black.withOpacity(0.6),
+                                                            Colors.transparent,
+                                                          ],
+                                                          begin: Alignment.bottomCenter,
+                                                          end: Alignment.topCenter,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                               const SizedBox(height: 10),
                                               Text(

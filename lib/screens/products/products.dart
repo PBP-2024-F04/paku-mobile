@@ -127,24 +127,22 @@ class ProductCard extends StatelessWidget {
             borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
             child: Stack(
               children: [
-                ClipRRect(
-                  child: SizedBox(
-                    height: 180,
-                    width: double.infinity,
-                    child: product.fields.productImage != null
-                        ? Image.network(
-                            product.fields.productImage!,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return const Center(child: Icon(Icons.image_not_supported));
-                            },
-                            loadingBuilder: (context, child, loadingProgress) {
-                              if (loadingProgress == null) return child;
-                              return const Center(child: CircularProgressIndicator());
-                            },
-                          )
-                        : const Center(child: Icon(Icons.image_not_supported)),
-                  ),
+                SizedBox(
+                  height: 180,
+                  width: double.infinity,
+                  child: product.fields.productImage != null
+                      ? Image.network(
+                          product.fields.productImage!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return const Center(child: Icon(Icons.image_not_supported));
+                          },
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return const Center(child: CircularProgressIndicator());
+                          },
+                        )
+                      : const Center(child: Icon(Icons.image_not_supported)),
                 ),
                 Container(
                   height: 180,
