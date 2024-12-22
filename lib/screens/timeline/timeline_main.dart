@@ -80,7 +80,7 @@ class _TimelineMainPageState extends State<TimelineMainPage> {
             child: RefreshIndicator(
               onRefresh: () async {
                 setState(() {
-                  _future = _fetchPosts(request);
+                  _future = _fetchPosts(request, query: _query);
                 });
               },
               child: Column(
