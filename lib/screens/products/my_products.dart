@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:paku/colors.dart'; 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -20,20 +19,16 @@ class _MyProductsPageState extends State<MyProductsPage> {
   late Future<List<Product>> _products;
 
   Future<List<Product>> fetchProducts(CookieRequest request) async {
-    // final request = context.watch<CookieRequest>();
-    String username = request.jsonData['username'] ?? "Tidak dikenal";
-
-    // Cetak nama pengguna di console
-    print("Pengguna yang sedang login: $username");
-    final response = await request.get("http://localhost:8000/products/my-products-api/${username}");
-    print(response.toString());
-    if (response['success']) {
-      print("======");
-      print(response['products']);
-      return productFromJson(jsonEncode(response['products']));
-    } else {
-      throw Exception(response['message'] ?? "Failed to fetch products.");
+    final response = await request.get("http://localhost:8000/products/my-products-flutter");
+    
+    List<Product> listProduct = [];
+    for (var d in response) {
+      if (d != null) {
+        listProduct.add(Product.fromJson(d));
+      }
     }
+
+    return listProduct;
   }
 
   Future<void> deleteProduct(CookieRequest request, String productId) async {
@@ -124,7 +119,6 @@ class _MyProductsPageState extends State<MyProductsPage> {
                     );
                   } else {
                     final products = snapshot.data!;
-                    print( products);
                     return SingleChildScrollView(
                       child: Column(
                         children: <Widget>[
@@ -173,13 +167,23 @@ class _MyProductsPageState extends State<MyProductsPage> {
                                             children: <Widget>[
                                               ClipRRect(
                                                 borderRadius: const BorderRadius.all(Radius.circular(12)),
-                                                child: SizedBox(
-                                                  height: 120,
-                                                  width: MediaQuery.of(context).size.width,
-                                                  child: product.fields.productImage != null
-                                                      ? Image.network(product.fields.productImage!, fit: BoxFit.cover)
-                                                      : const Placeholder(),
-                                                ),
+                                                  child: SizedBox(
+                                                    height: 120,
+                                                    width: double.infinity,
+                                                    child: product.fields.productImage != null
+                                                        ? Image.network(
+                                                            product.fields.productImage!,
+                                                            fit: BoxFit.cover,
+                                                            errorBuilder: (context, error, stackTrace) {
+                                                              return const Center(child: Icon(Icons.image_not_supported));
+                                                            },
+                                                            loadingBuilder: (context, child, loadingProgress) {
+                                                              if (loadingProgress == null) return child;
+                                                              return const Center(child: CircularProgressIndicator());
+                                                            },
+                                                          )
+                                                        : const Center(child: Icon(Icons.image_not_supported)),
+                                                  ),
                                               ),
                                               const SizedBox(height: 10),
                                               Text(
