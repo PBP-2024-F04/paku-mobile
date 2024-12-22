@@ -19,6 +19,7 @@ class _AddProductPageState extends State<AddProductPage> {
   int _price = 0;
   String _description = "";
   String _category = "";
+  String _productImage = "";
 
   void _addProduct(BuildContext context, CookieRequest request) async {
     final response = await request.postJson(
@@ -28,6 +29,7 @@ class _AddProductPageState extends State<AddProductPage> {
         "price": _price,
         "description": _description,
         "category": _category,
+        "productImage": _productImage,
       }),
     );
 
@@ -142,6 +144,19 @@ class _AddProductPageState extends State<AddProductPage> {
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return "Category cannot be empty!";
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                buildTextField(
+                  label: "Image URL",
+                  hint: "Enter a URL",
+                  onChanged: (value) => _productImage = value,
+                  validator: (value) {
+                    if (value != null && !Uri.parse(value).isAbsolute) {
+                      return "Invalid URL!";
                     }
                     return null;
                   },

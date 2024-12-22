@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:paku/screens/products/models/product.dart';
 import 'package:provider/provider.dart';
 import 'package:paku/colors.dart';
 import 'package:paku/widgets/left_drawer.dart';
@@ -7,7 +8,7 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 
 class EditProductPage extends StatefulWidget {
   final String productId;
-  final Map<String, dynamic> initialData;
+  final Product initialData;
 
   const EditProductPage({super.key, required this.productId, required this.initialData});
 
@@ -21,15 +22,17 @@ class _EditProductPageState extends State<EditProductPage> {
   late int _price;
   late String _description;
   late String _category;
+  late String _productImage;
 
   @override
   void initState() {
     super.initState();
     // Initialize fields with data passed from previous page
-    _productName = widget.initialData['product_name'] ?? "";
-    _price = widget.initialData['price'] ?? 0;
-    _description = widget.initialData['description'] ?? "";
-    _category = widget.initialData['category'] ?? "";
+    _productName = widget.initialData.fields.productName;
+    _price = widget.initialData.fields.price;
+    _description = widget.initialData.fields.description;
+    _category = widget.initialData.fields.category;
+    _productImage = widget.initialData.fields.productImage ?? "";
   }
 
   void _editProduct(BuildContext context, CookieRequest request) async {
@@ -41,6 +44,7 @@ class _EditProductPageState extends State<EditProductPage> {
           "price": _price,
           "description": _description,
           "category": _category,
+          "productImage": _productImage,
         }),
       );
 
@@ -159,6 +163,20 @@ class _EditProductPageState extends State<EditProductPage> {
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return "Category cannot be empty!";
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                buildTextField(
+                  label: "Image URL",
+                  hint: "Enter a URL",
+                  initialValue: _productImage,
+                  onChanged: (value) => _productImage = value,
+                  validator: (value) {
+                    if (value != null && !Uri.parse(value).isAbsolute) {
+                      return "Invalid URL!";
                     }
                     return null;
                   },

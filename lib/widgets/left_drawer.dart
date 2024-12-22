@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:paku/screens/promos/my_promos.dart';
 import 'package:paku/screens/reviews/merchant_reviews.dart';
 import 'package:paku/screens/products/my_products.dart';
 import 'package:paku/screens/profile/profile.dart';
 import 'package:provider/provider.dart';
 import 'package:paku/screens/accounts/login.dart';
 import 'package:paku/screens/accounts/home.dart';
-import 'package:paku/screens/promos/my_promos.dart';
 import 'package:paku/screens/promos/promos.dart';
 import 'package:paku/screens/reviews/reviews.dart';
 import 'package:paku/screens/products/products.dart';

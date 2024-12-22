@@ -35,6 +35,7 @@ class Fields {
     int price;
     String description;
     String category;
+    String? productImage;
 
     Fields({
         required this.user,
@@ -43,6 +44,7 @@ class Fields {
         required this.price,
         required this.description,
         required this.category,
+        required this.productImage,
     });
 
     factory Fields.fromJson(Map<String, dynamic> json) => Fields(
@@ -51,7 +53,8 @@ class Fields {
         restaurant: json["restaurant"],
         price: json["price"],
         description: json["description"],
-        category: json["category"]!,
+        category: json["category"],
+        productImage: json["product_image"],
     );
 
     Map<String, dynamic> toJson() => {
@@ -61,6 +64,7 @@ class Fields {
         "price": price,
         "description": description,
         "category": categoryValues.reverse[category],
+        "product_image": productImage,
     };
 }
 
