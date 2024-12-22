@@ -81,7 +81,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(15),
-                      child: widget.product.fields.productImage != null
+                      child: widget.product.fields.productImage != null && widget.product.fields.productImage!.isNotEmpty
                           ? Image.network(
                               widget.product.fields.productImage!,
                               fit: BoxFit.cover,

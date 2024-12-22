@@ -39,7 +39,7 @@ class MyProductDetailPage extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 20),
-                if (product.fields.productImage != null)
+                if (product.fields.productImage != null && product.fields.productImage!.isNotEmpty)
                   ClipRRect(
                     borderRadius: BorderRadius.circular(15),
                     child: Image.network(

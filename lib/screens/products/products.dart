@@ -132,7 +132,7 @@ class ProductCard extends StatelessWidget {
             child: SizedBox(
               height: 180,
               width: double.infinity,
-              child: product.fields.productImage != null
+              child: product.fields.productImage != null && product.fields.productImage!.isNotEmpty
                   ? Image.network(
                       product.fields.productImage!,
                       fit: BoxFit.cover,
