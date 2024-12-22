@@ -144,101 +144,101 @@ class _MyProductsPageState extends State<MyProductsPage> {
                           child: Stack(
                             children: [
                               Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        color: TailwindColors.whiteLightActive,
-        boxShadow: const [
-          BoxShadow(
-            color: TailwindColors.whiteActive,
-            blurRadius: 15.0,
-            spreadRadius: 0.5,
-            offset: Offset(3.0, 3.0),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-            child: SizedBox(
-              height: 180,
-              width: double.infinity,
-              child: product.fields.productImage != null
-                  ? Image.network(
-                      product.fields.productImage!,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return const Center(
-                          child: Icon(Icons.image_not_supported),
-                        );
-                      },
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return const Center(child: CircularProgressIndicator());
-                      },
-                    )
-                  : const Center(child: Icon(Icons.image_not_supported)),
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.all(12.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  product.fields.productName,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  product.fields.description,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: TailwindColors.whiteDarker,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Flexible(
-                      child: Text(
-                        product.fields.category,
-                        style: const TextStyle(
-                          color: TailwindColors.peachDefault,
-                          fontSize: 12,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    Flexible(
-                      child: Text(
-                        "Rp ${product.fields.price}",
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: TailwindColors.peachDarker,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    ),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(16),
+                                  color: TailwindColors.whiteLightActive,
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: TailwindColors.whiteActive,
+                                      blurRadius: 15.0,
+                                      spreadRadius: 0.5,
+                                      offset: Offset(3.0, 3.0),
+                                    ),
+                                  ],
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    ClipRRect(
+                                      borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                                      child: SizedBox(
+                                        height: 180,
+                                        width: double.infinity,
+                                        child: product.fields.productImage != null
+                                            ? Image.network(
+                                                product.fields.productImage!,
+                                                fit: BoxFit.cover,
+                                                errorBuilder: (context, error, stackTrace) {
+                                                  return const Center(
+                                                    child: Icon(Icons.image_not_supported),
+                                                  );
+                                                },
+                                                loadingBuilder: (context, child, loadingProgress) {
+                                                  if (loadingProgress == null) return child;
+                                                  return const Center(child: CircularProgressIndicator());
+                                                },
+                                              )
+                                            : const Center(child: Icon(Icons.image_not_supported)),
+                                      ),
+                                    ),
+                                    Container(
+                                      padding: const EdgeInsets.all(12.0),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          Text(
+                                            product.fields.productName,
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black,
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          const SizedBox(height: 5),
+                                          Text(
+                                            product.fields.description,
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              color: TailwindColors.whiteDarker,
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          const SizedBox(height: 10),
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: <Widget>[
+                                              Flexible(
+                                                child: Text(
+                                                  product.fields.category,
+                                                  style: const TextStyle(
+                                                    color: TailwindColors.peachDefault,
+                                                    fontSize: 12,
+                                                  ),
+                                                  overflow: TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                              Flexible(
+                                                child: Text(
+                                                  "Rp ${product.fields.price}",
+                                                  style: const TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: TailwindColors.peachDarker,
+                                                  ),
+                                                  overflow: TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                               Positioned(
                                 top: 8,
                                 right: 8,
@@ -337,10 +337,10 @@ class ProductDetailPage extends StatelessWidget {
                 const SizedBox(height: 20),
                 if (product.fields.productImage != null)
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(15),
                     child: Image.network(
                       product.fields.productImage!,
-                      height: 200,
+                      height: 300,
                       width: MediaQuery.of(context).size.width,
                       fit: BoxFit.cover,
                     ),
